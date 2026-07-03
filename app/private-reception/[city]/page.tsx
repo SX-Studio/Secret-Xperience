@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
+import { getCityEditorial, cityFaq } from '../../lib/cityContent'
 
 const CITIES: Record<string, string> = {
   brussels:    'Brussels',
@@ -112,8 +113,11 @@ export default async function PrivateReceptionCityPage({ params }: { params: { c
     ? [...new Set((listings ?? []).map(l => l.city).filter(Boolean))].sort()
     : []
 
-  const jsonLd = {
-    '@context': 'https://schema.org',
+  // City editorial + FAQ (city pages only)
+  const editorial = !isCountry ? getCityEditorial(slug, displayName) : null
+  const faq = !isCountry ? cityFaq(displayName, 'private reception host') : []
+
+  const itemList = {
     '@type': 'ItemList',
     name: `Private Reception in ${displayName}`,
     url: `https://www.secretxperience.eu/private-reception/${slug}`,
@@ -125,6 +129,18 @@ export default async function PrivateReceptionCityPage({ params }: { params: { c
       name: l.title,
     })),
   }
+  const graph: any[] = [itemList]
+  if (!isCountry && faq.length) {
+    graph.push({
+      '@type': 'FAQPage',
+      mainEntity: faq.map(f => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    })
+  }
+  const jsonLd = { '@context': 'https://schema.org', '@graph': graph }
 
   const S = {
     bg: '#050505', bg2: '#0e0e0e', t: '#ece8e1', t2: 'rgba(236,232,225,0.5)',
@@ -418,9 +434,27 @@ export default async function PrivateReceptionCityPage({ params }: { params: { c
           <h1 style={{ fontFamily: S.serif, fontSize: 'clamp(32px,5vw,52px)', fontWeight: 400, marginBottom: '0.5rem', lineHeight: 1.15 }}>
             Private Reception <em style={{ fontStyle: 'italic', color: S.gold }}>{displayName}</em>
           </h1>
-          <p style={{ fontSize: 14, color: S.t2, marginBottom: '2.5rem', maxWidth: 560, lineHeight: 1.7 }}>
+          <p style={{ fontSize: 14, color: S.t2, marginBottom: '1.25rem', maxWidth: 560, lineHeight: 1.7 }}>
             {listingCount} verified host{listingCount !== 1 ? 's' : ''} in {displayName}. Visit them at their own discreet location — companionship, massage and curated experiences.
           </p>
+
+          {editorial && (
+            <div style={{ maxWidth: 720, marginBottom: '2.5rem' }}>
+              <p style={{ fontSize: 15, color: S.t, lineHeight: 1.8, marginBottom: editorial.areas.length ? '1.25rem' : 0 }}>
+                {editorial.intro}
+              </p>
+              {editorial.areas.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: S.t2, marginBottom: '0.6rem' }}>Areas in {displayName}</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {editorial.areas.map(a => (
+                      <span key={a} className="pill-link" style={{ cursor: 'default' }}>{a}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {listingCount === 0 ? (
             <div style={{ textAlign: 'center', padding: '4rem 0', color: S.t2 }}>
@@ -453,6 +487,22 @@ export default async function PrivateReceptionCityPage({ params }: { params: { c
                 </Link>
               ))}
             </div>
+          )}
+
+          {faq.length > 0 && (
+            <section style={{ marginTop: '4rem', borderTop: `0.5px solid ${S.b}`, paddingTop: '2.5rem', maxWidth: 760 }}>
+              <h2 style={{ fontFamily: S.serif, fontSize: 'clamp(24px,4vw,34px)', fontWeight: 400, marginBottom: '1.75rem' }}>
+                Private reception in {displayName} — <em style={{ color: S.gold }}>your questions</em>
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                {faq.map(f => (
+                  <div key={f.q}>
+                    <h3 style={{ fontSize: 15, fontWeight: 600, color: S.t, marginBottom: '0.4rem' }}>{f.q}</h3>
+                    <p style={{ fontSize: 14, color: S.t2, lineHeight: 1.7 }}>{f.a}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
           )}
 
           <div style={{ marginTop: '4rem', borderTop: `0.5px solid ${S.b}`, paddingTop: '2rem' }}>

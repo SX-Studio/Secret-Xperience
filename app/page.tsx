@@ -5,6 +5,7 @@ import SliderAds from './components/SliderAds/SliderAds'
 import PremiumBanner from './components/PremiumBanner/PremiumBanner'
 import LiveBanner from './components/LiveBanner/LiveBanner'
 import CategoryAnimations from './components/CategoryAnimations/CategoryAnimations'
+import PartnersShowcase from './components/PartnersShowcase/PartnersShowcase'
 import DesignDemos from './components/DesignDemos'
 
 export default function Home() {
@@ -2646,6 +2647,9 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </main>
   </div>
 
+  <!-- ══ PARTNERS & LINKS (React portal — PartnersShowcase) ══ -->
+  <div id="partnersShowcaseMount"></div>
+
   <!-- ══ FOOTER ══ -->
   <footer style="background:var(--bg1);border-top:0.5px solid var(--b);padding:4rem 1.5rem 2rem;">
     <div style="max-width:1200px;margin:0 auto;">
@@ -3302,6 +3306,8 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <PremiumBanner placement="homepage" portalTo="homepagePremiumMount" />
       {/* GSAP slider ads — rendered as React portal anchored after #featuredBanner */}
       <SliderAds />
+      {/* Partners & Links band — portal into #partnersShowcaseMount above the footer */}
+      <PartnersShowcase />
       <DesignDemos />
     </>
   )

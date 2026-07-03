@@ -6,6 +6,7 @@ import PremiumBanner from './components/PremiumBanner/PremiumBanner'
 import LiveBanner from './components/LiveBanner/LiveBanner'
 import CategoryAnimations from './components/CategoryAnimations/CategoryAnimations'
 import PartnersShowcase from './components/PartnersShowcase/PartnersShowcase'
+import OnlyFansShowcase from './components/OnlyFansShowcase/OnlyFansShowcase'
 import DesignDemos from './components/DesignDemos'
 
 export default function Home() {
@@ -2647,6 +2648,9 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </main>
   </div>
 
+  <!-- ══ ONLYFANS CREATORS (React portal — OnlyFansShowcase) ══ -->
+  <div id="onlyfansShowcaseMount"></div>
+
   <!-- ══ PARTNERS & LINKS (React portal — PartnersShowcase) ══ -->
   <div id="partnersShowcaseMount"></div>
 
@@ -3306,6 +3310,8 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <PremiumBanner placement="homepage" portalTo="homepagePremiumMount" />
       {/* GSAP slider ads — rendered as React portal anchored after #featuredBanner */}
       <SliderAds />
+      {/* OnlyFans creator directory — portal into #onlyfansShowcaseMount above the partners band */}
+      <OnlyFansShowcase portalTo="onlyfansShowcaseMount" />
       {/* Partners & Links band — portal into #partnersShowcaseMount above the footer */}
       <PartnersShowcase />
       <DesignDemos />

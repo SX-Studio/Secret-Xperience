@@ -4,6 +4,7 @@ import Link from 'next/link'
 import CreatorsGrid from './CreatorsGrid'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
 import CreatorFeed from './CreatorFeed'
+import OnlyFansShowcase from '../components/OnlyFansShowcase/OnlyFansShowcase'
 
 export async function generateMetadata() {
   return {
@@ -133,6 +134,11 @@ export default async function CreatorsPage() {
               </Link>
             </div>
             <CreatorFeed posts={posts} />
+          </div>
+
+          {/* OnlyFans creator directory — shared with homepage, data in app/data/onlyfans.ts */}
+          <div style={{ margin: '0 -1.5rem 3rem' }}>
+            <OnlyFansShowcase />
           </div>
 
           {allListings.length > 0 && (

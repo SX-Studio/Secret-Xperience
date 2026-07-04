@@ -9,6 +9,32 @@ import { ONLYFANS_GROUPS, ONLYFANS_TOTAL } from '../../data/onlyfans'
 // pass portalTo) — same pattern as PremiumBanner/PartnersShowcase.
 const OF_BLUE = '#00aeef'
 
+// Avatar next to each link: tries /onlyfans/<handle>.jpg from /public (drop the
+// creator's photo there — filename = handle with dots/dashes as-is). Until the
+// file exists it falls back to an initials monogram. OnlyFans avatars cannot be
+// hotlinked or fetched programmatically (authenticated API, bot protection).
+function OFAvatar({ name, handle }: { name: string; handle: string }) {
+  const [failed, setFailed] = useState(false)
+  const initials = name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase()
+  if (failed) {
+    return (
+      <span aria-hidden="true" style={{ width: 26, height: 26, borderRadius: '50%', flexShrink: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, rgba(0,174,239,0.35), rgba(0,116,190,0.55))', border: '1px solid rgba(0,174,239,0.45)', color: '#eaf7ff', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.02em' }}>
+        {initials}
+      </span>
+    )
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`/onlyfans/${handle}.jpg`}
+      alt=""
+      loading="lazy"
+      onError={() => setFailed(true)}
+      style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '1px solid rgba(0,174,239,0.45)', background: 'rgba(0,174,239,0.12)' }}
+    />
+  )
+}
+
 export default function OnlyFansShowcase({ portalTo }: { portalTo?: string }) {
   const [mountEl, setMountEl] = useState<HTMLElement | null>(null)
 
@@ -19,9 +45,8 @@ export default function OnlyFansShowcase({ portalTo }: { portalTo?: string }) {
   const body = (
     <section aria-label="OnlyFans creators" style={{ background: 'var(--bg1, #0a090c)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderLeft: 'none', borderRight: 'none', padding: '3rem 1.5rem 2.5rem' }}>
       <style>{`
-        .ofx-chip { display:inline-flex; align-items:center; gap:7px; padding:8px 14px; background:var(--bg2, rgba(255,255,255,0.03)); border:0.5px solid rgba(0,174,239,0.22); border-radius:20px; color:var(--t, #ece8e1); font:500 12.5px var(--sans, 'Poppins', sans-serif); text-decoration:none; white-space:nowrap; transition:border-color .15s, background .15s, transform .12s; }
+        .ofx-chip { display:inline-flex; align-items:center; gap:8px; padding:5px 14px 5px 6px; background:var(--bg2, rgba(255,255,255,0.03)); border:0.5px solid rgba(0,174,239,0.22); border-radius:20px; color:var(--t, #ece8e1); font:500 12.5px var(--sans, 'Poppins', sans-serif); text-decoration:none; white-space:nowrap; transition:border-color .15s, background .15s, transform .12s; }
         .ofx-chip:hover { border-color:rgba(0,174,239,0.6); background:rgba(0,174,239,0.08); transform:translateY(-1px); }
-        .ofx-chip .ofx-dot { width:7px; height:7px; border-radius:50%; background:${OF_BLUE}; box-shadow:0 0 8px rgba(0,174,239,0.6); flex-shrink:0; }
         .ofx-chip .ofx-ext { font-size:10px; color:var(--t3, rgba(255,255,255,0.3)); }
         .ofx-group { margin-bottom:1.4rem; }
         .ofx-group-label { display:flex; align-items:center; gap:8px; font:700 10px var(--sans, 'Poppins',sans-serif); letter-spacing:.14em; text-transform:uppercase; color:rgba(0,174,239,0.75); margin-bottom:0.65rem; }
@@ -58,7 +83,7 @@ export default function OnlyFansShowcase({ portalTo }: { portalTo?: string }) {
             <div className="ofx-chips">
               {group.items.map(c => (
                 <a key={c.handle} href={c.url} target="_blank" rel="noopener noreferrer nofollow" className="ofx-chip" title={`@${c.handle} on OnlyFans`}>
-                  <span className="ofx-dot" />
+                  <OFAvatar name={c.name} handle={c.handle} />
                   {c.name}
                   <i className="ti ti-external-link ofx-ext" aria-hidden="true" />
                 </a>

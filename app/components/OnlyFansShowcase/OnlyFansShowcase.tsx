@@ -73,6 +73,32 @@ export default function OnlyFansShowcase({ portalTo }: { portalTo?: string }) {
           </a>
         </div>
 
+        {/* Featured photo cards — creators flagged `featured` with a photo in /public/onlyfans/ */}
+        {(() => {
+          const featured = ONLYFANS_GROUPS.flatMap(g => g.items.filter(c => c.featured))
+          if (!featured.length) return null
+          return (
+            <div className="ofx-group">
+              <div className="ofx-group-label">
+                <span style={{ fontSize: 14, letterSpacing: 0 }}>✦</span>
+                Featured
+                <span style={{ color: 'var(--t3, rgba(255,255,255,0.2))', fontWeight: 400 }}>{featured.length}</span>
+              </div>
+              <div className="ofx-chips">
+                {featured.map(c => (
+                  <a key={`feat-${c.handle}`} href={c.url} target="_blank" rel="noopener noreferrer nofollow" title={`@${c.handle} on OnlyFans`}
+                     style={{ display: 'block', width: 160, height: 160, borderRadius: 14, overflow: 'hidden', border: '1px solid rgba(0,174,239,0.35)', boxShadow: '0 6px 24px rgba(0,0,0,0.45)', flexShrink: 0, transition: 'transform .15s, border-color .15s' }}
+                     onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(0,174,239,0.8)' }}
+                     onMouseOut={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.borderColor = 'rgba(0,174,239,0.35)' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={`/onlyfans/${c.handle}.jpg`} alt={c.name} loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  </a>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
+
         {ONLYFANS_GROUPS.map(group => (
           <div key={group.id} className="ofx-group">
             <div className="ofx-group-label">

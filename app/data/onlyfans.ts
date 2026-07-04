@@ -6,6 +6,8 @@ export interface OFCreator {
   name: string
   handle: string
   url: string
+  /** Show as a large clickable photo card (requires /public/onlyfans/<handle>.jpg). */
+  featured?: boolean
 }
 
 export interface OFGroup {
@@ -21,7 +23,7 @@ export const ONLYFANS_GROUPS: OFGroup[] = [
     label: 'België',
     flag: '🇧🇪',
     items: [
-      { name: 'Barbii Pinkii', handle: 'barbiipinkii', url: 'https://onlyfans.com/barbiipinkii' },
+      { name: 'Nannaagirlii', handle: 'barbiipinkii', url: 'https://onlyfans.com/barbiipinkii', featured: true },
       { name: 'Sabrina', handle: 'sabrinack', url: 'https://onlyfans.com/sabrinack' },
       { name: 'Elise Luna', handle: 'elise_luna7', url: 'https://onlyfans.com/elise_luna7' },
       { name: 'Gigi Max', handle: 'gigimaxofficial', url: 'https://onlyfans.com/gigimaxofficial' },

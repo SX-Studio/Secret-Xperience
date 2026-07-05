@@ -29,7 +29,7 @@ export const ONLYFANS_GROUPS: OFGroup[] = [
       { name: 'Gigi Max 🍒', handle: 'gigimaxofficial', url: 'https://onlyfans.com/gigimaxofficial', featured: true },
       { name: 'Call of Booty 🍑', handle: 'baddiemi', url: 'https://onlyfans.com/baddiemi?rec=89521844', featured: true },
       { name: 'KimberlyX', handle: 'kimberlyxxxxxxxx', url: 'https://onlyfans.com/kimberlyxxxxxxxx', featured: true },
-      { name: 'Fetilicious', handle: 'mfetilicious', url: 'https://onlyfans.com/mfetilicious' },
+      { name: 'Miss Fetilicious', handle: 'mfetilicious', url: 'https://onlyfans.com/mfetilicious', featured: true },
       { name: 'Yuki 🔥', handle: 'yuki.nky', url: 'https://onlyfans.com/yuki.nky', featured: true },
       { name: 'Kayleigh Wonder', handle: 'kayleigh.wonder', url: 'https://onlyfans.com/kayleigh.wonder' },
       { name: 'Curvy Geek', handle: 'curvygeekvip', url: 'https://onlyfans.com/curvygeekvip' },

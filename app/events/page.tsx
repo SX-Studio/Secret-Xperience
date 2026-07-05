@@ -172,6 +172,58 @@ export default function EventsPage() {
         </div>
       </div>
 
+      {/* ══ ERO-EXPO SHOWCASE — Belgium's biggest erotica fair, tickets via fairtix ══ */}
+      {(country === 'All' || country === 'Belgium') && (category === 'All' || category === 'lifestyle') && (
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem 0' }}>
+          <section aria-label="ERO-EXPO tickets" style={{ position: 'relative', overflow: 'hidden', borderRadius: 20, border: '1px solid rgba(255,46,204,0.45)', background: '#0a0a0c', boxShadow: '0 14px 44px rgba(0,0,0,0.55)' }}>
+            {/* background: model image right + dark fade */}
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(120deg,#0a0a0c 0%,#141216 60%,#0a0a0c 100%)' }} />
+            <img src="/events/ero-expo-model.png" alt="" aria-hidden="true" style={{ position: 'absolute', right: 0, bottom: 0, height: '115%', maxWidth: '52%', objectFit: 'contain', objectPosition: 'bottom right', opacity: 0.55, pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(10,10,12,0.92) 35%, rgba(10,10,12,0.35) 75%, rgba(10,10,12,0.75) 100%)' }} />
+
+            <div style={{ position: 'relative', padding: 'clamp(1.5rem,4vw,2.75rem)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 18, flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+                <img src="/events/ero-expo-logo.png" alt="ERO-EXPO" style={{ width: 84, height: 84, borderRadius: 14, objectFit: 'cover', border: '1px solid rgba(255,46,204,0.4)' }} />
+                <div>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.22em', color: '#ff2ecc', textTransform: 'uppercase', marginBottom: 6 }}>ERO-EXPO · Erotica Fair · 🇧🇪 België</div>
+                  <div style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(22px,3.4vw,34px)', fontWeight: 400, lineHeight: 1.1, color: '#fff' }}>
+                    The most sensual <em style={{ fontStyle: 'italic', color: '#ff2ecc' }}>event of Belgium</em>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 14, maxWidth: 880 }}>
+                {[
+                  { title: 'ERO-EXPO ANTWERP', date: '09–11 October 2026', venue: 'Antwerp Expo' },
+                  { title: 'ERO-EXPO HASSELT', date: '06–08 November 2026', venue: 'Trixxo Arena' },
+                  { title: 'ERO-EXPO ANTWERP', date: '13–14 February 2027', venue: 'Antwerp Expo' },
+                ].map((ev, i) => (
+                  <a key={i} href="https://ero-expo.fairtix.io/" target="_blank" rel="noopener noreferrer nofollow" style={{ display: 'block', background: 'rgba(16,14,18,0.92)', border: '1.5px solid #ff2ecc', borderRadius: 16, padding: '1.1rem 1.2rem', textDecoration: 'none', transition: 'transform .15s, box-shadow .2s', boxShadow: '0 0 0 rgba(255,46,204,0)' }}
+                     onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(255,46,204,0.25)' }}
+                     onMouseOut={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 0 0 rgba(255,46,204,0)' }}>
+                    <div style={{ fontSize: 14.5, fontWeight: 700, color: '#fff', letterSpacing: '0.03em', marginBottom: 3 }}>{ev.title}</div>
+                    <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.08em', color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginBottom: 12 }}>{ev.date} · {ev.venue}</div>
+                    <div style={{ marginBottom: 12 }}>
+                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', verticalAlign: 'top' }}>€</span>
+                      <span style={{ fontSize: 30, fontWeight: 700, color: '#eee', lineHeight: 1 }}>27,50</span>
+                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', marginLeft: 6 }}>From</span>
+                    </div>
+                    <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.14)', paddingTop: 10, marginBottom: 14 }}>
+                      {['Standard Ticket', 'BDSM Ticket', 'Couples Club ticket', 'Singles Club'].map(t => (
+                        <div key={t} style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 12.5, color: 'rgba(255,255,255,0.7)', padding: '3px 0' }}>
+                          <i className="ti ti-circle-check" style={{ color: '#ff2ecc', fontSize: 14 }} /> {t}
+                        </div>
+                      ))}
+                    </div>
+                    <span style={{ display: 'block', textAlign: 'center', padding: '10px 0', background: '#ff2ecc', borderRadius: 8, color: '#fff', fontSize: 13.5, fontWeight: 700, letterSpacing: '0.02em' }}>Buy tickets</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
       {/* CONTENT */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>
         {loading ? (

@@ -4,7 +4,7 @@
 export interface BizLink {
   name: string
   tagline: string
-  url: string           // real URL (replace with affiliate/tracking link when active)
+  url: string           // real URL (replace with affiliate/tracking link when active); '' = no website known yet, renders unlinked
   network?: string      // affiliate network, if applicable
   badge?: string
   emoji: string
@@ -75,6 +75,38 @@ export const PARTNER_SECTIONS: PartnerSection[] = [
       { name: 'Désiré Lounge Brussels', emoji: '🌙', tagline: 'Private members club in Brussels. Discreet, premium experience. Cross-referral with escort listings.', url: 'https://www.desirelounge.be' },
       { name: 'Club NV Amsterdam', emoji: '💫', tagline: 'Amsterdam premium night venue. Well-established clientele overlap with escort/companion services.', url: 'https://www.clubnv.nl' },
       { name: 'Moulin Rouge Brussels', emoji: '🎭', tagline: 'Classic Brussels adult entertainment. Evening shows and private arrangements. Link exchange opportunity.', url: 'https://www.moulinrouge.be' },
+    ],
+  },
+
+  {
+    id: 'nightlife-uk',
+    title: 'Adult Clubs — United Kingdom',
+    emoji: '🇬🇧',
+    description: 'Swingers clubs, naturist venues and adult members clubs across the United Kingdom.',
+    items: [
+      { name: 'The Phoenix Club', emoji: '🦅', tagline: 'Members club — Paddington, London.', url: 'https://phoenixartsclub.com/' },
+      { name: 'Quest Swingers Club', emoji: '🗝️', tagline: 'Swingers club — Hunslet, Leeds.', url: 'https://questswingersclub.co.uk/' },
+      { name: 'Ignite Heathrow', emoji: '🔥', tagline: 'Swingers club — Heathrow, London.', url: 'https://club-ignite.co.uk/' },
+      { name: 'Penthouse Playrooms', emoji: '🏙️', tagline: 'Adult playrooms — Dunstable.', url: 'https://penthouseplayrooms.com/' },
+      { name: 'Cupids Swingers Club', emoji: '💘', tagline: 'Swingers club — Swinton, Manchester.', url: 'https://www.cupidsswingersclub.co.uk/' },
+      { name: 'DECADANCE Rochdale', emoji: '🥂', tagline: 'Swingers club — Rochdale.', url: 'https://www.decadanceswingersclub.com/' },
+      { name: 'Eureka Naturist Club', emoji: '🌞', tagline: 'Naturist club — Longfield, Kent.', url: 'https://eurekanaturistclub.co.uk/' },
+      { name: 'Infusion Swinger Club', emoji: '🌊', tagline: 'Swingers club — Blackpool.', url: 'https://www.infusionblackpool.co.uk/' },
+      { name: 'Jaydees', emoji: '🍸', tagline: 'Swingers club — Bedfordshire.', url: 'https://www.jaydeesclub.com/' },
+      { name: 'Le Boudoir', emoji: '🎭', tagline: 'Upscale swingers club — London.', url: 'http://www.theboudoirclub.com/' },
+      { name: 'Liberty Elite', emoji: '👑', tagline: 'Lifestyle club — Lutterworth, Leicestershire.', url: 'https://libertyelite.co.uk/' },
+      { name: 'Our Place 4 Fun', emoji: '🏡', tagline: 'Private adult club — Greater London.', url: 'https://ourplace4fun.com/' },
+      { name: 'Pleasures in Kent', emoji: '🌹', tagline: 'Swingers club — Maidstone, Kent.', url: 'https://pleasures-in-kent.co.uk/' },
+      { name: 'Purple Mamba Club', emoji: '🐍', tagline: 'Adult club — Nottinghamshire.', url: 'https://www.purplemambaclub.com/' },
+      { name: "Rio's Naturist Club", emoji: '🌴', tagline: 'Naturist spa & club — Greater London.', url: 'https://www.rios.co.uk/' },
+      { name: 'Route69', emoji: '🛣️', tagline: 'Swingers club — Weston-super-Mare.', url: 'https://route69-wsm.co.uk/the-club' },
+      { name: 'Shhh Swingers Club', emoji: '🤫', tagline: 'Swingers club — Newcastle upon Tyne.', url: 'https://shhhnewcastleswingers.club/' },
+      { name: 'Slap Stick Club', emoji: '🎬', tagline: 'Fetish & kink club — London.', url: '' },
+      { name: 'Temptations', emoji: '😈', tagline: 'Swingers club — Bournemouth.', url: '' },
+      { name: 'Townhouse International', emoji: '🏛️', tagline: 'Swingers, fetish & LGBTQ+ club — Birkenhead, Wirral.', url: 'https://townhouseswingers.com/' },
+      { name: 'V2V', emoji: '✌️', tagline: 'Swingers club — Nuneaton.', url: '' },
+      { name: 'Vanilla Alternative', emoji: '🍦', tagline: 'Swingers club & hotel — Tempsford, Bedfordshire.', url: '' },
+      { name: 'Vault72', emoji: '🔐', tagline: 'Alternative & kink bar — Plymouth, Devon.', url: 'https://www.vault72.com/' },
     ],
   },
 
@@ -225,5 +257,5 @@ export const PARTNER_BADGE: Record<string, { bg: string; color: string; border: 
   'Industry Standard':{ bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)', border: 'rgba(255,255,255,0.15)' },
 }
 
-export const PARTNER_INDUSTRY_IDS  = ['sexshops','webcam','premium-content','nightlife-venues','massage','directories','industry-services']
+export const PARTNER_INDUSTRY_IDS  = ['sexshops','webcam','premium-content','nightlife-venues','nightlife-uk','massage','directories','industry-services']
 export const PARTNER_LIFESTYLE_IDS = ['lingerie','privacy','beauty','creator','travel','finance','wellness']

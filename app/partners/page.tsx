@@ -115,9 +115,13 @@ export default function PartnersPage() {
                     </div>
                     <p style={{ fontSize:11, color:'rgba(255,255,255,0.45)', lineHeight:1.65, flex:1 }}>{p.tagline}</p>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:6 }}>
-                      <a href={p.url} target="_blank" rel="noopener noreferrer nofollow" className="p-visit">
-                        {new URL(p.url).hostname.replace('www.','')} <i className="ti ti-external-link" style={{ fontSize:10 }} />
-                      </a>
+                      {p.url ? (
+                        <a href={p.url} target="_blank" rel="noopener noreferrer nofollow" className="p-visit">
+                          {new URL(p.url).hostname.replace('www.','')} <i className="ti ti-external-link" style={{ fontSize:10 }} />
+                        </a>
+                      ) : (
+                        <span className="p-visit" style={{ opacity: 0.45, cursor: 'default' }}>website coming soon</span>
+                      )}
                       {p.network && (
                         <span style={{ fontSize:9, color:'rgba(255,255,255,0.18)', fontFamily:"'Poppins',sans-serif" }}>
                           via {p.network}
@@ -172,9 +176,13 @@ export default function PartnersPage() {
                     </div>
                     <p style={{ fontSize:11, color:'rgba(255,255,255,0.45)', lineHeight:1.65, flex:1 }}>{p.tagline}</p>
                     <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:6 }}>
-                      <a href={p.url} target="_blank" rel="noopener noreferrer nofollow" className="p-visit">
-                        {new URL(p.url).hostname.replace('www.','')} <i className="ti ti-external-link" style={{ fontSize:10 }} />
-                      </a>
+                      {p.url ? (
+                        <a href={p.url} target="_blank" rel="noopener noreferrer nofollow" className="p-visit">
+                          {new URL(p.url).hostname.replace('www.','')} <i className="ti ti-external-link" style={{ fontSize:10 }} />
+                        </a>
+                      ) : (
+                        <span className="p-visit" style={{ opacity: 0.45, cursor: 'default' }}>website coming soon</span>
+                      )}
                       {p.network && (
                         <span style={{ fontSize:9, color:'rgba(255,255,255,0.18)', fontFamily:"'Poppins',sans-serif" }}>
                           via {p.network}

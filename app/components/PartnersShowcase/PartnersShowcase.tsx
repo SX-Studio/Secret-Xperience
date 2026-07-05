@@ -65,13 +65,18 @@ export default function PartnersShowcase() {
             <div className="psx-chips">
               {section.items.map(p => {
                 const bs = p.badge ? PARTNER_BADGE[p.badge] : null
-                return (
-                  <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer nofollow" className="psx-chip" title={p.tagline}>
+                const inner = (
+                  <>
                     <span style={{ fontSize: 14 }}>{p.emoji}</span>
                     {p.name}
                     {bs && <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '.06em', padding: '2px 6px', borderRadius: 20, background: bs.bg, color: bs.color, border: `0.5px solid ${bs.border}` }}>{p.badge}</span>}
-                    <i className="ti ti-external-link psx-ext" aria-hidden="true" />
-                  </a>
+                    {p.url && <i className="ti ti-external-link psx-ext" aria-hidden="true" />}
+                  </>
+                )
+                return p.url ? (
+                  <a key={p.name} href={p.url} target="_blank" rel="noopener noreferrer nofollow" className="psx-chip" title={p.tagline}>{inner}</a>
+                ) : (
+                  <span key={p.name} className="psx-chip" title={p.tagline} style={{ cursor: 'default' }}>{inner}</span>
                 )
               })}
             </div>

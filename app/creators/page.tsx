@@ -144,6 +144,16 @@ export default async function CreatorsPage() {
           {allListings.length > 0 && (
             <h2 style={{ fontFamily: 'var(--serif)', fontSize: '24px', fontWeight: 400, margin: '0 0 1.25rem' }}>Book a creator</h2>
           )}
+
+          {/* Creator link card — Cassie Redstarr (allmylinks) */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: '1.5rem' }}>
+            <a href="https://allmylinks.com/cassie-redstarr" target="_blank" rel="noopener noreferrer nofollow" title="Cassie Redstarr — all links"
+               style={{ display: 'block', width: 200, height: 200, borderRadius: 14, overflow: 'hidden', position: 'relative', border: '0.5px solid rgba(197,160,90,0.4)', boxShadow: '0 8px 28px rgba(0,0,0,0.45)', flexShrink: 0 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/promos/cassie-redstarr.jpg" alt="Cassie Redstarr" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              <span style={{ position: 'absolute', top: 10, left: 10, padding: '4px 10px', background: 'rgba(197,160,90,0.92)', borderRadius: 20, color: '#0a0a0a', fontSize: 9.5, fontWeight: 700, letterSpacing: '0.08em' }}>ALL LINKS</span>
+            </a>
+          </div>
           <PremiumBanner placement="section" category="creators" />
           <CreatorsGrid listings={allListings} />
 

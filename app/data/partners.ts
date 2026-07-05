@@ -101,8 +101,6 @@ export const PARTNER_SECTIONS: PartnerSection[] = [
       { name: "Rio's Naturist Club", emoji: '🌴', tagline: 'Naturist spa & club — Greater London.', url: 'https://www.rios.co.uk/' },
       { name: 'Route69', emoji: '🛣️', tagline: 'Swingers club — Weston-super-Mare.', url: 'https://route69-wsm.co.uk/the-club' },
       { name: 'Shhh Swingers Club', emoji: '🤫', tagline: 'Swingers club — Newcastle upon Tyne.', url: 'https://shhhnewcastleswingers.club/' },
-      { name: 'Slap Stick Club', emoji: '🎬', tagline: 'Fetish & kink club — London.', url: '' },
-      { name: 'Temptations', emoji: '😈', tagline: 'Swingers club — Bournemouth.', url: '' },
       { name: 'Townhouse International', emoji: '🏛️', tagline: 'Swingers, fetish & LGBTQ+ club — Birkenhead, Wirral.', url: 'https://townhouseswingers.com/' },
       { name: 'V2V', emoji: '✌️', tagline: 'Swingers club — Nuneaton.', url: 'https://v2v.uk/' },
       { name: 'Vanilla Alternative', emoji: '🍦', tagline: 'Swingers club & hotel — Tempsford, Bedfordshire.', url: 'https://va2.co.uk/' },

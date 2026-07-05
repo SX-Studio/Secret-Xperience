@@ -633,6 +633,48 @@ export default async function NightlifePage() {
         <PremiumBanner placement="section" category="nightlife" />
       </div>
       <NightlifeGrid listings={listings} />
+
+      {/* ══ Brussels & Antwerp venue directory — clubs, bars & massage salons ══ */}
+      <section aria-label="Brussels and Antwerp venues" style={{ maxWidth: 1200, margin: '0 auto', padding: '3rem 1.5rem 5rem' }}>
+        <p style={{ fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.55)', marginBottom: 8 }}>✦ Venues · 🇧🇪 België</p>
+        <h2 style={{ fontFamily: "var(--serif, 'Cormorant Garamond', serif)", fontSize: 'clamp(22px,3vw,32px)', fontWeight: 400, lineHeight: 1.15, margin: '0 0 8px' }}>
+          Brussel &amp; Antwerpen — <em style={{ color: '#c5a05a', fontStyle: 'italic' }}>Clubs, Bars &amp; Salons</em>
+        </h2>
+        <p style={{ fontSize: 13, color: 'var(--t2, rgba(255,255,255,0.45))', maxWidth: 560, lineHeight: 1.7, marginBottom: '1.75rem' }}>
+          Gentlemen&apos;s clubs, private bars and erotic massage salons in and around Brussels &amp; Antwerp — each linking to their own site.
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 12 }}>
+          {[
+            { emoji: '🥃', name: 'Club Amnesia', desc: 'Gentlemen’s club & bar.', url: 'http://www.clubamnesia.be' },
+            { emoji: '🌺', name: 'Anna Berry — Salon Louise', desc: 'Tantric massage centre — Louise district, Brussels.', url: 'http://annaberry.be/en/salon-louise/' },
+            { emoji: '🌸', name: 'Anna Berry — Salon Schuman', desc: 'Tantric massage centre — EU quarter, Brussels.', url: 'https://annaberry.be/en/salon-schuman/' },
+            { emoji: '💫', name: 'Massage Aphrodite', desc: 'Erotic massage centre — Brussels.', url: 'http://www.massageaphrodite.be/en/our-center' },
+            { emoji: '💦', name: 'Aqua Massage & Sauna', desc: 'Massage & private sauna.', url: 'http://www.aquamassagesauna.com/site/welkom-en/' },
+            { emoji: '🕉️', name: 'BoKarma', desc: 'Tantric massage salon — Brussels.', url: 'https://www.bokarma.be/' },
+            { emoji: '🌹', name: 'Clara Moore', desc: 'Erotic massage salon — Brussels.', url: 'http://en.claramoore.be/' },
+            { emoji: '🐎', name: 'Funny Horse', desc: 'Club & bar — Brussels.', url: 'http://www.funnyhorse.be/' },
+            { emoji: '🌿', name: 'Jardins Secrets', desc: 'Massage centre — Machelen (1830).', url: 'http://www.jardins-secret.be/fr/centre-massage-1830' },
+            { emoji: '🛁', name: 'Le Hammam', desc: 'Private hammam & massage — Brussels.', url: 'https://www.lehammam.be/' },
+            { emoji: '👑', name: 'Euro VIP', desc: 'Private VIP club.', url: 'http://www.euro-vip.com/home_2009.php' },
+            { emoji: '🌀', name: 'Vertigo Brussels Massage', desc: 'Erotic massage — Brussels.', url: 'http://vertigobrusselsmassage.be/' },
+            { emoji: '🍯', name: 'Sweetness Massage', desc: 'Tantric massage salon — Brussels.', url: 'http://www.sweetness-massage.be/' },
+            { emoji: '✨', name: 'Abilux', desc: 'Private club.', url: 'http://abilux.be/' },
+            { emoji: '🍷', name: 'Love Bar Room', desc: 'Love bar & private rooms.', url: 'https://love-bar-room.be/' },
+          ].map(v => (
+            <a key={v.name} href={v.url} target="_blank" rel="noopener noreferrer nofollow" style={{ display: 'flex', flexDirection: 'column', gap: 8, background: 'var(--bg1, #0e0c12)', border: '0.5px solid rgba(197,160,90,0.22)', borderRadius: 12, padding: '1rem 1.1rem', textDecoration: 'none', transition: 'border-color .2s, transform .15s' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <span style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(197,160,90,0.08)', border: '0.5px solid rgba(197,160,90,0.25)', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0 }}>{v.emoji}</span>
+                <span style={{ fontFamily: "var(--serif, 'Cormorant Garamond', serif)", fontSize: 17, color: 'var(--t, #ece8e1)', lineHeight: 1.2 }}>{v.name}</span>
+              </div>
+              <span style={{ fontSize: 12, color: 'var(--t2, rgba(255,255,255,0.45))', lineHeight: 1.6, flex: 1 }}>{v.desc}</span>
+              <span style={{ alignSelf: 'flex-start', padding: '6px 14px', border: '0.5px solid rgba(197,160,90,0.35)', borderRadius: 8, color: '#c5a05a', fontSize: 11.5, fontWeight: 600, letterSpacing: '0.03em' }}>Visit website ↗</span>
+            </a>
+          ))}
+        </div>
+        <p style={{ fontSize: 10.5, color: 'var(--t3, rgba(255,255,255,0.25))', marginTop: '1.25rem' }}>
+          Independent third-party venues (18+). Opening hours and services on their own sites.
+        </p>
+      </section>
     </>
   )
 }

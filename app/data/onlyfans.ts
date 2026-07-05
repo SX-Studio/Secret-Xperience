@@ -31,7 +31,7 @@ export const ONLYFANS_GROUPS: OFGroup[] = [
       { name: 'KimberlyX', handle: 'kimberlyxxxxxxxx', url: 'https://onlyfans.com/kimberlyxxxxxxxx', featured: true },
       { name: 'Miss Fetilicious', handle: 'mfetilicious', url: 'https://onlyfans.com/mfetilicious', featured: true },
       { name: 'Yuki 🔥', handle: 'yuki.nky', url: 'https://onlyfans.com/yuki.nky', featured: true },
-      { name: 'Kayleigh Wonder', handle: 'kayleigh.wonder', url: 'https://onlyfans.com/kayleigh.wonder' },
+      { name: 'Kayleigh Wonder', handle: 'kayleigh.wonder', url: 'https://onlyfans.com/kayleigh.wonder', featured: true },
       { name: 'Curvy Geek', handle: 'curvygeekvip', url: 'https://onlyfans.com/curvygeekvip' },
       { name: 'Our Deepest Secrets', handle: 'ourdeepest_secrets', url: 'https://onlyfans.com/ourdeepest_secrets' },
       { name: 'Lisa Wildlove', handle: 'lisawildlove', url: 'https://onlyfans.com/lisawildlove?rec=89521844' },

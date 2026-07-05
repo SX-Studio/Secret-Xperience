@@ -2695,6 +2695,14 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <img src="/promos/f2f.jpg" alt="F2F — friends2follow" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left center;" />
       <span style="position:absolute;left:0;right:0;bottom:0;padding:22px 10px 8px;background:linear-gradient(to top,rgba(10,8,18,0.9),transparent);color:#fff;font:600 11.5px var(--sans);text-align:center;letter-spacing:0.05em;">F2F.com ↗</span>
     </a>
+    <a href="https://4based.com/login" target="_blank" rel="noopener noreferrer nofollow" aria-label="4based creator platform" style="display:block;width:220px;min-height:120px;flex-shrink:0;border:0.5px solid rgba(234,88,54,0.45);border-radius:16px;overflow:hidden;position:relative;box-shadow:0 10px 34px rgba(0,0,0,0.45);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='rgba(240,120,80,0.85)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(234,88,54,0.45)';this.style.transform=''">
+      <img src="/promos/4based.jpg" alt="4based" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:right center;" />
+      <span style="position:absolute;left:0;right:0;bottom:0;padding:22px 10px 8px;background:linear-gradient(to top,rgba(10,8,10,0.9),transparent);color:#fff;font:600 11.5px var(--sans);text-align:center;letter-spacing:0.05em;">4based.com ↗</span>
+    </a>
+    <a href="https://creatorhub.fansly.com/" target="_blank" rel="noopener noreferrer nofollow" aria-label="Fansly Creator Hub" style="display:block;width:220px;min-height:120px;flex-shrink:0;border:0.5px solid rgba(45,136,255,0.45);border-radius:16px;overflow:hidden;position:relative;box-shadow:0 10px 34px rgba(0,0,0,0.45);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='rgba(90,170,255,0.85)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(45,136,255,0.45)';this.style.transform=''">
+      <img src="/promos/fansly-creatorhub.jpg" alt="Fansly Creator Hub" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left center;" />
+      <span style="position:absolute;left:0;right:0;bottom:0;padding:22px 10px 8px;background:linear-gradient(to top,rgba(8,10,16,0.9),transparent);color:#fff;font:600 11.5px var(--sans);text-align:center;letter-spacing:0.05em;">Fansly Creator Hub ↗</span>
+    </a>
   </div>
 
   <!-- ══ ONLYFANS CREATORS (React portal — OnlyFansShowcase) ══ -->

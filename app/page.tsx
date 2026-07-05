@@ -2648,8 +2648,12 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </main>
   </div>
 
-  <!-- ══ LIVE CAMS PROMO BANNER (Stripchat) ══ -->
-  <div style="padding:2.5rem 1.5rem 0;display:flex;justify-content:center;background:var(--bg1);">
+  <!-- ══ LIVE CAMS PROMO BANNER (Stripchat) + IdaJonesy live card ══ -->
+  <div style="padding:2.5rem 1.5rem 0;display:flex;justify-content:center;align-items:stretch;gap:16px;flex-wrap:wrap;background:var(--bg1);">
+    <a href="https://nl.stripchat.com/IdaJonesy" target="_blank" rel="noopener noreferrer nofollow" aria-label="IdaJonesy live chat on Stripchat" style="display:block;width:200px;height:200px;flex-shrink:0;border:0.5px solid rgba(220,60,80,0.45);border-radius:16px;overflow:hidden;position:relative;box-shadow:0 10px 34px rgba(0,0,0,0.5);transition:border-color .2s,transform .15s;order:2;" onmouseover="this.style.borderColor='rgba(240,90,110,0.85)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(220,60,80,0.45)';this.style.transform=''">
+      <img src="/promos/idajonesy.jpg" alt="IdaJonesy" style="width:100%;height:100%;object-fit:cover;display:block;" />
+      <span style="position:absolute;top:10px;left:10px;display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(200,16,46,0.92);border-radius:20px;color:#fff;font:700 9.5px var(--sans);letter-spacing:0.1em;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;animation:livePulse 1.6s ease-in-out infinite;"></span> LIVE</span>
+    </a>
     <a href="/live" aria-label="Live Cams — watch now" style="display:flex;align-items:center;gap:24px;width:100%;max-width:600px;height:200px;padding:0 32px;background:linear-gradient(120deg,#1a0a0d 0%,#3d0d14 55%,#6e1020 100%);border:0.5px solid rgba(220,60,80,0.45);border-radius:16px;text-decoration:none;overflow:hidden;position:relative;box-shadow:0 10px 34px rgba(0,0,0,0.5);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='rgba(240,90,110,0.85)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(220,60,80,0.45)';this.style.transform=''">
       <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 85% 20%,rgba(240,80,100,0.22) 0%,transparent 60%);pointer-events:none;"></div>
       <img src="/promos/stripchat-logo.png" alt="Stripchat" style="width:184px;max-width:38%;height:auto;border-radius:10px;flex-shrink:0;position:relative;box-shadow:0 4px 18px rgba(0,0,0,0.45);" />

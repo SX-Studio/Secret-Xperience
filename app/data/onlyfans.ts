@@ -26,7 +26,7 @@ export const ONLYFANS_GROUPS: OFGroup[] = [
       { name: 'Nannaagirlii', handle: 'barbiipinkii', url: 'https://onlyfans.com/barbiipinkii', featured: true },
       { name: 'Sabrina._Ck ♡', handle: 'sabrinack', url: 'https://onlyfans.com/sabrinack', featured: true },
       { name: 'Elise Luna', handle: 'elise_luna7', url: 'https://onlyfans.com/elise_luna7' },
-      { name: 'Gigi Max', handle: 'gigimaxofficial', url: 'https://onlyfans.com/gigimaxofficial' },
+      { name: 'Gigi Max 🍒', handle: 'gigimaxofficial', url: 'https://onlyfans.com/gigimaxofficial', featured: true },
       { name: 'Baddie Mi', handle: 'baddiemi', url: 'https://onlyfans.com/baddiemi?rec=89521844' },
       { name: 'Kimberly X', handle: 'kimberlyxxxxxxxx', url: 'https://onlyfans.com/kimberlyxxxxxxxx' },
       { name: 'Fetilicious', handle: 'mfetilicious', url: 'https://onlyfans.com/mfetilicious' },

@@ -2648,6 +2648,21 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </main>
   </div>
 
+  <!-- ══ LIVE CAMS PROMO BANNER (Stripchat) ══ -->
+  <div style="padding:2.5rem 1.5rem 0;display:flex;justify-content:center;background:var(--bg1);">
+    <a href="/live" aria-label="Live Cams — watch now" style="display:flex;align-items:center;gap:24px;width:100%;max-width:600px;height:200px;padding:0 32px;background:linear-gradient(120deg,#1a0a0d 0%,#3d0d14 55%,#6e1020 100%);border:0.5px solid rgba(220,60,80,0.45);border-radius:16px;text-decoration:none;overflow:hidden;position:relative;box-shadow:0 10px 34px rgba(0,0,0,0.5);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='rgba(240,90,110,0.85)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(220,60,80,0.45)';this.style.transform=''">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 85% 20%,rgba(240,80,100,0.22) 0%,transparent 60%);pointer-events:none;"></div>
+      <img src="/promos/stripchat-logo.png" alt="Stripchat" style="width:184px;max-width:38%;height:auto;border-radius:10px;flex-shrink:0;position:relative;box-shadow:0 4px 18px rgba(0,0,0,0.45);" />
+      <div style="position:relative;min-width:0;">
+        <div style="display:inline-flex;align-items:center;gap:7px;font:600 10px var(--sans);letter-spacing:0.16em;text-transform:uppercase;color:#ff8c9c;margin-bottom:8px;"><span style="width:8px;height:8px;border-radius:50%;background:#ff4560;box-shadow:0 0 8px rgba(255,69,96,0.8);display:inline-block;animation:livePulse 1.6s ease-in-out infinite;"></span> Live now</div>
+        <div style="font-family:var(--serif);font-size:clamp(20px,3.5vw,26px);color:#fff;line-height:1.2;margin-bottom:6px;">Live <em style="font-style:italic;color:#ff8c9c;">Cams</em></div>
+        <div style="font-size:12.5px;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:10px;">Watch models live, right now — free to enter.</div>
+        <span style="display:inline-block;padding:8px 18px;background:#fff;border-radius:8px;color:#8b0f1e;font:700 12px var(--sans);letter-spacing:0.04em;">Watch live →</span>
+      </div>
+    </a>
+  </div>
+  <style>@keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.35}}</style>
+
   <!-- ══ ONLYFANS CREATORS (React portal — OnlyFansShowcase) ══ -->
   <div id="onlyfansShowcaseMount"></div>
 

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import Link from 'next/link'
 import ProductGrid from './ProductGrid'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
+import ShopShowcase from '../components/ShopShowcase/ShopShowcase'
 
 export async function generateMetadata() {
   return {
@@ -181,6 +182,11 @@ export default async function ShopPage() {
           </a>
 
           <ProductGrid products={allProducts} />
+
+          {/* Partner boutiques — lingerie & adult fashion, data in app/data/shops.ts */}
+          <div style={{ margin: '3rem -1.5rem 0' }}>
+            <ShopShowcase variant="large" />
+          </div>
 
           {/* VENDOR CTA */}
           {allProducts.length > 0 && (

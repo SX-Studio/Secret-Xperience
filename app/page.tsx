@@ -7,6 +7,7 @@ import LiveBanner from './components/LiveBanner/LiveBanner'
 import CategoryAnimations from './components/CategoryAnimations/CategoryAnimations'
 import PartnersShowcase from './components/PartnersShowcase/PartnersShowcase'
 import OnlyFansShowcase from './components/OnlyFansShowcase/OnlyFansShowcase'
+import ShopShowcase from './components/ShopShowcase/ShopShowcase'
 import DesignDemos from './components/DesignDemos'
 
 export default function Home() {
@@ -2695,6 +2696,9 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   <!-- ══ ONLYFANS CREATORS (React portal — OnlyFansShowcase) ══ -->
   <div id="onlyfansShowcaseMount"></div>
 
+  <!-- ══ BOUTIQUES / SHOP THE LOOK (React portal — ShopShowcase) ══ -->
+  <div id="shopShowcaseMount"></div>
+
   <!-- ══ PARTNERS & LINKS (React portal — PartnersShowcase) ══ -->
   <div id="partnersShowcaseMount"></div>
 
@@ -3356,6 +3360,8 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <SliderAds />
       {/* OnlyFans creator directory — portal into #onlyfansShowcaseMount above the partners band */}
       <OnlyFansShowcase portalTo="onlyfansShowcaseMount" />
+      {/* Partner boutiques — portal between OnlyFans creators and Partners & Links */}
+      <ShopShowcase variant="compact" portalTo="shopShowcaseMount" />
       {/* Partners & Links band — portal into #partnersShowcaseMount above the footer */}
       <PartnersShowcase />
       <DesignDemos />

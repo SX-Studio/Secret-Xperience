@@ -30,7 +30,7 @@ export const ONLYFANS_GROUPS: OFGroup[] = [
       { name: 'Call of Booty 🍑', handle: 'baddiemi', url: 'https://onlyfans.com/baddiemi?rec=89521844', featured: true },
       { name: 'KimberlyX', handle: 'kimberlyxxxxxxxx', url: 'https://onlyfans.com/kimberlyxxxxxxxx', featured: true },
       { name: 'Fetilicious', handle: 'mfetilicious', url: 'https://onlyfans.com/mfetilicious' },
-      { name: 'Yuki', handle: 'yuki.nky', url: 'https://onlyfans.com/yuki.nky' },
+      { name: 'Yuki 🔥', handle: 'yuki.nky', url: 'https://onlyfans.com/yuki.nky', featured: true },
       { name: 'Kayleigh Wonder', handle: 'kayleigh.wonder', url: 'https://onlyfans.com/kayleigh.wonder' },
       { name: 'Curvy Geek', handle: 'curvygeekvip', url: 'https://onlyfans.com/curvygeekvip' },
       { name: 'Our Deepest Secrets', handle: 'ourdeepest_secrets', url: 'https://onlyfans.com/ourdeepest_secrets' },

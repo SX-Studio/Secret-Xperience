@@ -675,6 +675,31 @@ export default async function NightlifePage() {
           Independent third-party venues (18+). Opening hours and services on their own sites.
         </p>
       </section>
+
+      {/* ══ EROTIC ADVISOR banner — worldwide venue directory ══ */}
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 1.5rem 5rem' }}>
+        <a href="https://eroticadvisor.com/nl" target="_blank" rel="noopener noreferrer nofollow" aria-label="Erotic Advisor — sex clubs, strip clubs and more" style={{ display: 'block', position: 'relative', overflow: 'hidden', borderRadius: 20, border: '1px solid rgba(244,114,144,0.45)', minHeight: 260, boxShadow: '0 14px 44px rgba(0,0,0,0.55)', textDecoration: 'none' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/promos/eroticadvisor-bg.jpg" alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 22%' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(20,8,16,0.55), rgba(20,8,16,0.25) 45%, rgba(20,8,16,0.65))' }} />
+          <div style={{ position: 'relative', padding: 'clamp(1.75rem,4vw,2.75rem)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 14 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, background: '#fff', borderRadius: 30, padding: '9px 22px' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/promos/eroticadvisor-icon.png" alt="" style={{ width: 26, height: 26 }} />
+              <span style={{ font: '700 15px var(--sans, Poppins, sans-serif)', letterSpacing: '0.14em', color: '#1a1a1a' }}>EROTIC ADVISOR</span>
+            </span>
+            <div style={{ fontFamily: "var(--serif, 'Cormorant Garamond', serif)", fontSize: 'clamp(22px,3.4vw,34px)', color: '#fff', textShadow: '0 2px 14px rgba(0,0,0,0.7)', lineHeight: 1.15 }}>
+              Sex Clubs, Strip Clubs <em style={{ fontStyle: 'italic', color: '#ff8fa8' }}>and More</em>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', maxWidth: 760 }}>
+              {['Bordel', 'Cabaret', 'Erotic Massage', 'Erotic Sauna', 'FKK', "Men's Club", 'Love Hotel', 'Strip Club', 'Swingers'].map(t => (
+                <span key={t} style={{ padding: '6px 14px', background: 'rgba(255,255,255,0.92)', borderRadius: 20, color: '#2a2a2a', fontSize: 12, fontWeight: 600 }}>{t}</span>
+              ))}
+            </div>
+            <span style={{ marginTop: 6, display: 'inline-block', padding: '11px 26px', background: '#ff5f7e', borderRadius: 10, color: '#fff', fontSize: 13.5, fontWeight: 700, letterSpacing: '0.03em' }}>Ontdek venues wereldwijd →</span>
+          </div>
+        </a>
+      </div>
     </>
   )
 }

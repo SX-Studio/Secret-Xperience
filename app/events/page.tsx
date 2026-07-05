@@ -224,6 +224,38 @@ export default function EventsPage() {
         </div>
       )}
 
+      {/* ══ VENUS BERLIN — Germany's biggest erotic trade fair ══ */}
+      {(country === 'All' || country === 'Germany') && (category === 'All' || category === 'lifestyle') && (
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem 0' }}>
+          <section aria-label="VENUS Berlin tickets" style={{ position: 'relative', overflow: 'hidden', borderRadius: 20, border: '1px solid rgba(230,0,126,0.5)', background: 'linear-gradient(120deg,#14060e 0%,#2a0a1c 60%,#3a0d26 100%)', boxShadow: '0 14px 44px rgba(0,0,0,0.55)', display: 'flex', flexWrap: 'wrap', alignItems: 'stretch' }}>
+            <a href="https://shop.venus-berlin.com/6ef52a729ace4314908a6d08eea09fe3/tickets" target="_blank" rel="noopener noreferrer nofollow" style={{ flexShrink: 0, display: 'block' }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/events/venus-berlin.png" alt="VENUS Berlin — 22-25 Oktober, Messegelände Berlin" style={{ display: 'block', width: 300, height: 600, maxWidth: '100%', objectFit: 'cover' }} />
+            </a>
+            <div style={{ flex: 1, minWidth: 280, padding: 'clamp(1.5rem,4vw,3rem)', display: 'flex', flexDirection: 'column', justifyContent: 'center', position: 'relative' }}>
+              <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 80% 20%,rgba(230,0,126,0.18) 0%,transparent 60%)', pointerEvents: 'none' }} />
+              <div style={{ position: 'relative' }}>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '0.22em', color: '#ff2e8f', textTransform: 'uppercase', marginBottom: 10 }}>VENUS Berlin · Erotic Trade Fair · 🇩🇪 Deutschland</div>
+                <div style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(24px,3.6vw,38px)', fontWeight: 400, lineHeight: 1.12, color: '#fff', marginBottom: 10 }}>
+                  The world&apos;s biggest <em style={{ fontStyle: 'italic', color: '#ff2e8f' }}>erotic fair</em>
+                </div>
+                <div style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7, maxWidth: 480, marginBottom: 18 }}>
+                  22–25 Oktober · Messegelände Berlin. Four days of shows, stars, lifestyle and the entire adult industry under one roof.
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 22 }}>
+                  {['Live shows', 'Star signings', 'BDSM area', 'Lifestyle & toys'].map(t => (
+                    <span key={t} style={{ padding: '6px 14px', border: '0.5px solid rgba(255,46,143,0.45)', borderRadius: 20, color: 'rgba(255,255,255,0.8)', fontSize: 12.5 }}>{t}</span>
+                  ))}
+                </div>
+                <a href="https://shop.venus-berlin.com/6ef52a729ace4314908a6d08eea09fe3/tickets" target="_blank" rel="noopener noreferrer nofollow" style={{ display: 'inline-block', padding: '13px 30px', background: '#e6007e', borderRadius: 10, color: '#fff', fontSize: 14.5, fontWeight: 700, textDecoration: 'none', letterSpacing: '0.02em' }}>
+                  Buy tickets →
+                </a>
+              </div>
+            </div>
+          </section>
+        </div>
+      )}
+
       {/* CONTENT */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>
         {loading ? (

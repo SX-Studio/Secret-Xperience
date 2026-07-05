@@ -2730,6 +2730,30 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   <!-- ══ BOUTIQUES / SHOP THE LOOK (React portal — ShopShowcase) ══ -->
   <div id="shopShowcaseMount"></div>
 
+  <!-- ══ MEDICAL & REGULATIONS INFO BANNERS ══ -->
+  <div style="background:var(--bg1);border-top:0.5px solid var(--b);padding:2.5rem 1.5rem;display:flex;justify-content:center;align-items:stretch;gap:16px;flex-wrap:wrap;">
+    <a href="/medical" aria-label="Medical information" style="display:flex;align-items:center;gap:24px;width:100%;max-width:600px;height:200px;padding:0 32px;background:linear-gradient(120deg,#0a1410 0%,#0d2018 55%,#123528 100%);border:0.5px solid rgba(62,207,142,0.4);border-radius:16px;text-decoration:none;overflow:hidden;position:relative;box-shadow:0 10px 34px rgba(0,0,0,0.5);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='rgba(90,230,170,0.8)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(62,207,142,0.4)';this.style.transform=''">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 85% 20%,rgba(62,207,142,0.16) 0%,transparent 60%);pointer-events:none;"></div>
+      <div style="width:88px;height:88px;border-radius:50%;background:rgba(62,207,142,0.12);border:1px solid rgba(62,207,142,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;"><i class="ti ti-heart-rate-monitor" style="font-size:42px;color:#3ecf8e;"></i></div>
+      <div style="position:relative;min-width:0;">
+        <div style="font:600 10px var(--sans);letter-spacing:0.16em;text-transform:uppercase;color:rgba(62,207,142,0.85);margin-bottom:8px;">Health &amp; Safety</div>
+        <div style="font-family:var(--serif);font-size:clamp(20px,3.2vw,26px);color:#fff;line-height:1.2;margin-bottom:6px;">Medical <em style="font-style:italic;color:#3ecf8e;">Information</em></div>
+        <div style="font-size:12.5px;color:rgba(255,255,255,0.6);line-height:1.55;margin-bottom:12px;">STI testing, prevention, PrEP and anonymous health resources in Belgium, the Netherlands &amp; Germany.</div>
+        <span style="display:inline-block;padding:8px 18px;border:0.5px solid rgba(62,207,142,0.55);border-radius:8px;color:#3ecf8e;font:600 12px var(--sans);letter-spacing:0.04em;">Read more →</span>
+      </div>
+    </a>
+    <a href="/regulations" aria-label="Regulation and rights" style="display:flex;align-items:center;gap:24px;width:100%;max-width:600px;height:200px;padding:0 32px;background:linear-gradient(120deg,#0a0e18 0%,#0e1526 55%,#16204a 100%);border:0.5px solid rgba(90,140,220,0.4);border-radius:16px;text-decoration:none;overflow:hidden;position:relative;box-shadow:0 10px 34px rgba(0,0,0,0.5);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='rgba(130,175,255,0.8)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(90,140,220,0.4)';this.style.transform=''">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 85% 20%,rgba(90,140,220,0.18) 0%,transparent 60%);pointer-events:none;"></div>
+      <div style="width:88px;height:88px;border-radius:50%;background:rgba(90,140,220,0.12);border:1px solid rgba(90,140,220,0.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;"><i class="ti ti-scale" style="font-size:42px;color:#7aa5e8;"></i></div>
+      <div style="position:relative;min-width:0;">
+        <div style="font:600 10px var(--sans);letter-spacing:0.16em;text-transform:uppercase;color:rgba(122,165,232,0.9);margin-bottom:8px;">Know your rights</div>
+        <div style="font-family:var(--serif);font-size:clamp(20px,3.2vw,26px);color:#fff;line-height:1.2;margin-bottom:6px;">Regulation &amp; <em style="font-style:italic;color:#7aa5e8;">Rights</em></div>
+        <div style="font-size:12.5px;color:rgba(255,255,255,0.6);line-height:1.55;margin-bottom:12px;">Sex work laws per country, your legal rights, taxes and support organisations across the EU.</div>
+        <span style="display:inline-block;padding:8px 18px;border:0.5px solid rgba(122,165,232,0.55);border-radius:8px;color:#7aa5e8;font:600 12px var(--sans);letter-spacing:0.04em;">Read more →</span>
+      </div>
+    </a>
+  </div>
+
   <!-- ══ PARTNERS & LINKS (React portal — PartnersShowcase) ══ -->
   <div id="partnersShowcaseMount"></div>
 

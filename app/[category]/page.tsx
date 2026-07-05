@@ -249,6 +249,16 @@ export default async function CategoryPage({ params }: { params: { category: str
               </Link>
             </div>
           )}
+          {/* Sensora banner — massage category only */}
+          {params.category === 'massage' && (
+            <a href="https://sensora-massage.com/" target="_blank" rel="noopener noreferrer nofollow" aria-label="Sensora — massage sensuel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '3rem', minHeight: 220, borderRadius: 20, border: '0.5px solid rgba(214,190,150,0.35)', background: 'radial-gradient(ellipse 90% 130% at 15% -20%, rgba(230,215,185,0.16) 0%, transparent 55%), linear-gradient(120deg,#050505 0%,#0c0a08 60%,#050505 100%)', boxShadow: '0 14px 44px rgba(0,0,0,0.55)', textDecoration: 'none', position: 'relative', overflow: 'hidden', padding: '2rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, position: 'relative' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/promos/sensora-logo.png" alt="SENSORA — Massage Sensuel" style={{ width: 300, maxWidth: '80vw', height: 'auto' }} />
+                <span style={{ padding: '10px 26px', border: '0.5px solid rgba(214,190,150,0.5)', borderRadius: 10, color: '#d6be96', fontSize: 13, fontWeight: 600, letterSpacing: '0.08em', fontFamily: 'var(--sans)' }}>DÉCOUVRIR →</span>
+              </div>
+            </a>
+          )}
         </div>
 
         {/* FOOTER */}

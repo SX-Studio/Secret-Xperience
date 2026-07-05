@@ -256,6 +256,30 @@ export default function EventsPage() {
         </div>
       )}
 
+      {/* ══ KAMASUTRA BEURS — Netherlands, October 2026 edition ══ */}
+      {(country === 'All' || country === 'Netherlands') && (category === 'All' || category === 'lifestyle') && (
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem 0' }}>
+          <a href="https://presaleksa.blue.nl/" target="_blank" rel="noopener noreferrer nofollow" aria-label="Kamasutra beurs tickets" style={{ display: 'block', position: 'relative', overflow: 'hidden', borderRadius: 20, border: '1px solid rgba(220,30,40,0.55)', minHeight: 320, boxShadow: '0 14px 44px rgba(0,0,0,0.55)', textDecoration: 'none', transition: 'transform .15s, border-color .2s' }}
+             onMouseOver={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.borderColor = 'rgba(255,60,70,0.9)' }}
+             onMouseOut={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.borderColor = 'rgba(220,30,40,0.55)' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/events/kamasutra.png" alt="" aria-hidden="true" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(10,8,10,0.85) 0%, transparent 45%)' }} />
+            <div style={{ position: 'absolute', top: 0, left: 0, padding: '14px 22px', background: 'rgba(20,26,38,0.94)', borderBottomRightRadius: 14, display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ fontFamily: 'var(--serif)', fontSize: 22, letterSpacing: '0.12em', color: '#fff' }}>KAMASUTRA</span>
+              <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: '0.14em', color: '#e02030', textTransform: 'uppercase' }}>October 2026 Edition · 🇳🇱 Nederland</span>
+            </div>
+            <div style={{ position: 'absolute', left: 22, right: 22, bottom: 20, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+              <div style={{ color: '#fff' }}>
+                <div style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(19px,3vw,27px)', lineHeight: 1.15, textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>Nederland&apos;s grootste <em style={{ fontStyle: 'italic', color: '#ff4550' }}>erotische beurs</em></div>
+                <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.75)', marginTop: 4, textShadow: '0 1px 8px rgba(0,0,0,0.8)' }}>29, 30, 31 oktober &amp; 1 november 2026 · Early bird tickets nu verkrijgbaar</div>
+              </div>
+              <span style={{ display: 'inline-block', padding: '13px 30px', background: '#e02030', borderRadius: 10, color: '#fff', fontSize: 14.5, fontWeight: 700, letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>Buy tickets →</span>
+            </div>
+          </a>
+        </div>
+      )}
+
       {/* CONTENT */}
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem 6rem' }}>
         {loading ? (

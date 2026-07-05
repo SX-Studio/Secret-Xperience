@@ -2696,6 +2696,25 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   <!-- ══ ONLYFANS CREATORS (React portal — OnlyFansShowcase) ══ -->
   <div id="onlyfansShowcaseMount"></div>
 
+  <!-- ══ CREATOR LINKS (All My Links) ══ -->
+  <section aria-label="Creator links" style="background:var(--bg1);border-top:0.5px solid var(--b);padding:3rem 1.5rem 2.5rem;">
+    <div style="max-width:1200px;margin:0 auto;">
+      <p style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:rgba(197,160,90,0.55);margin:0 0 8px;">✦ Creator Links</p>
+      <h2 style="font-family:var(--serif);font-size:clamp(22px,3vw,32px);font-weight:400;color:var(--t);line-height:1.15;margin:0 0 8px;">All <em style="color:#c5a05a;font-style:italic;">My Links</em></h2>
+      <p style="font-size:13px;color:var(--t2);max-width:520px;line-height:1.7;margin:0 0 1.5rem;">One link, everything they do — follow these creators across all their platforms.</p>
+      <div style="display:flex;flex-wrap:wrap;gap:14px;">
+        <a href="https://allmylinks.com/cassie-redstarr" target="_blank" rel="noopener noreferrer nofollow" title="Cassie Redstarr — all links" style="display:block;width:200px;height:200px;border-radius:14px;overflow:hidden;position:relative;border:0.5px solid rgba(197,160,90,0.4);box-shadow:0 8px 28px rgba(0,0,0,0.45);flex-shrink:0;transition:transform .15s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(197,160,90,0.8)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(197,160,90,0.4)'">
+          <img src="/promos/cassie-redstarr.jpg" alt="Cassie Redstarr" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" />
+          <span style="position:absolute;top:10px;left:10px;padding:4px 10px;background:rgba(197,160,90,0.92);border-radius:20px;color:#0a0a0a;font:700 9.5px var(--sans);letter-spacing:0.08em;">ALL LINKS</span>
+        </a>
+        <a href="https://link.me/teknoshadows" target="_blank" rel="noopener noreferrer nofollow" title="Teknoshadows — all links" style="display:block;width:200px;height:200px;border-radius:14px;overflow:hidden;position:relative;border:0.5px solid rgba(197,160,90,0.4);box-shadow:0 8px 28px rgba(0,0,0,0.45);flex-shrink:0;transition:transform .15s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(197,160,90,0.8)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(197,160,90,0.4)'">
+          <img src="/promos/teknoshadows.jpg" alt="Teknoshadows" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" />
+          <span style="position:absolute;top:10px;left:10px;padding:4px 10px;background:rgba(197,160,90,0.92);border-radius:20px;color:#0a0a0a;font:700 9.5px var(--sans);letter-spacing:0.08em;">ALL LINKS</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- ══ BOUTIQUES / SHOP THE LOOK (React portal — ShopShowcase) ══ -->
   <div id="shopShowcaseMount"></div>
 

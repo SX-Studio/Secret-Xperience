@@ -20,8 +20,8 @@ export default function ShopShowcase({ variant, portalTo }: Props) {
   }, [portalTo])
 
   const W = variant === 'large' ? 300 : 200
-  const H = variant === 'large' ? 400 : 300
-  const nameSize = variant === 'large' ? 19 : 14.5
+  const H = variant === 'large' ? 400 : 150
+  const nameSize = variant === 'large' ? 19 : 13.5
 
   const body = (
     <section aria-label="Partner boutiques" style={{ background: 'var(--bg1, #0a090c)', borderTop: '0.5px solid var(--b, rgba(255,255,255,0.06))', padding: '3rem 1.5rem 2.5rem' }}>
@@ -56,9 +56,9 @@ export default function ShopShowcase({ variant, portalTo }: Props) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={`/shops/${s.slug}.jpg`} alt={s.name} loading="lazy" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(150deg,#1d1424,#0d0a10)', fontFamily: "var(--serif, 'Cormorant Garamond', serif)", fontStyle: 'italic', fontSize: variant === 'large' ? 34 : 24, color: '#c5a05a', textAlign: 'center', padding: '0 14px', lineHeight: 1.25 }}>{s.name}</span>
+                <span style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(150deg,#1d1424,#0d0a10)', fontFamily: "var(--serif, 'Cormorant Garamond', serif)", fontStyle: 'italic', fontSize: variant === 'large' ? 34 : 20, color: '#c5a05a', textAlign: 'center', padding: '0 14px', lineHeight: 1.25 }}>{s.name}</span>
               )}
-              <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: `${variant === 'large' ? 40 : 30}px 12px 12px`, background: 'linear-gradient(to top, rgba(5,3,8,0.88), transparent)', color: '#f2ead8', fontFamily: "var(--serif, 'Cormorant Garamond', serif)", fontSize: nameSize, textAlign: 'center', letterSpacing: '0.03em' }}>
+              <span style={{ position: 'absolute', left: 0, right: 0, bottom: 0, padding: `${variant === 'large' ? 40 : 22}px 12px ${variant === 'large' ? 12 : 8}px`, background: 'linear-gradient(to top, rgba(5,3,8,0.88), transparent)', color: '#f2ead8', fontFamily: "var(--serif, 'Cormorant Garamond', serif)", fontSize: nameSize, textAlign: 'center', letterSpacing: '0.03em' }}>
                 {s.name} <span style={{ fontSize: nameSize - 6, color: 'rgba(197,160,90,0.9)' }}>↗</span>
               </span>
             </a>

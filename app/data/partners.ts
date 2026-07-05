@@ -104,9 +104,10 @@ export const PARTNER_SECTIONS: PartnerSection[] = [
       { name: 'Slap Stick Club', emoji: '🎬', tagline: 'Fetish & kink club — London.', url: '' },
       { name: 'Temptations', emoji: '😈', tagline: 'Swingers club — Bournemouth.', url: '' },
       { name: 'Townhouse International', emoji: '🏛️', tagline: 'Swingers, fetish & LGBTQ+ club — Birkenhead, Wirral.', url: 'https://townhouseswingers.com/' },
-      { name: 'V2V', emoji: '✌️', tagline: 'Swingers club — Nuneaton.', url: '' },
-      { name: 'Vanilla Alternative', emoji: '🍦', tagline: 'Swingers club & hotel — Tempsford, Bedfordshire.', url: '' },
+      { name: 'V2V', emoji: '✌️', tagline: 'Swingers club — Nuneaton.', url: 'https://v2v.uk/' },
+      { name: 'Vanilla Alternative', emoji: '🍦', tagline: 'Swingers club & hotel — Tempsford, Bedfordshire.', url: 'https://va2.co.uk/' },
       { name: 'Vault72', emoji: '🔐', tagline: 'Alternative & kink bar — Plymouth, Devon.', url: 'https://www.vault72.com/' },
+      { name: 'WT Club', emoji: '🌙', tagline: 'Adult club — Lower Union Lane, Torquay (TQ2 5PR).', url: 'https://wtclub.co.uk/' },
     ],
   },
 

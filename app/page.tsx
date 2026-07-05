@@ -2663,6 +2663,19 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   </div>
   <style>@keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.35}}</style>
 
+  <!-- ══ CREATOR PLATFORMS GUIDE FRAME ══ -->
+  <div style="padding:1.5rem 1.5rem 0;display:flex;justify-content:center;background:var(--bg1);">
+    <a href="/creator-platforms" aria-label="20+ Best Platforms to Make Money for Creators" style="display:flex;align-items:center;justify-content:space-between;gap:20px;width:100%;max-width:600px;padding:26px 32px;background:linear-gradient(120deg,#14101a 0%,#1a1420 60%,#241a14 100%);border:0.5px solid rgba(197,160,90,0.4);border-radius:16px;text-decoration:none;position:relative;overflow:hidden;box-shadow:0 10px 34px rgba(0,0,0,0.45);transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='rgba(197,160,90,0.8)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(197,160,90,0.4)';this.style.transform=''">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 90% 10%,rgba(197,160,90,0.14) 0%,transparent 55%);pointer-events:none;"></div>
+      <div style="position:relative;min-width:0;">
+        <div style="font:600 10px var(--sans);letter-spacing:0.16em;text-transform:uppercase;color:rgba(197,160,90,0.75);margin-bottom:8px;">✦ Creator Economy Guide</div>
+        <div style="font-family:var(--serif);font-size:clamp(18px,3vw,23px);color:var(--t);line-height:1.25;margin-bottom:6px;">20+ Best Platforms to <em style="font-style:italic;color:var(--gold);">Make Money</em> for Creators</div>
+        <div style="font-size:12px;color:var(--t3);line-height:1.5;">OnlyFans alternatives, low-commission platforms &amp; site builders — compared.</div>
+      </div>
+      <span style="flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border:0.5px solid rgba(197,160,90,0.5);border-radius:10px;color:var(--gold);font:600 12px var(--sans);letter-spacing:0.04em;white-space:nowrap;position:relative;">Read the guide →</span>
+    </a>
+  </div>
+
   <!-- ══ ONLYFANS CREATORS (React portal — OnlyFansShowcase) ══ -->
   <div id="onlyfansShowcaseMount"></div>
 

@@ -722,12 +722,14 @@ export default function PrivateReceptionPage() {
 
             {/* Sensora banner — massage category only */}
             {category === 'massage' && (
-              <a href="https://sensora-massage.com/" target="_blank" rel="noopener noreferrer nofollow" aria-label="Sensora — massage sensuel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: '2rem', minHeight: 220, borderRadius: 20, border: '0.5px solid rgba(214,190,150,0.35)', background: 'radial-gradient(ellipse 90% 130% at 15% -20%, rgba(230,215,185,0.16) 0%, transparent 55%), linear-gradient(120deg,#050505 0%,#0c0a08 60%,#050505 100%)', boxShadow: '0 14px 44px rgba(0,0,0,0.55)', textDecoration: 'none', position: 'relative', overflow: 'hidden', padding: '2rem' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, position: 'relative' }}>
+              <a href="https://sensora-massage.com/" target="_blank" rel="noopener noreferrer nofollow" aria-label="Sensora — massage sensuel" style={{ display: 'flex', alignItems: 'stretch', marginTop: '2rem', minHeight: 240, borderRadius: 20, border: '0.5px solid rgba(214,190,150,0.35)', background: 'radial-gradient(ellipse 90% 130% at 15% -20%, rgba(230,215,185,0.16) 0%, transparent 55%), linear-gradient(120deg,#050505 0%,#0c0a08 60%,#050505 100%)', boxShadow: '0 14px 44px rgba(0,0,0,0.55)', textDecoration: 'none', position: 'relative', overflow: 'hidden' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, position: 'relative', padding: '2rem' }}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/promos/sensora-logo.png" alt="SENSORA — Massage Sensuel" style={{ width: 300, maxWidth: '80vw', height: 'auto' }} />
+                  <img src="/promos/sensora-logo.png" alt="SENSORA — Massage Sensuel" style={{ width: 300, maxWidth: '70vw', height: 'auto' }} />
                   <span style={{ padding: '10px 26px', border: '0.5px solid rgba(214,190,150,0.5)', borderRadius: 10, color: '#d6be96', fontSize: 13, fontWeight: 600, letterSpacing: '0.08em' }}>DÉCOUVRIR →</span>
                 </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/promos/sensora-photo.png" alt="" aria-hidden="true" style={{ width: 'clamp(140px, 24vw, 250px)', objectFit: 'cover', objectPosition: 'center top', flexShrink: 0, maskImage: 'linear-gradient(to right, transparent 0%, black 18%)', WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 18%)' }} />
               </a>
             )}
           </main>

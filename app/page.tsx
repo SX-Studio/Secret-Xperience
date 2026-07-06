@@ -8,6 +8,7 @@ import CategoryAnimations from './components/CategoryAnimations/CategoryAnimatio
 import PartnersShowcase from './components/PartnersShowcase/PartnersShowcase'
 import OnlyFansShowcase from './components/OnlyFansShowcase/OnlyFansShowcase'
 import StripchatLive from './components/StripchatLive/StripchatLive'
+import HeroThemes from './components/HeroThemes/HeroThemes'
 import ShopShowcase from './components/ShopShowcase/ShopShowcase'
 import DesignDemos from './components/DesignDemos'
 
@@ -2166,6 +2167,9 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   </div>
 
   <!-- ══ EDITORIAL HERO ══ -->
+  <!-- Visitor-selectable hero styles render here (HeroThemes) -->
+  <div id="heroThemesMount"></div>
+
   <section id="editorialHero" style="width:100%;background:var(--grad-candle);border-top:0.5px solid var(--b);border-bottom:0.5px solid var(--b);padding:4rem 1.5rem;">
     <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:48% 22% 30%;gap:2rem;align-items:center;">
       <!-- LEFT: text -->
@@ -3418,6 +3422,8 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <OnlyFansShowcase portalTo="onlyfansShowcaseMount" />
       {/* Partner boutiques — portal between OnlyFans creators and Partners & Links */}
       <ShopShowcase variant="compact" portalTo="shopShowcaseMount" />
+      {/* Visitor-selectable hero styles — 🎨 picker, persists in localStorage */}
+      <HeroThemes />
       {/* Live-status checker for the Stripchat profile cards (green line when live) */}
       <StripchatLive />
       {/* Partners & Links band — portal into #partnersShowcaseMount above the footer */}

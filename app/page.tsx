@@ -2654,6 +2654,25 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </main>
   </div>
 
+  <!-- ══ SPONSORED FEATURE — Victoria Secret Garden ══ -->
+  <div style="background:var(--bg1);padding:2.5rem 1.5rem 0;">
+    <div style="max-width:1200px;margin:0 auto;">
+      <p style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin:0 0 10px;">✦ Sponsored Feature</p>
+      <a href="https://victoriasecretgarden.be/" target="_blank" rel="noopener noreferrer nofollow sponsored" aria-label="Victoria Secret Garden — escort agency Brussels" style="display:block;position:relative;overflow:hidden;border-radius:20px;border:1px solid rgba(232,90,140,0.45);min-height:300px;box-shadow:0 14px 44px rgba(0,0,0,0.55);text-decoration:none;transition:transform .15s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(255,130,175,0.85)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(232,90,140,0.45)'">
+        <img src="/promos/vsg-bg.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;" />
+        <div style="position:absolute;inset:0;background:linear-gradient(to right, rgba(12,8,10,0.82) 0%, rgba(12,8,10,0.35) 45%, rgba(12,8,10,0.15) 70%, rgba(12,8,10,0.55) 100%);"></div>
+        <div style="position:relative;padding:clamp(1.75rem,4vw,3rem);max-width:520px;display:flex;flex-direction:column;align-items:flex-start;gap:16px;">
+          <span style="display:inline-block;background:#fff;border-radius:14px;padding:12px 20px;box-shadow:0 8px 26px rgba(0,0,0,0.4);">
+            <img src="/promos/vsg-logo.png" alt="Victoria Secret Garden" style="height:56px;width:auto;display:block;" />
+          </span>
+          <div style="font-family:var(--serif);font-size:clamp(20px,3vw,28px);color:#fff;line-height:1.2;text-shadow:0 2px 12px rgba(0,0,0,0.8);">Brussels&apos; most <em style="font-style:italic;color:#ff9ec4;">exclusive escort agency</em></div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.75);line-height:1.6;text-shadow:0 1px 8px rgba(0,0,0,0.8);">High-class companions, hotel &amp; home visits, dinner dates — discreet en stijlvol.</div>
+          <span style="display:inline-block;padding:12px 28px;background:linear-gradient(90deg,#ff5c8a,#e0356e);border-radius:10px;color:#fff;font:600 13.5px var(--sans);letter-spacing:0.03em;">Bezoek Victoria Secret Garden →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
   <!-- ══ LIVE CAMS PROMO BANNER (Stripchat) + IdaJonesy live card ══ -->
   <div style="padding:2.5rem 1.5rem 0;display:flex;justify-content:center;align-items:stretch;gap:16px;flex-wrap:wrap;background:var(--bg1);">
     <a href="https://nl.stripchat.com/IdaJonesy" data-sc="IdaJonesy" target="_blank" rel="noopener noreferrer nofollow" aria-label="IdaJonesy live chat on Stripchat" style="display:block;width:200px;height:200px;flex-shrink:0;border:0.5px solid rgba(220,60,80,0.45);border-radius:16px;overflow:hidden;position:relative;box-shadow:0 10px 34px rgba(0,0,0,0.5);transition:border-color .2s,transform .15s;order:2;" onmouseover="this.style.borderColor='rgba(240,90,110,0.85)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(220,60,80,0.45)';this.style.transform=''">

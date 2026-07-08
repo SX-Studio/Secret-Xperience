@@ -35,6 +35,7 @@ interface EscortProfileProps {
     profile_id: string
     contact_phone?: string | null
     whatsapp_optin?: boolean | null
+    website?: string | null
     profile: {
       full_name: string | null
       username: string | null
@@ -521,7 +522,9 @@ export default function EscortProfile({
               : (p.whatsapp || (listing.whatsapp_optin ? (p.phone || listing.contact_phone) : null) || null)
             const waVerified = !!(p.whatsapp && p.whatsapp_verified)
             const waDigits  = waNum ? String(waNum).replace(/[^0-9]/g, '') : ''
-            if (!phoneNum && !waNum) return null
+            const site      = listing.website && /^https?:\/\//i.test(listing.website) ? listing.website : null
+            const siteLabel = site ? site.replace(/^https?:\/\//i, '').replace(/\/$/, '') : ''
+            if (!phoneNum && !waNum && !site) return null
             return (
               <div className="rl-scard">
                 <div className="rl-section-title" style={{ fontSize: '10px' }}>Contact</div>
@@ -541,6 +544,13 @@ export default function EscortProfile({
                     {waVerified && (
                       <span title="Verified WhatsApp" style={{ marginLeft: 'auto', fontSize: '10px', fontWeight: 700, color: C.green, background: 'rgba(38,212,160,0.12)', border: `0.5px solid ${C.green}55`, borderRadius: '20px', padding: '2px 8px' }}>✓</span>
                     )}
+                  </a>
+                )}
+                {site && (
+                  <a href={site} target="_blank" rel="noopener noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '9px 0', borderTop: (phoneNum || waNum) ? `0.5px solid ${C.b}` : 'none', textDecoration: 'none', color: C.t }}>
+                    <span style={{ fontSize: '17px' }}>🌐</span>
+                    <span style={{ fontSize: '15px', fontFamily: "'Poppins',sans-serif", letterSpacing: '0.02em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{siteLabel}</span>
+                    <span style={{ marginLeft: 'auto', fontSize: '13px', color: C.t3, flexShrink: 0 }}>↗</span>
                   </a>
                 )}
               </div>

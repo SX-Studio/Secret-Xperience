@@ -230,27 +230,43 @@ export default function AdminPage() {
     }
   }
 
-  async function setListingTier(id: string, tier: 'basic' | 'featured' | 'slider' | 'section' | 'premium' | 'homepage') {
+  // Placements are multi-select: a listing can hold several at once (e.g.
+  // Slider + Section + Homepage). `tier` is kept in sync as the primary
+  // (highest-priority) placement for the badge and back-compat reads.
+  async function toggleListingPlacement(id: string, placement: 'basic' | 'featured' | 'slider' | 'section' | 'premium' | 'homepage') {
     const supabase = createClient()
+    const PLACEMENT_DAYS: Record<string, number> = { featured: 7, slider: 7, section: 7, premium: 30, homepage: 30 }
+    // Priority high→low for choosing the representative `tier`.
+    const PRIORITY = ['homepage', 'premium', 'section', 'slider', 'featured'] as const
+
+    const cur = listings.find(l => l.id === id)
+    const prevPlacements: string[] = Array.isArray((cur as any)?.placements)
+      ? [...(cur as any).placements]
+      : (cur?.tier && cur.tier !== 'basic' ? [cur.tier] : [])
+
+    let next: string[]
+    if (placement === 'basic') {
+      next = [] // Basic clears every placement
+    } else {
+      next = prevPlacements.includes(placement)
+        ? prevPlacements.filter(p => p !== placement)
+        : [...prevPlacements, placement]
+    }
+
     const now = new Date()
-    const days = (tier === 'premium' || tier === 'homepage') ? 30 : tier === 'basic' ? 0 : 7
-    const until = days > 0 ? new Date(now.getTime() + days * 86400000) : null
+    const maxDays = next.reduce((m, p) => Math.max(m, PLACEMENT_DAYS[p] || 0), 0)
+    const until = maxDays > 0 ? new Date(now.getTime() + maxDays * 86400000) : null
+    const primaryTier = PRIORITY.find(p => next.includes(p)) || 'basic'
+    const hasPremium = next.includes('premium') || next.includes('homepage')
+
     const update: Record<string, unknown> = {
-      tier,
+      placements: next,
+      tier: primaryTier,
       tier_expires_at: until?.toISOString() ?? null,
+      featured_until: until?.toISOString() ?? null,
+      premium: hasPremium,
       active: true,
       status: 'approved',
-    }
-    if (tier === 'featured' || tier === 'slider' || tier === 'section') {
-      update.featured_until = until!.toISOString()
-      update.premium = false
-    } else if (tier === 'premium' || tier === 'homepage') {
-      update.featured_until = until!.toISOString()
-      update.premium = true
-    } else {
-      // basic — clear featured state
-      update.premium = false
-      update.featured_until = null
     }
     await supabase.from('listings').update(update).eq('id', id)
     setListings(prev => prev.map(l => l.id === id ? { ...l, ...update } : l))
@@ -671,25 +687,30 @@ export default function AdminPage() {
                               <i className="ti ti-trash" aria-hidden="true" />
                             </button>
                           </div>
-                          {/* Row 2: Tier buttons — Basic · Featured 7d · Slider 7d · Premium 30d */}
+                          {/* Row 2: Placements — multi-select. Basic clears all; others stack. */}
                           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
                             <span style={{ font: '500 9px/1 var(--sans)', color: 'var(--t3)', letterSpacing: '0.1em', marginRight: 2 }}>TIER:</span>
-                            {(['basic', 'featured', 'slider', 'section', 'premium', 'homepage'] as const).map(tier => {
-                              const active = l.tier === tier
-                              const colors: Record<string, string> = { basic: 'rgba(236,232,225,0.5)', featured: '#c5a05a', slider: '#b0a0f8', section: '#5ec8c0', premium: '#f5a826', homepage: '#e8c97a' }
-                              const labels: Record<string, string> = { basic: 'Basic', featured: 'Featured 7d', slider: 'Slider 7d', section: 'Section 7d', premium: 'Premium 30d', homepage: 'Homepage 30d' }
-                              return (
-                                <button
-                                  key={tier}
-                                  className="adm-action-icon-btn adm-action-btn"
-                                  onClick={() => setListingTier(l.id, tier)}
-                                  style={{ color: active ? colors[tier] : 'var(--t3)', borderColor: active ? colors[tier] : 'var(--b2)', background: active ? `${colors[tier]}18` : 'transparent', opacity: active ? 1 : 0.7 }}
-                                  title={`Set tier: ${labels[tier]}`}
-                                >
-                                  <span style={{ font: `${active ? '700' : '500'} 10px/1 var(--sans)`, letterSpacing: '0.05em' }}>{labels[tier]}</span>
-                                </button>
-                              )
-                            })}
+                            {(() => {
+                              const placements: string[] = Array.isArray((l as any).placements)
+                                ? (l as any).placements
+                                : (l.tier && l.tier !== 'basic' ? [l.tier] : [])
+                              return (['basic', 'featured', 'slider', 'section', 'premium', 'homepage'] as const).map(tier => {
+                                const active = tier === 'basic' ? placements.length === 0 : placements.includes(tier)
+                                const colors: Record<string, string> = { basic: 'rgba(236,232,225,0.5)', featured: '#c5a05a', slider: '#b0a0f8', section: '#5ec8c0', premium: '#f5a826', homepage: '#e8c97a' }
+                                const labels: Record<string, string> = { basic: 'Basic', featured: 'Featured 7d', slider: 'Slider 7d', section: 'Section 7d', premium: 'Premium 30d', homepage: 'Homepage 30d' }
+                                return (
+                                  <button
+                                    key={tier}
+                                    className="adm-action-icon-btn adm-action-btn"
+                                    onClick={() => toggleListingPlacement(l.id, tier)}
+                                    style={{ color: active ? colors[tier] : 'var(--t3)', borderColor: active ? colors[tier] : 'var(--b2)', background: active ? `${colors[tier]}18` : 'transparent', opacity: active ? 1 : 0.7 }}
+                                    title={tier === 'basic' ? 'Clear all placements' : `Toggle placement: ${labels[tier]}`}
+                                  >
+                                    <span style={{ font: `${active ? '700' : '500'} 10px/1 var(--sans)`, letterSpacing: '0.05em' }}>{active && tier !== 'basic' ? '✓ ' : ''}{labels[tier]}</span>
+                                  </button>
+                                )
+                              })
+                            })()}
                           </div>
                         </div>
                       </td>

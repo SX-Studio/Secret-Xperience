@@ -185,6 +185,7 @@ What's next (user hasn't asked for these yet, don't do proactively):
 - CCBill declined escorts (2026-06) — it's a dead end, not a pending lead
 - Don't claim a UI change works without verifying (user has called this out before)
 - Don't add comments explaining "what" the code does — only "why" if non-obvious
+- **Data-handling policy** (`docs/data-handling-policy.md`): PII (ID docs, real names, phone/WhatsApp, messages, meetup details) stays in Supabase. External connectors get aggregate/marketing/ops data ONLY — never customer/provider identity. Stripe = clean verticals only (rentals/hotels/events/shop), NEVER escort/companionship/massage. Read that file before connecting any new external service.
 
 ## Useful files
 - `app/page.tsx` — homepage (huge, mixed JSX + dangerouslySetInnerHTML)

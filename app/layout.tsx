@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 import CookieBanner from './components/CookieBanner'
 import AttributionTracker from './components/AttributionTracker'
+import PageviewTracker from './components/PageviewTracker'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -364,6 +365,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script id="lang-picker" strategy="afterInteractive">{langPickerScript}</Script>
         <CookieBanner />
         <AttributionTracker />
+        <PageviewTracker />
       </body>
     </html>
   )

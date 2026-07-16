@@ -2314,7 +2314,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
         >
           <div
             style={{
-              position: 'relative', overflow: 'hidden', height: '100%', minHeight: 132,
+              position: 'relative', overflow: 'hidden', height: '100%', minHeight: 150,
               display: 'flex', alignItems: 'center', gap: '1.25rem',
               border: '0.5px solid rgba(236,111,43,0.35)', borderRadius: 18, padding: '20px 26px',
               boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
@@ -2364,33 +2364,40 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
         >
           <div
             style={{
-              display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', justifyContent: 'space-between', height: '100%', minHeight: 132,
-              background: 'linear-gradient(135deg, rgba(197,160,90,0.10), rgba(20,14,26,0.55))',
-              border: '0.5px solid rgba(197,160,90,0.30)', borderRadius: 18, padding: '20px 26px',
-              boxShadow: '0 14px 44px rgba(0,0,0,0.38)', backdropFilter: 'blur(4px)',
+              position: 'relative', overflow: 'hidden', height: '100%', minHeight: 150,
+              display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+              background: '#d8f0ef',
+              border: '0.5px solid rgba(197,160,90,0.30)', borderRadius: 18,
+              boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flex: '1 1 auto', minWidth: 0 }}>
-              <span aria-hidden="true" style={{ fontSize: 24, lineHeight: 1 }}>🔞</span>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.75)' }}>
-                  Curated Partner
-                </div>
-                <div style={{ font: '400 19px/1.25 "Cormorant Garamond", Georgia, serif', color: '#ece8e1', marginTop: 5 }}>
+            <img
+              src="/promos/pornlinks-hero.png"
+              alt=""
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+            />
+            <div
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(6,16,16,0.86) 0%, rgba(6,16,16,0.58) 26%, rgba(6,16,16,0.06) 55%, rgba(6,16,16,0) 72%)' }}
+            />
+            <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'flex-end', gap: '1rem', flexWrap: 'wrap', justifyContent: 'space-between', width: '100%', padding: '16px 26px 18px' }}>
+              <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+                <div style={{ font: '400 16px/1.3 "Cormorant Garamond", Georgia, serif', color: '#eef3f2' }}>
                   The web&rsquo;s best adult sites &mdash; a hand-picked directory
                 </div>
               </div>
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
+                  background: 'linear-gradient(135deg,#e7c87f,#c5a05a 55%,#a0803d)', color: '#1a1206',
+                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '12px 20px',
+                  borderRadius: 11, boxShadow: '0 8px 24px rgba(197,160,90,0.28)',
+                }}
+              >
+                Best Porn Sites <span aria-hidden="true">&rarr;</span>
+              </span>
             </div>
-            <span
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
-                background: 'linear-gradient(135deg,#e7c87f,#c5a05a 55%,#a0803d)', color: '#1a1206',
-                font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '13px 22px',
-                borderRadius: 11, boxShadow: '0 8px 24px rgba(197,160,90,0.28)',
-              }}
-            >
-              Best Porn Sites <span aria-hidden="true">&rarr;</span>
-            </span>
           </div>
         </a>
       </div>

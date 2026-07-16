@@ -2339,22 +2339,22 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       {/* Curated partner link banners */}
       <div
         style={{
-          display: 'flex', alignItems: 'stretch', gap: '1.25rem', flexWrap: 'wrap', justifyContent: 'center',
-          maxWidth: 980, margin: '2.75rem auto 0.5rem', padding: '0 1rem',
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.25rem',
+          maxWidth: 1000, margin: '2.75rem auto 0.5rem', padding: '0 1rem',
         }}
       >
-        {/* Sex Vakanties partner card (left) */}
+        {/* Sex Vakanties partner card */}
         <a
           href="https://www.sexvakanties.be/"
           target="_blank"
           rel="noopener noreferrer nofollow sponsored"
           title="Sex Vakanties"
           aria-label="Sex Vakanties — sex holidays from dating to swingers holiday (opens in a new tab)"
-          style={{ flex: '1 1 420px', minWidth: 0, display: 'block', textDecoration: 'none' }}
+          style={{ display: 'flex', minWidth: 0, textDecoration: 'none' }}
         >
           <div
             style={{
-              position: 'relative', overflow: 'hidden', height: '100%', minHeight: 150,
+              flex: 1, minHeight: 158, position: 'relative', overflow: 'hidden',
               display: 'flex', alignItems: 'center', gap: '1.25rem',
               border: '0.5px solid rgba(236,111,43,0.35)', borderRadius: 18, padding: '20px 26px',
               boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
@@ -2393,18 +2393,18 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           </div>
         </a>
 
-        {/* Best Porn Sites partner card (right) */}
+        {/* Best Porn Sites partner card */}
         <a
           href="https://thepornlinks.com/"
           target="_blank"
           rel="noopener noreferrer nofollow sponsored"
           title="Best Porn Sites"
           aria-label="Best Porn Sites — curated adult directory (opens in a new tab)"
-          style={{ flex: '1 1 420px', minWidth: 0, display: 'block', textDecoration: 'none' }}
+          style={{ display: 'flex', minWidth: 0, textDecoration: 'none' }}
         >
           <div
             style={{
-              position: 'relative', overflow: 'hidden', height: '100%', minHeight: 150,
+              flex: 1, minHeight: 158, position: 'relative', overflow: 'hidden',
               display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
               background: '#d8f0ef',
               border: '0.5px solid rgba(197,160,90,0.30)', borderRadius: 18,
@@ -2415,27 +2415,112 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
               src="/promos/pornlinks-hero.png"
               alt=""
               aria-hidden="true"
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center top', zIndex: 0 }}
             />
             <div
               aria-hidden="true"
-              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(6,16,16,0.86) 0%, rgba(6,16,16,0.58) 26%, rgba(6,16,16,0.06) 55%, rgba(6,16,16,0) 72%)' }}
+              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(6,16,16,0.88) 0%, rgba(6,16,16,0.62) 30%, rgba(6,16,16,0.12) 52%, rgba(6,16,16,0) 66%)' }}
             />
-            <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'flex-end', gap: '1rem', flexWrap: 'wrap', justifyContent: 'space-between', width: '100%', padding: '16px 26px 18px' }}>
-              <div style={{ minWidth: 0, flex: '1 1 auto' }}>
-                <div style={{ font: '400 16px/1.3 "Cormorant Garamond", Georgia, serif', color: '#eef3f2' }}>
-                  The web&rsquo;s best adult sites &mdash; a hand-picked directory
-                </div>
+            <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, width: '100%', padding: '14px 24px 16px' }}>
+              <div style={{ font: '400 15px/1.3 "Cormorant Garamond", Georgia, serif', color: '#eef3f2' }}>
+                The web&rsquo;s best adult sites &mdash; a hand-picked directory
               </div>
               <span
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
                   background: 'linear-gradient(135deg,#e7c87f,#c5a05a 55%,#a0803d)', color: '#1a1206',
-                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '12px 20px',
+                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '12px 18px',
                   borderRadius: 11, boxShadow: '0 8px 24px rgba(197,160,90,0.28)',
                 }}
               >
                 Best Porn Sites <span aria-hidden="true">&rarr;</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        {/* Adultvisor partner card */}
+        <a
+          href="https://adultvisor.com/"
+          target="_blank"
+          rel="noopener noreferrer nofollow sponsored"
+          title="Adultvisor"
+          aria-label="Adultvisor — adult site reviews & directory (opens in a new tab)"
+          style={{ display: 'flex', minWidth: 0, textDecoration: 'none' }}
+        >
+          <div
+            style={{
+              flex: 1, minHeight: 158, position: 'relative', overflow: 'hidden',
+              display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+              background: '#a5121a',
+              border: '0.5px solid rgba(207,26,32,0.5)', borderRadius: 18,
+              boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
+            }}
+          >
+            <img
+              src="/promos/adultvisor-hero.jpg"
+              alt=""
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center top', zIndex: 0 }}
+            />
+            <div
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(45,3,5,0.9) 0%, rgba(45,3,5,0.55) 30%, rgba(45,3,5,0.08) 55%, rgba(45,3,5,0) 68%)' }}
+            />
+            <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, width: '100%', padding: '14px 24px 16px' }}>
+              <div style={{ font: '400 15px/1.3 "Cormorant Garamond", Georgia, serif', color: '#ffe9e7' }}>
+                Adult site reviews &amp; directory
+              </div>
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
+                  background: 'linear-gradient(135deg,#ff5b47,#d21a20 55%,#a5121a)', color: '#fff',
+                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '12px 18px',
+                  borderRadius: 11, boxShadow: '0 8px 24px rgba(207,26,32,0.32)',
+                }}
+              >
+                Adultvisor <span aria-hidden="true">&rarr;</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        {/* EuroSexScene partner card */}
+        <a
+          href="https://eurosexscene.com/city-guides/"
+          target="_blank"
+          rel="noopener noreferrer nofollow sponsored"
+          title="EuroSexScene"
+          aria-label="EuroSexScene — European city sex guides (opens in a new tab)"
+          style={{ display: 'flex', minWidth: 0, textDecoration: 'none' }}
+        >
+          <div
+            style={{
+              flex: 1, minHeight: 158, position: 'relative', overflow: 'hidden',
+              display: 'flex', flexDirection: 'column',
+              background: 'linear-gradient(180deg,#ffffff,#f0eef2)',
+              border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 18,
+              boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
+            }}
+          >
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 24px 4px' }}>
+              <span style={{ font: '800 34px/1 Arial, Helvetica, sans-serif', letterSpacing: '-0.5px' }}>
+                <span style={{ color: '#d81f26' }}>Euro</span><span style={{ color: '#1c1c22' }}>Sex</span><span style={{ color: '#d81f26' }}>Scene</span>
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, width: '100%', padding: '0 24px 16px' }}>
+              <div style={{ font: '400 15px/1.3 "Cormorant Garamond", Georgia, serif', color: '#4a4750' }}>
+                European city sex guides &amp; directory
+              </div>
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
+                  background: 'linear-gradient(135deg,#ef3a41,#d81f26 55%,#b3161c)', color: '#fff',
+                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '12px 18px',
+                  borderRadius: 11, boxShadow: '0 8px 24px rgba(216,31,38,0.3)',
+                }}
+              >
+                City Guides <span aria-hidden="true">&rarr;</span>
               </span>
             </div>
           </div>

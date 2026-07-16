@@ -2337,15 +2337,15 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       </a>
 
       {/* Curated partner link banners */}
-      <div style={{ maxWidth: 1000, margin: '2.75rem auto 0', padding: '0 1rem', textAlign: 'center' }}>
+      <div style={{ maxWidth: 1160, margin: '2.75rem auto 0', padding: '0 1rem', textAlign: 'center' }}>
         <div style={{ font: '600 11px/1 Poppins, sans-serif', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.8)' }}>
           Curated Partners
         </div>
       </div>
       <div
         style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.25rem',
-          maxWidth: 1000, margin: '1.1rem auto 0.5rem', padding: '0 1rem',
+          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem',
+          maxWidth: 1160, margin: '1.1rem auto 0.5rem', padding: '0 1rem',
         }}
       >
         {/* Sex Vakanties partner card */}
@@ -2384,6 +2384,88 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
                 }}
               >
                 Sex Vakanties <span aria-hidden="true">&rarr;</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        {/* X Reservations partner card */}
+        <a
+          href="https://xreservations.com/"
+          target="_blank"
+          rel="noopener noreferrer nofollow sponsored"
+          title="X Reservations"
+          aria-label="X Reservations (opens in a new tab)"
+          style={{ display: 'flex', minWidth: 0, textDecoration: 'none' }}
+        >
+          <div
+            style={{
+              flex: 1, minHeight: 158, position: 'relative', overflow: 'hidden',
+              display: 'flex', alignItems: 'center',
+              border: '0.5px solid rgba(224,36,44,0.4)', borderRadius: 18, padding: '20px 26px',
+              boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
+            }}
+          >
+            <img
+              src="/promos/xreservations-hero.jpg"
+              alt="X Reservations"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+            />
+            <div
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(50,16,10,0.72) 0%, rgba(50,16,10,0.26) 36%, rgba(50,16,10,0) 60%)' }}
+            />
+            <div style={{ position: 'relative', zIndex: 2, alignSelf: 'flex-end', width: '100%' }}>
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
+                  background: 'linear-gradient(135deg,#f04a4f,#d0202a 55%,#a5161d)', color: '#fff',
+                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '12px 20px',
+                  borderRadius: 11, boxShadow: '0 8px 24px rgba(208,32,42,0.3)',
+                }}
+              >
+                X Reservations <span aria-hidden="true">&rarr;</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        {/* UpNext Group partner card */}
+        <a
+          href="https://www.upnextgroup.com/"
+          target="_blank"
+          rel="noopener noreferrer nofollow sponsored"
+          title="UpNext Group"
+          aria-label="UpNext Group — better memories, better travel (opens in a new tab)"
+          style={{ display: 'flex', minWidth: 0, textDecoration: 'none' }}
+        >
+          <div
+            style={{
+              flex: 1, minHeight: 158, position: 'relative', overflow: 'hidden',
+              display: 'flex', alignItems: 'center',
+              border: '0.5px solid rgba(31,134,208,0.45)', borderRadius: 18, padding: '20px 26px',
+              boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
+            }}
+          >
+            <img
+              src="/promos/upnext-hero.jpg"
+              alt="UpNext Group — better memories, better travel"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+            />
+            <div
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(8,40,68,0.66) 0%, rgba(8,40,68,0.2) 38%, rgba(8,40,68,0) 62%)' }}
+            />
+            <div style={{ position: 'relative', zIndex: 2, alignSelf: 'flex-end', width: '100%' }}>
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
+                  background: '#ffffff', color: '#146fb8',
+                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '12px 20px',
+                  borderRadius: 11, boxShadow: '0 8px 24px rgba(8,40,68,0.28)',
+                }}
+              >
+                UpNext Group <span aria-hidden="true">&rarr;</span>
               </span>
             </div>
           </div>

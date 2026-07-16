@@ -2337,10 +2337,15 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       </a>
 
       {/* Curated partner link banners */}
+      <div style={{ maxWidth: 1000, margin: '2.75rem auto 0', padding: '0 1rem', textAlign: 'center' }}>
+        <div style={{ font: '600 11px/1 Poppins, sans-serif', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.8)' }}>
+          Curated Partners
+        </div>
+      </div>
       <div
         style={{
           display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '1.25rem',
-          maxWidth: 1000, margin: '2.75rem auto 0.5rem', padding: '0 1rem',
+          maxWidth: 1000, margin: '1.1rem auto 0.5rem', padding: '0 1rem',
         }}
       >
         {/* Sex Vakanties partner card */}

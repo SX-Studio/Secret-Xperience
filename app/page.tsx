@@ -2367,28 +2367,19 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           >
             <img
               src="/promos/sexvakanties-hero.jpg"
-              alt=""
-              aria-hidden="true"
+              alt="Sex Holiday — beautiful sex holidays, sex trips and sex weekends"
               style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
             />
             <div
               aria-hidden="true"
-              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(100deg, rgba(20,10,4,0.86) 0%, rgba(20,10,4,0.66) 46%, rgba(20,10,4,0.30) 100%)' }}
+              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(20,10,6,0.72) 0%, rgba(20,10,6,0.28) 34%, rgba(20,10,6,0) 58%)' }}
             />
-            <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', justifyContent: 'space-between', width: '100%' }}>
-              <div style={{ minWidth: 0, flex: '1 1 auto' }}>
-                <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,178,120,0.9)' }}>
-                  Curated Partner
-                </div>
-                <div style={{ font: '400 19px/1.25 "Cormorant Garamond", Georgia, serif', color: '#f5efe8', marginTop: 5 }}>
-                  For all sex holidays <span style={{ color: '#f5822a' }}>from dating to swingers holiday</span>
-                </div>
-              </div>
+            <div style={{ position: 'relative', zIndex: 2, alignSelf: 'flex-end', width: '100%' }}>
               <span
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
                   background: 'linear-gradient(135deg,#ff9d4d,#ec6f2b 55%,#c9541b)', color: '#1a0e04',
-                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '13px 22px',
+                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '12px 20px',
                   borderRadius: 11, boxShadow: '0 8px 24px rgba(236,111,43,0.32)',
                 }}
               >
@@ -2411,23 +2402,18 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
             style={{
               flex: 1, minHeight: 158, position: 'relative', overflow: 'hidden',
               display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
-              background: '#d8f0ef',
-              border: '0.5px solid rgba(197,160,90,0.30)', borderRadius: 18,
+              background: '#ffffff',
+              border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 18,
               boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
             }}
           >
             <img
-              src="/promos/pornlinks-hero.png"
-              alt=""
-              aria-hidden="true"
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center top', zIndex: 0 }}
-            />
-            <div
-              aria-hidden="true"
-              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(6,16,16,0.88) 0%, rgba(6,16,16,0.62) 30%, rgba(6,16,16,0.12) 52%, rgba(6,16,16,0) 66%)' }}
+              src="/promos/pornlinks-hero.jpg"
+              alt="PORNLINKS"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', zIndex: 0 }}
             />
             <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 10, width: '100%', padding: '14px 24px 16px' }}>
-              <div style={{ font: '400 15px/1.3 "Cormorant Garamond", Georgia, serif', color: '#eef3f2' }}>
+              <div style={{ font: '400 15px/1.3 "Cormorant Garamond", Georgia, serif', color: '#3a3a42' }}>
                 The web&rsquo;s best adult sites &mdash; a hand-picked directory
               </div>
               <span

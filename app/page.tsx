@@ -2296,6 +2296,46 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 ` }} />
       <CategoryAnimations />
 
+      {/* SDC.com partner side badge (desktop, right edge) */}
+      <a
+        href="https://www.sdc.com/be"
+        target="_blank"
+        rel="noopener noreferrer nofollow sponsored"
+        title="SDC.com — Swingers Date Club"
+        aria-label="SDC.com — Swingers Date Club (opens in a new tab)"
+        className="sdc-side-badge"
+      >
+        <div
+          style={{
+            width: 210, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+            background: 'linear-gradient(160deg, rgba(30,22,14,0.96), rgba(14,10,16,0.96))',
+            border: '0.5px solid rgba(197,160,90,0.45)', borderRadius: 18, padding: '20px 18px',
+            boxShadow: '0 18px 50px rgba(0,0,0,0.5)',
+          }}
+        >
+          <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.8)' }}>
+            Curated Partner
+          </div>
+          <img
+            src="/promos/sdc-logo.png"
+            alt="SDC.com"
+            width={150}
+            height={150}
+            style={{ width: 150, height: 150, objectFit: 'contain', filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.45))' }}
+          />
+          <span
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
+              background: 'linear-gradient(135deg,#e7c87f,#c5a05a 55%,#a0803d)', color: '#1a1206',
+              font: '700 12px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '11px 18px',
+              borderRadius: 11, boxShadow: '0 8px 24px rgba(197,160,90,0.28)',
+            }}
+          >
+            Visit SDC.com <span aria-hidden="true">&rarr;</span>
+          </span>
+        </div>
+      </a>
+
       {/* Curated partner link banners */}
       <div
         style={{

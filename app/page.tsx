@@ -2296,46 +2296,104 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 ` }} />
       <CategoryAnimations />
 
-      {/* Curated partner link banner */}
-      <a
-        href="https://thepornlinks.com/"
-        target="_blank"
-        rel="noopener noreferrer nofollow sponsored"
-        title="Best Porn Sites"
-        aria-label="Best Porn Sites — curated adult directory (opens in a new tab)"
-        style={{ display: 'block', maxWidth: 980, margin: '2.75rem auto 0.5rem', padding: '0 1rem', textDecoration: 'none' }}
+      {/* Curated partner link banners */}
+      <div
+        style={{
+          display: 'flex', alignItems: 'stretch', gap: '1.25rem', flexWrap: 'wrap', justifyContent: 'center',
+          maxWidth: 980, margin: '2.75rem auto 0.5rem', padding: '0 1rem',
+        }}
       >
-        <div
-          style={{
-            display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', justifyContent: 'center',
-            background: 'linear-gradient(135deg, rgba(197,160,90,0.10), rgba(20,14,26,0.55))',
-            border: '0.5px solid rgba(197,160,90,0.30)', borderRadius: 18, padding: '20px 26px',
-            boxShadow: '0 14px 44px rgba(0,0,0,0.38)', backdropFilter: 'blur(4px)',
-          }}
+        {/* Sex Vakanties partner card (left) */}
+        <a
+          href="https://www.sexvakanties.be/"
+          target="_blank"
+          rel="noopener noreferrer nofollow sponsored"
+          title="Sex Vakanties"
+          aria-label="Sex Vakanties — sex holidays from dating to swingers holiday (opens in a new tab)"
+          style={{ flex: '1 1 420px', minWidth: 0, display: 'block', textDecoration: 'none' }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flex: '1 1 auto', minWidth: 0 }}>
-            <span aria-hidden="true" style={{ fontSize: 24, lineHeight: 1 }}>🔞</span>
-            <div style={{ minWidth: 0 }}>
-              <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.75)' }}>
-                Curated Partner
-              </div>
-              <div style={{ font: '400 19px/1.25 "Cormorant Garamond", Georgia, serif', color: '#ece8e1', marginTop: 5 }}>
-                The web&rsquo;s best adult sites &mdash; a hand-picked directory
-              </div>
-            </div>
-          </div>
-          <span
+          <div
             style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
-              background: 'linear-gradient(135deg,#e7c87f,#c5a05a 55%,#a0803d)', color: '#1a1206',
-              font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '13px 22px',
-              borderRadius: 11, boxShadow: '0 8px 24px rgba(197,160,90,0.28)',
+              position: 'relative', overflow: 'hidden', height: '100%', minHeight: 132,
+              display: 'flex', alignItems: 'center', gap: '1.25rem',
+              border: '0.5px solid rgba(236,111,43,0.35)', borderRadius: 18, padding: '20px 26px',
+              boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
             }}
           >
-            Best Porn Sites <span aria-hidden="true">&rarr;</span>
-          </span>
-        </div>
-      </a>
+            <img
+              src="/promos/sexvakanties-hero.jpg"
+              alt=""
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+            />
+            <div
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(100deg, rgba(20,10,4,0.86) 0%, rgba(20,10,4,0.66) 46%, rgba(20,10,4,0.30) 100%)' }}
+            />
+            <div style={{ position: 'relative', zIndex: 2, display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', justifyContent: 'space-between', width: '100%' }}>
+              <div style={{ minWidth: 0, flex: '1 1 auto' }}>
+                <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,178,120,0.9)' }}>
+                  Curated Partner
+                </div>
+                <div style={{ font: '400 19px/1.25 "Cormorant Garamond", Georgia, serif', color: '#f5efe8', marginTop: 5 }}>
+                  For all sex holidays <span style={{ color: '#f5822a' }}>from dating to swingers holiday</span>
+                </div>
+              </div>
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
+                  background: 'linear-gradient(135deg,#ff9d4d,#ec6f2b 55%,#c9541b)', color: '#1a0e04',
+                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '13px 22px',
+                  borderRadius: 11, boxShadow: '0 8px 24px rgba(236,111,43,0.32)',
+                }}
+              >
+                Sex Vakanties <span aria-hidden="true">&rarr;</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
+        {/* Best Porn Sites partner card (right) */}
+        <a
+          href="https://thepornlinks.com/"
+          target="_blank"
+          rel="noopener noreferrer nofollow sponsored"
+          title="Best Porn Sites"
+          aria-label="Best Porn Sites — curated adult directory (opens in a new tab)"
+          style={{ flex: '1 1 420px', minWidth: 0, display: 'block', textDecoration: 'none' }}
+        >
+          <div
+            style={{
+              display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap', justifyContent: 'space-between', height: '100%', minHeight: 132,
+              background: 'linear-gradient(135deg, rgba(197,160,90,0.10), rgba(20,14,26,0.55))',
+              border: '0.5px solid rgba(197,160,90,0.30)', borderRadius: 18, padding: '20px 26px',
+              boxShadow: '0 14px 44px rgba(0,0,0,0.38)', backdropFilter: 'blur(4px)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', flex: '1 1 auto', minWidth: 0 }}>
+              <span aria-hidden="true" style={{ fontSize: 24, lineHeight: 1 }}>🔞</span>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.75)' }}>
+                  Curated Partner
+                </div>
+                <div style={{ font: '400 19px/1.25 "Cormorant Garamond", Georgia, serif', color: '#ece8e1', marginTop: 5 }}>
+                  The web&rsquo;s best adult sites &mdash; a hand-picked directory
+                </div>
+              </div>
+            </div>
+            <span
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
+                background: 'linear-gradient(135deg,#e7c87f,#c5a05a 55%,#a0803d)', color: '#1a1206',
+                font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '13px 22px',
+                borderRadius: 11, boxShadow: '0 8px 24px rgba(197,160,90,0.28)',
+              }}
+            >
+              Best Porn Sites <span aria-hidden="true">&rarr;</span>
+            </span>
+          </div>
+        </a>
+      </div>
 
       <div dangerouslySetInnerHTML={{ __html: `
   <div class="layout">

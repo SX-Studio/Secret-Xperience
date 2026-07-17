@@ -103,6 +103,32 @@ RETURNING id, title, category, city, price_from, price_to, meet_type, tier, webs
 If there is no website, omit it from the column list (or pass `NULL`) and use
 `ARRAY[]::text[]` for `placements` when not GOLD.
 
+## Pulling photos from a source link (RedLights etc.)
+
+When the ad comes as a **URL** (e.g. a RedLights profile) rather than pasted text,
+also pull the provider's photos automatically instead of asking for a manual upload:
+
+1. `WebFetch` the URL for the structured profile data.
+2. Get the page HTML (`curl -A "Mozilla/5.0"`) and find the **profile's own** gallery.
+   On RedLights, images are `https://a.rl.be/photos/<w>/<h>/c/<galleryId>/<name>-<ts>.jpg`.
+   The profile's gallery is the `galleryId` with **by far the most images** (related
+   listings show only 1 thumbnail each) — do NOT grab the related-listing thumbnails.
+3. Download the first ~5 distinct photos at a **large size** — the CDN accepts arbitrary
+   dimensions, so request `900/1200` (bigger than the 100/100 / 380/418 thumbnails on
+   the page). Send `-e "https://www.redlights.be/"` as referer.
+4. Save to `public/ads/<slug>-1..N.jpg`, verify each is a real JPEG (`file`), and
+   **eyeball photo 1** (Read the image) to confirm it's the right person.
+5. **Crop the watermark** — RedLights burns a "REDLIGHTS" logo bottom-left. Remove the
+   bottom ~7% of every image (Pillow: `im.crop((0,0,w,int(h*0.93)))`). This is the
+   **standing default** for RedLights pulls — always do it, don't ask each time.
+6. Commit the images to the repo, push, and set the listing `images` array to the
+   `/ads/<slug>-N.jpg` paths.
+7. Delete temporary download files (the hosted `public/ads` copies stay — they ARE the
+   photos; never delete those or the card goes blank).
+
+Only falls back to the manual upload page when a source blocks downloads (login-gated
+sites like OnlyFans behind a paywall). Pillow isn't preinstalled — `pip install Pillow`.
+
 ## After the insert — always report
 
 Return a compact table: **ID, category/subcategory, location + age + gender, rates,

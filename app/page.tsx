@@ -2296,58 +2296,65 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 ` }} />
       <CategoryAnimations />
 
-      {/* SDC.com partner side badge (desktop, right edge) */}
-      <a
-        href="https://www.sdc.com/swingers-nederland.html"
-        target="_blank"
-        rel="noopener noreferrer nofollow sponsored"
-        title="SDC.com — Swingers Date Club"
-        aria-label="SDC.com — Swingers Date Club (opens in a new tab)"
-        className="sdc-side-badge"
-      >
-        <div
-          style={{
-            width: 210, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
-            background: 'linear-gradient(160deg, rgba(30,22,14,0.96), rgba(14,10,16,0.96))',
-            border: '0.5px solid rgba(197,160,90,0.45)', borderRadius: 18, padding: '20px 18px',
-            boxShadow: '0 18px 50px rgba(0,0,0,0.5)',
-          }}
-        >
-          <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.8)' }}>
-            Curated Partner
-          </div>
-          <img
-            src="/promos/sdc-logo.png"
-            alt="SDC.com"
-            width={150}
-            height={150}
-            style={{ width: 150, height: 150, objectFit: 'contain', filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.45))' }}
-          />
-          <span
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
-              background: 'linear-gradient(135deg,#e7c87f,#c5a05a 55%,#a0803d)', color: '#1a1206',
-              font: '700 12px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '11px 18px',
-              borderRadius: 11, boxShadow: '0 8px 24px rgba(197,160,90,0.28)',
-            }}
-          >
-            Visit SDC.com <span aria-hidden="true">&rarr;</span>
-          </span>
-        </div>
-      </a>
-
-      {/* Curated partner link banners */}
-      <div style={{ maxWidth: 1160, margin: '2.75rem auto 0', padding: '0 1rem', textAlign: 'center' }}>
-        <div style={{ font: '600 11px/1 Poppins, sans-serif', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.8)' }}>
-          Curated Partners
-        </div>
-      </div>
+      {/* Curated partners — SDC card (left) + banner grid (right) */}
       <div
         style={{
-          display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem',
-          maxWidth: 1160, margin: '1.1rem auto 0.5rem', padding: '0 1rem',
+          display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '1.25rem',
+          maxWidth: 1400, margin: '2.75rem auto 0.5rem', padding: '0 1rem',
         }}
       >
+        {/* SDC.com partner card */}
+        <a
+          href="https://www.sdc.com/swingers-nederland.html"
+          target="_blank"
+          rel="noopener noreferrer nofollow sponsored"
+          title="SDC.com — Swingers Date Club"
+          aria-label="SDC.com — Swingers Date Club (opens in a new tab)"
+          style={{ flex: '0 0 210px', display: 'flex', textDecoration: 'none' }}
+        >
+          <div
+            style={{
+              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+              background: 'linear-gradient(160deg, rgba(30,22,14,0.96), rgba(14,10,16,0.96))',
+              border: '0.5px solid rgba(197,160,90,0.45)', borderRadius: 18, padding: '20px 18px',
+              boxShadow: '0 18px 50px rgba(0,0,0,0.5)',
+            }}
+          >
+            <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.8)' }}>
+              Curated Partner
+            </div>
+            <img
+              src="/promos/sdc-logo.png"
+              alt="SDC.com"
+              width={150}
+              height={150}
+              style={{ width: 150, height: 150, objectFit: 'contain', filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.45))' }}
+            />
+            <span
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
+                background: 'linear-gradient(135deg,#e7c87f,#c5a05a 55%,#a0803d)', color: '#1a1206',
+                font: '700 12px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '11px 18px',
+                borderRadius: 11, boxShadow: '0 8px 24px rgba(197,160,90,0.28)',
+              }}
+            >
+              Visit SDC.com <span aria-hidden="true">&rarr;</span>
+            </span>
+          </div>
+        </a>
+
+        {/* Banner grid column */}
+        <div style={{ flex: '1 1 640px', minWidth: 0 }}>
+          <div style={{ textAlign: 'center', marginBottom: '1.1rem' }}>
+            <div style={{ font: '600 11px/1 Poppins, sans-serif', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.8)' }}>
+              Curated Partners
+            </div>
+          </div>
+          <div
+            style={{
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem',
+            }}
+          >
         {/* Sex Vakanties partner card */}
         <a
           href="https://www.sexvakanties.be/"
@@ -2598,6 +2605,8 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
             </div>
           </div>
         </a>
+          </div>
+        </div>
       </div>
 
       <div dangerouslySetInnerHTML={{ __html: `

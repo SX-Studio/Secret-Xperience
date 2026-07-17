@@ -41,7 +41,7 @@ This replaces the manual `INSERT` we used to write by hand for every provider.
 | `description` | Bio text | Keep readable English. **Escape single quotes by doubling** (`don''t`). Append: region-availability line (if listed), a `Rates: …` line, and `Available 24/7` if stated. Drop non-ASCII emoji that risk SQL issues. |
 | `category` | Source label | `Escort …` → **escorts**; `Massage …` → **massage**; female "luxury company / private reception / companionship" with no "escort" word → **companionship**; domination-led → **domination**. When the source clearly says "Escort", use escorts even for gigolos. Ambiguous → pick + flag. |
 | `subcategory` | context | `private reception` (receives at home) · `Independent` · `Touring` (travels / worldwide). |
-| `meet_type` | context | **incall** = receives at home only · **outcall** = comes to you / "escort at your place" / "I don't host" · **both** = both. Unstated → `both`. Enum: `incall|outcall|both`. |
+| `meet_type` | context | **incall** = receives at home only · **outcall** = comes to you / "escort at your place" / "I don't host" · **both** = both. Unstated → `both`. Enum: `incall|outcall|both`. **Rule:** if the ad/source says **"private reception" (prive-ontvangst)**, set `meet_type = 'incall'` — even if an escort/out-call option is also listed. Private reception = incall. |
 | `price_from` / `price_to` | rate list | Min and max EUR across all listed durations. Single rate → `price_from` set, `price_to` NULL. None → both NULL. |
 | `currency` | — | `'EUR'`. |
 | `city`, `country` | location | City = the base/departure city. `country='Belgium'` unless clearly elsewhere. |

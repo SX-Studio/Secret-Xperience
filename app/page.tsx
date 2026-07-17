@@ -5,6 +5,7 @@ import SliderAds from './components/SliderAds/SliderAds'
 import PremiumBanner from './components/PremiumBanner/PremiumBanner'
 import LiveBanner from './components/LiveBanner/LiveBanner'
 import CategoryAnimations from './components/CategoryAnimations/CategoryAnimations'
+import UpcomingEventBanner from './components/UpcomingEventBanner'
 import PartnersShowcase from './components/PartnersShowcase/PartnersShowcase'
 import OnlyFansShowcase from './components/OnlyFansShowcase/OnlyFansShowcase'
 import StripchatLive from './components/StripchatLive/StripchatLive'
@@ -2790,6 +2791,9 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
         <button class="ft-btn" id="featuredBannerBtn">View advertisement <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
       </div>
 
+      <!-- Upcoming event banner mount point -->
+      <div id="upcomingEventMount"></div>
+
       <!-- Homepage Premium banner mount point -->
       <div id="homepagePremiumMount"></div>
 
@@ -3747,6 +3751,8 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 </div><!-- #app -->` }} />
       {/* Live-now ticker — portal into #liveBannerMount, renders only when an advertiser is broadcasting */}
       <LiveBanner />
+      {/* Upcoming event banner — portal into #upcomingEventMount */}
+      <UpcomingEventBanner />
       {/* Homepage Premium banner — portal into #homepagePremiumMount, renders only when sold */}
       <PremiumBanner placement="homepage" portalTo="homepagePremiumMount" />
       {/* GSAP slider ads — rendered as React portal anchored after #featuredBanner */}

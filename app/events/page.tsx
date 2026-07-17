@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { createClient } from '../lib/supabase'
 
 const COUNTRIES = ['All', 'Belgium', 'Germany', 'Netherlands', 'United Kingdom', 'Spain', 'Switzerland']
-const CATEGORIES = ['All', 'fetish', 'nightlife', 'lifestyle', 'wellness']
-const CATEGORY_LABELS: Record<string, string> = { fetish: 'Fetish', nightlife: 'Nightlife', lifestyle: 'Lifestyle', wellness: 'Wellness' }
+const CATEGORIES = ['All', 'private-party', 'fetish', 'nightlife', 'lifestyle', 'wellness']
+const CATEGORY_LABELS: Record<string, string> = { 'private-party': 'Private Parties', fetish: 'Fetish', nightlife: 'Nightlife', lifestyle: 'Lifestyle', wellness: 'Wellness' }
 const COUNTRY_FLAGS: Record<string, string> = { Belgium: '🇧🇪', Germany: '🇩🇪', Netherlands: '🇳🇱', 'United Kingdom': '🇬🇧', Spain: '🇪🇸', Switzerland: '🇨🇭', France: '🇫🇷', Austria: '🇦🇹', 'Czech Republic': '🇨🇿' }
 
 function formatDate(d: string) {
@@ -107,7 +107,8 @@ export default function EventsPage() {
   useEffect(() => {
     let res = events
     if (country !== 'All') res = res.filter(e => e.country === country)
-    if (category !== 'All') res = res.filter(e => e.category === category)
+    if (category === 'private-party') res = res.filter(e => Array.isArray(e.tags) && e.tags.includes('private-party'))
+    else if (category !== 'All') res = res.filter(e => e.category === category)
     if (search) res = res.filter(e => `${e.title ?? ''} ${e.city ?? ''} ${e.description ?? ''} ${e.venue_name ?? ''}`.toLowerCase().includes(search.toLowerCase()))
     setFiltered(res)
   }, [country, category, search, events])

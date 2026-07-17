@@ -2298,7 +2298,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 
       {/* SDC.com partner side badge (desktop, right edge) */}
       <a
-        href="https://www.sdc.com/be"
+        href="https://www.sdc.com/swingers-nederland.html"
         target="_blank"
         rel="noopener noreferrer nofollow sponsored"
         title="SDC.com — Swingers Date Club"

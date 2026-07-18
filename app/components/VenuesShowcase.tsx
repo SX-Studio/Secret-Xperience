@@ -87,9 +87,11 @@ export default function VenuesShowcase({ variant = 'full', portalTo }: { variant
   }
 
   // full page — grouped by country, then category
-  const COUNTRIES: { name: 'Belgium' | 'Germany'; flag: string }[] = [
+  const COUNTRIES: { name: Venue['country']; flag: string }[] = [
     { name: 'Belgium', flag: '🇧🇪' },
+    { name: 'Netherlands', flag: '🇳🇱' },
     { name: 'Germany', flag: '🇩🇪' },
+    { name: 'France', flag: '🇫🇷' },
   ]
   return (
     <div style={{ display: 'grid', gap: '3.5rem' }}>

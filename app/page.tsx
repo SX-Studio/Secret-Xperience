@@ -7,6 +7,7 @@ import LiveBanner from './components/LiveBanner/LiveBanner'
 import CategoryAnimations from './components/CategoryAnimations/CategoryAnimations'
 import UpcomingEventBanner from './components/UpcomingEventBanner'
 import PartnersShowcase from './components/PartnersShowcase/PartnersShowcase'
+import VenuesShowcase from './components/VenuesShowcase'
 import OnlyFansShowcase from './components/OnlyFansShowcase/OnlyFansShowcase'
 import StripchatLive from './components/StripchatLive/StripchatLive'
 import HeroThemes from './components/HeroThemes/HeroThemes'
@@ -3096,6 +3097,9 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </a>
   </div>
 
+  <!-- ══ VENUES BELGIUM (React portal — VenuesShowcase teaser) ══ -->
+  <div id="venuesMount"></div>
+
   <!-- ══ PARTNERS & LINKS (React portal — PartnersShowcase) ══ -->
   <div id="partnersShowcaseMount"></div>
 
@@ -3765,6 +3769,8 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <HeroThemes />
       {/* Live-status checker for the Stripchat profile cards (green line when live) */}
       <StripchatLive />
+      {/* Venues Belgium teaser — portal into #venuesMount */}
+      <VenuesShowcase variant="teaser" portalTo="venuesMount" />
       {/* Partners & Links band — portal into #partnersShowcaseMount above the footer */}
       <PartnersShowcase />
       <DesignDemos />

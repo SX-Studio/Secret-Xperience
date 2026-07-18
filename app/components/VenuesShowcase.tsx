@@ -7,8 +7,10 @@ import { venues, VENUE_CATEGORY_ORDER, type Venue } from '../data/venues'
 const CAT_ICON: Record<string, string> = {
   "Gentlemen's Clubs & Bars": '🍸',
   'Erotic Massage & Sauna': '💆',
+  'Brothels & Laufhaus': '🏩',
   'Strip Clubs': '💃',
   'Swingers Clubs': '🔑',
+  'Domina & Fetish': '⛓️',
   'Escort': '💋',
 }
 
@@ -84,23 +86,42 @@ export default function VenuesShowcase({ variant = 'full', portalTo }: { variant
     return mountEl ? createPortal(teaser, mountEl) : null
   }
 
-  // full page
+  // full page — grouped by country, then category
+  const COUNTRIES: { name: 'Belgium' | 'Germany'; flag: string }[] = [
+    { name: 'Belgium', flag: '🇧🇪' },
+    { name: 'Germany', flag: '🇩🇪' },
+  ]
   return (
-    <div style={{ display: 'grid', gap: '2.5rem' }}>
-      {VENUE_CATEGORY_ORDER.map(cat => {
-        const items = venues.filter(v => v.category === cat)
-        if (!items.length) return null
+    <div style={{ display: 'grid', gap: '3.5rem' }}>
+      {COUNTRIES.map(({ name: country, flag }) => {
+        const cv = venues.filter(v => v.country === country)
+        if (!cv.length) return null
         return (
-          <section key={cat}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-              <span style={{ fontSize: 18 }} aria-hidden="true">{CAT_ICON[cat] || '◆'}</span>
-              <h2 style={{ font: '400 22px/1.1 "Cormorant Garamond", Georgia, serif', color: '#f2ede4', margin: 0 }}>{cat}</h2>
-              <span style={{ font: '400 12px/1 Poppins, sans-serif', color: 'rgba(236,232,225,0.4)' }}>({items.length})</span>
+          <div key={country} id={country.toLowerCase()}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, paddingBottom: 12, marginBottom: 24, borderBottom: '0.5px solid rgba(197,160,90,0.28)' }}>
+              <span style={{ fontSize: 26 }} aria-hidden="true">{flag}</span>
+              <h2 style={{ font: '400 30px/1 "Cormorant Garamond", Georgia, serif', color: '#f2ede4', margin: 0 }}>{country}</h2>
+              <span style={{ font: '400 13px/1 Poppins, sans-serif', color: 'rgba(236,232,225,0.4)' }}>{cv.length} venues</span>
             </div>
-            <div style={gridStyle}>
-              {items.map(v => <VenueCard key={v.name + v.city} v={v} />)}
+            <div style={{ display: 'grid', gap: '2.5rem' }}>
+              {VENUE_CATEGORY_ORDER.map(cat => {
+                const items = cv.filter(v => v.category === cat)
+                if (!items.length) return null
+                return (
+                  <section key={cat}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+                      <span style={{ fontSize: 18 }} aria-hidden="true">{CAT_ICON[cat] || '◆'}</span>
+                      <h3 style={{ font: '400 22px/1.1 "Cormorant Garamond", Georgia, serif', color: '#f2ede4', margin: 0 }}>{cat}</h3>
+                      <span style={{ font: '400 12px/1 Poppins, sans-serif', color: 'rgba(236,232,225,0.4)' }}>({items.length})</span>
+                    </div>
+                    <div style={gridStyle}>
+                      {items.map(v => <VenueCard key={v.name + v.city} v={v} />)}
+                    </div>
+                  </section>
+                )
+              })}
             </div>
-          </section>
+          </div>
         )
       })}
     </div>

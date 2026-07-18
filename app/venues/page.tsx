@@ -21,13 +21,17 @@ export default function VenuesPage() {
       <section style={{ padding: '4.5rem 1.5rem 3rem', textAlign: 'center', position: 'relative', overflow: 'hidden', borderBottom: '0.5px solid rgba(255,255,255,0.06)' }}>
         <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 0%,rgba(197,160,90,0.08) 0%,transparent 65%)', pointerEvents: 'none' }} />
         <div style={{ position: 'relative', maxWidth: '720px', margin: '0 auto' }}>
-          <div style={{ font: '700 11px/1 Poppins, sans-serif', letterSpacing: '0.3em', color: '#c5a05a', textTransform: 'uppercase', marginBottom: '1.25rem' }}>Venues · Belgium</div>
+          <div style={{ font: '700 11px/1 Poppins, sans-serif', letterSpacing: '0.3em', color: '#c5a05a', textTransform: 'uppercase', marginBottom: '1.25rem' }}>Venues · Belgium &amp; Germany</div>
           <h1 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2.2rem,5vw,3.4rem)', fontWeight: 400, lineHeight: 1.15, margin: '0 0 1rem' }}>
             Clubs, Saunas &amp; <em style={{ fontStyle: 'italic', color: '#c5a05a' }}>Erotic Massage</em>
           </h1>
-          <p style={{ fontSize: '15.5px', color: 'rgba(236,232,225,0.6)', lineHeight: 1.7, maxWidth: '540px', margin: '0 auto' }}>
-            A curated directory of {venues.length} adult venues across Belgium — gentlemen&rsquo;s clubs, erotic massage salons, saunas and swingers clubs. Each links directly to its own website.
+          <p style={{ fontSize: '15.5px', color: 'rgba(236,232,225,0.6)', lineHeight: 1.7, maxWidth: '560px', margin: '0 auto 1.5rem' }}>
+            A curated directory of {venues.length} adult venues across Belgium &amp; Germany — gentlemen&rsquo;s clubs, erotic massage salons, saunas, brothels, domina studios and swingers clubs. Each links directly to its own website.
           </p>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
+            <a href="#belgium" style={{ padding: '8px 18px', borderRadius: 20, border: '0.5px solid rgba(197,160,90,0.4)', color: '#c5a05a', textDecoration: 'none', font: '600 13px/1 Poppins, sans-serif' }}>🇧🇪 Belgium</a>
+            <a href="#germany" style={{ padding: '8px 18px', borderRadius: 20, border: '0.5px solid rgba(197,160,90,0.4)', color: '#c5a05a', textDecoration: 'none', font: '600 13px/1 Poppins, sans-serif' }}>🇩🇪 Germany</a>
+          </div>
         </div>
       </section>
 

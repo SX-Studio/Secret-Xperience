@@ -47,6 +47,7 @@ function saveLastSeen(t: Tab) {
 
 export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false)
+  const [navOpen, setNavOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('Listings')
   const [badges, setBadges] = useState<Record<Tab, number>>({ Listings: 0, Users: 0, Verification: 0, Reports: 0, Bookings: 0, Newsletter: 0, Contacts: 0, Acquisition: 0, Keywords: 0, Tools: 0 })
   const [reports, setReports] = useState<any[]>([])
@@ -469,39 +470,55 @@ export default function AdminPage() {
         .adm-action-btn { transition: opacity var(--t-fast, 0.15s); }
         .adm-action-btn:hover { opacity: 0.8; }
         .adm-tab-btn:hover { color: var(--gold, #c5a05a) !important; }
+        .adm-hamburger { display: none; }
+        .adm-nav-overlay { display: none; }
         @media (max-width: 768px) {
-          .adm-shell { flex-direction: column !important; }
+          /* Sidebar becomes an off-canvas slide-in/out drawer */
           .adm-sidebar {
-            width: 100% !important; height: auto !important;
-            position: sticky !important; top: 0 !important; z-index: 50 !important;
-            border-right: none !important;
-            border-bottom: 0.5px solid var(--b, rgba(255,255,255,0.06)) !important;
-            flex-direction: column !important;
-            padding: 0 !important;
+            position: fixed !important; top: 0 !important; left: 0 !important;
+            width: 260px !important; max-width: 82vw !important; height: 100vh !important;
+            z-index: 120 !important;
+            transform: translateX(-100%); transition: transform 0.28s ease;
+            border-right: 0.5px solid var(--b, rgba(255,255,255,0.06)) !important;
+            box-shadow: 8px 0 40px rgba(0,0,0,0.55);
           }
-          .adm-sidebar-brand { display: none !important; }
-          .adm-sidebar-footer {
-            display: flex !important;
-            padding: 8px 12px !important;
-            border-top: 0.5px solid var(--b, rgba(255,255,255,0.06)) !important;
+          .adm-sidebar.open { transform: translateX(0); }
+          .adm-sidebar-brand { display: block !important; }
+          .adm-sidebar nav { flex-direction: column !important; overflow-y: auto !important; padding: 0.5rem 0 !important; }
+          .adm-tab-btn { border-left: 2px solid transparent !important; white-space: nowrap; }
+          .adm-sidebar-footer { display: block !important; }
+
+          /* Hamburger toggle + overlay */
+          .adm-hamburger {
+            display: inline-flex !important; align-items: center; justify-content: center;
+            width: 40px; height: 40px; flex-shrink: 0;
+            background: var(--bg2, rgba(255,255,255,0.05)); border: 0.5px solid var(--b2, rgba(255,255,255,0.12));
+            border-radius: 10px; color: var(--gold, #c5a05a); font-size: 20px; cursor: pointer;
           }
-          .adm-sidebar-footer button { width: auto !important; padding: 6px 14px !important; font-size: 12px !important; }
-          .adm-sidebar nav { flex-direction: row !important; overflow-x: auto !important; padding: 0 !important; flex: 1; display: flex; scrollbar-width: none; }
-          .adm-sidebar nav::-webkit-scrollbar { display: none; }
-          .adm-tab-btn {
-            padding: 12px 14px !important; white-space: nowrap;
-            border-left: none !important; border-bottom: 2px solid transparent !important;
-            font-size: 12px !important; flex-shrink: 0 !important;
+          .adm-nav-overlay.open {
+            display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+            z-index: 110; backdrop-filter: blur(2px);
           }
+
           .adm-main { overflow: visible !important; }
           .adm-main-header {
-            flex-direction: column !important; align-items: flex-start !important; gap: 10px !important;
-            padding: 1rem !important;
+            flex-direction: row !important; align-items: center !important; gap: 10px !important;
+            flex-wrap: wrap !important; padding: 1rem !important;
           }
           .adm-search-input { width: 100% !important; }
           .adm-content { padding: 1rem !important; }
           .adm-stats-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 0.75rem !important; }
           .adm-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+
+          /* Users table → stacked cards so every action button is reachable */
+          .adm-users-table { min-width: 0 !important; }
+          .adm-users-table thead { display: none !important; }
+          .adm-users-table, .adm-users-table tbody, .adm-users-table tr, .adm-users-table td { display: block !important; width: 100% !important; }
+          .adm-users-table tr { border: 0.5px solid var(--b, rgba(255,255,255,0.08)) !important; border-radius: 12px; margin: 0 0 12px; padding: 4px 4px; }
+          .adm-users-table td { padding: 8px 12px !important; }
+          .adm-users-table td:last-child { border-top: 0.5px solid var(--b, rgba(255,255,255,0.06)) !important; margin-top: 4px; }
+          .adm-users-table td:last-child > div { flex-wrap: wrap !important; }
+          .adm-users-table td:last-child .adm-action-icon-btn { flex: 1 1 auto; justify-content: center; min-width: 92px; }
         }
         .adm-search-input {
           height: 44px;
@@ -534,8 +551,11 @@ export default function AdminPage() {
         .adm-action-icon-btn:hover { opacity: 0.85; }
       `}</style>
 
+      {/* ── Mobile nav overlay (tap to close drawer) ── */}
+      <div className={`adm-nav-overlay${navOpen ? ' open' : ''}`} onClick={() => setNavOpen(false)} aria-hidden={!navOpen} />
+
       {/* ── Sidebar ── */}
-      <div className="adm-sidebar" style={{ width: '220px', background: 'var(--bg1, #080808)', borderRight: '0.5px solid var(--b, rgba(255,255,255,0.06))', display: 'flex', flexDirection: 'column', flexShrink: 0, position: 'sticky', top: 0, height: '100vh' }}>
+      <div className={`adm-sidebar${navOpen ? ' open' : ''}`} style={{ width: '220px', background: 'var(--bg1, #080808)', borderRight: '0.5px solid var(--b, rgba(255,255,255,0.06))', display: 'flex', flexDirection: 'column', flexShrink: 0, position: 'sticky', top: 0, height: '100vh' }}>
         <div className="adm-sidebar-brand" style={{ padding: '1.5rem', borderBottom: '0.5px solid var(--b, rgba(255,255,255,0.06))' }}>
           <div style={{ fontFamily: 'var(--serif)', color: 'var(--gold, #c5a05a)', fontSize: '18px', marginBottom: '6px' }}>SecretXperience</div>
           <div style={{ display: 'inline-block', background: 'var(--gbg)', color: 'var(--gold)', border: '0.5px solid var(--gbrd)', borderRadius: '20px', padding: '3px 10px', font: '600 10px/1 var(--sans)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Admin</div>
@@ -547,6 +567,7 @@ export default function AdminPage() {
               setTab(t)
               setBadges(b => ({ ...b, [t]: 0 }))
               saveLastSeen(t)
+              setNavOpen(false)
             }} style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '0.75rem 1.5rem', background: tab === t ? 'var(--gbg, rgba(197,160,90,0.08))' : 'transparent', border: 'none', borderLeft: tab === t ? '2px solid var(--gold, #c5a05a)' : '2px solid transparent', color: tab === t ? 'var(--gold, #c5a05a)' : 'var(--t2, #8c8880)', cursor: 'pointer', font: `${tab === t ? 600 : 400} 13px/1 var(--sans)`, textAlign: 'left', transition: 'all var(--t-fast, .15s) var(--ease-out)', position: 'relative' }}>
               <i className={`ti ti-${TAB_ICONS[t]}`} style={{ fontSize: '16px' }} aria-hidden="true" />
               <span style={{ flex: 1 }}>{t}</span>
@@ -568,10 +589,13 @@ export default function AdminPage() {
 
         {/* ── Page header ── */}
         <div className="adm-main-header" style={{ background: 'var(--bg1, #080808)', borderBottom: '0.5px solid var(--b, rgba(255,255,255,0.06))', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', minWidth: 0 }}>
+            <button className="adm-hamburger" onClick={() => setNavOpen(true)} aria-label="Open menu"><i className="ti ti-menu-2" aria-hidden="true" /></button>
+            <div style={{ minWidth: 0 }}>
             <h1 style={{ fontFamily: 'var(--serif)', fontWeight: 500, fontSize: '36px', color: 'var(--t, #ece8e1)', margin: 0, lineHeight: 1.1 }}>{tab}</h1>
             <div style={{ font: '300 11px/1 var(--sans)', color: 'var(--t3, #4c4a47)', marginTop: '4px', letterSpacing: '0.04em' }}>
               {tab === 'Listings' ? `${filteredListings.length} listings` : tab === 'Users' ? `${filteredUsers.length} users` : tab === 'Reports' ? `${reports.filter(r => r.status === 'open').length} open · ${reports.length} total` : tab === 'Newsletter' ? (search ? `${filteredNlSubs.length} of ${nlSubCount ?? '…'} subscribers` : `${nlSubCount ?? '…'} subscribers`) : tab === 'Contacts' ? `${optinContacts.length} opted-in · ${leads.length} leads` : tab === 'Acquisition' ? `${acqTotal} tracked signups · ${acq.length} sources` : tab === 'Keywords' ? `${kwResults.length ? `${kwResults.length} results` : 'SEO research'}` : tab === 'Tools' ? 'Admin tools' : `${filteredBookings.length} bookings`}
+            </div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -797,7 +821,7 @@ export default function AdminPage() {
 
           {/* ── Users table ── */}
             <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
+              <table className="adm-users-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                 <thead>
                   <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                     {['User', 'Role', 'Joined', 'Tokens', 'Badges', 'Actions'].map(h => (

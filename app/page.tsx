@@ -2173,7 +2173,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   <div id="heroThemesMount"></div>
 
   <section id="editorialHero" style="width:100%;background:var(--grad-candle);border-top:0.5px solid var(--b);border-bottom:0.5px solid var(--b);padding:4rem 1.5rem;">
-    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:48% 22% 30%;gap:2rem;align-items:center;">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr;gap:2rem;align-items:center;">
       <!-- LEFT: text -->
       <div>
         <p class="t-eyebrow-gold" style="margin-bottom:1rem;">EU · DISCREET · VERIFIED</p>
@@ -2197,13 +2197,6 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           <div><div style="font-family:var(--serif);font-size:28px;color:var(--gold);">8</div><div class="t-meta" style="color:var(--t3);">CATEGORIES</div></div>
           <div><div style="font-family:var(--serif);font-size:28px;color:var(--gold);">4.8 ★</div><div class="t-meta" style="color:var(--t3);">AVG RATING</div></div>
         </div>
-      </div>
-      <!-- MIDDLE: SX brand logo -->
-      <div class="hero-promo-col" style="display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;">
-        <div style="position:relative;background:#000;border-radius:var(--rl);padding:1rem;">
-          <img src="/sox-logo.png" alt="SecretXperience" style="width:260px;border-radius:var(--rl);filter:drop-shadow(0 0 40px rgba(197,160,90,0.35));" />
-        </div>
-        <p class="t-meta" style="color:var(--t3);margin-top:0.75rem;text-align:center;letter-spacing:0.16em;">SECRET · XPERIENCE</p>
       </div>
       <!-- RIGHT: featured advertisement card -->
       <div class="hero-hero-col" id="heroFeaturedCard" style="width:100%;max-width:320px;border-radius:var(--rl);border:0.5px solid var(--b2);box-shadow:var(--shadow-card-h);overflow:hidden;cursor:pointer;" onclick="document.getElementById('heroFeaturedCard').style.transform='translateY(-3px)'">

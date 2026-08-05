@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from './lib/supabase'
 import SliderAds from './components/SliderAds/SliderAds'
 import PremiumBanner from './components/PremiumBanner/PremiumBanner'
+import JoyBanner from './components/JoyBanner/JoyBanner'
 import LiveBanner from './components/LiveBanner/LiveBanner'
 import CategoryAnimations from './components/CategoryAnimations/CategoryAnimations'
 import UpcomingEventBanner from './components/UpcomingEventBanner'
@@ -2791,6 +2792,9 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <!-- Homepage Premium banner mount point -->
       <div id="homepagePremiumMount"></div>
 
+      <!-- Enjoy with Joy featured-advertiser banner mount point -->
+      <div id="joyBannerMount"></div>
+
       <!-- Slider Ads mount point -->
       <div id="sliderAdsMount"></div>
 
@@ -3752,6 +3756,8 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <UpcomingEventBanner />
       {/* Homepage Premium banner — portal into #homepagePremiumMount, renders only when sold */}
       <PremiumBanner placement="homepage" portalTo="homepagePremiumMount" />
+      {/* Enjoy with Joy featured-advertiser banner — portal into #joyBannerMount; double-click opens full profile, links to enjoywithjoy.be */}
+      <JoyBanner portalTo="joyBannerMount" />
       {/* GSAP slider ads — rendered as React portal anchored after #featuredBanner */}
       <SliderAds />
       {/* OnlyFans creator directory — portal into #onlyfansShowcaseMount above the partners band */}

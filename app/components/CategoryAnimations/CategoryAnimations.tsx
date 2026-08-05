@@ -37,7 +37,7 @@ export default function CategoryAnimations() {
         <div className="section-inner">
 
           <header className="section-head">
-            <span className="t-eyebrow t-eyebrow-gold">EIGHT WORLDS · ONE MEMBERSHIP</span>
+            <span className="t-eyebrow t-eyebrow-gold">TEN WORLDS · ONE MEMBERSHIP</span>
             <h2 className="t-display section-title">
               Discover what awaits<br /><em>after the door closes.</em>
             </h2>
@@ -396,6 +396,68 @@ export default function CategoryAnimations() {
                 <h3 className="cat-title">Shop</h3>
                 <p className="cat-desc">Refined accessories, intimate gifts, lingerie — delivered discreetly.</p>
                 <a href="/shop" className="cat-cta" onClick={e => e.stopPropagation()}>Shop now →</a>
+              </div>
+            </article>
+
+            {/* 9. LIVE — Cams, shows & chat */}
+            <article className="cat-card cat-live" id="cat-live" data-anim="live" onClick={go('/live')}>
+              <div className="cat-canvas">
+                <svg viewBox="0 0 260 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                  <defs>
+                    <radialGradient id="glow-live" cx="50%" cy="45%" r="55%">
+                      <stop offset="0%" stopColor="#e2504f" stopOpacity=".32" />
+                      <stop offset="70%" stopColor="#e2504f" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+                  <circle cx="130" cy="94" r="60" fill="url(#glow-live)" />
+                  <path className="lv-wave" d="M96 66 q-14 14 0 30" fill="none" stroke="rgba(197,160,90,.45)" strokeWidth="1.2" strokeLinecap="round" />
+                  <path className="lv-wave" d="M86 58 q-22 22 0 46" fill="none" stroke="rgba(197,160,90,.3)" strokeWidth="1.1" strokeLinecap="round" />
+                  <path className="lv-wave" d="M164 66 q14 14 0 30" fill="none" stroke="rgba(197,160,90,.45)" strokeWidth="1.2" strokeLinecap="round" />
+                  <path className="lv-wave" d="M174 58 q22 22 0 46" fill="none" stroke="rgba(197,160,90,.3)" strokeWidth="1.1" strokeLinecap="round" />
+                  <rect x="102" y="66" width="56" height="42" rx="6" fill="rgba(197,160,90,.05)" stroke="#c5a05a" strokeWidth="1.6" />
+                  <path d="M124 78 l16 9 -16 9 z" fill="#e0c082" />
+                  <rect x="100" y="120" width="46" height="18" rx="9" fill="rgba(226,80,79,.16)" stroke="#e2504f" strokeWidth="1.2" />
+                  <circle className="lv-dot" cx="111" cy="129" r="3.4" fill="#e2504f" />
+                  <text x="119" y="133" fontSize="9" fontWeight="700" letterSpacing="1.5" fill="#e2504f" fontFamily="Poppins, sans-serif">LIVE</text>
+                  <path d="M156 118 h34 a6 6 0 0 1 6 6 v14 a6 6 0 0 1 -6 6 h-20 l-8 8 v-8 h-6 a6 6 0 0 1 -6 -6 v-14 a6 6 0 0 1 6 -6 z" fill="rgba(197,160,90,.05)" stroke="#c5a05a" strokeWidth="1.5" strokeLinejoin="round" />
+                  <line x1="164" y1="128" x2="188" y2="128" stroke="rgba(197,160,90,.45)" strokeWidth="1.2" strokeLinecap="round" />
+                  <line x1="164" y1="135" x2="182" y2="135" stroke="rgba(197,160,90,.45)" strokeWidth="1.2" strokeLinecap="round" />
+                </svg>
+              </div>
+              <div className="cat-meta">
+                <h3 className="cat-title">Live</h3>
+                <p className="cat-desc">Cams, live shows &amp; private chat — watch, tip and talk in real time.</p>
+                <a href="/live" className="cat-cta" onClick={e => e.stopPropagation()}>Watch live →</a>
+              </div>
+            </article>
+
+            {/* 10. XVACATURES — Adult-industry jobs */}
+            <article className="cat-card cat-xvac" id="cat-xvacatures" data-anim="xvac" onClick={go('/jobs')}>
+              <div className="cat-canvas">
+                <svg viewBox="0 0 260 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                  <defs>
+                    <radialGradient id="glow-xvac" cx="50%" cy="48%" r="52%">
+                      <stop offset="0%" stopColor="#e0c082" stopOpacity=".28" />
+                      <stop offset="70%" stopColor="#e0c082" stopOpacity="0" />
+                    </radialGradient>
+                  </defs>
+                  <circle cx="130" cy="98" r="58" fill="url(#glow-xvac)" />
+                  <text x="196" y="54" fontSize="40" fontFamily="Playfair Display, Georgia, serif" fontStyle="italic" fill="rgba(197,160,90,.10)">X</text>
+                  <rect x="82" y="82" width="96" height="66" rx="8" fill="rgba(197,160,90,.05)" stroke="#c5a05a" strokeWidth="1.6" />
+                  <path d="M110 82 v-10 a6 6 0 0 1 6 -6 h28 a6 6 0 0 1 6 6 v10" fill="none" stroke="#c5a05a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  <line x1="82" y1="108" x2="178" y2="108" stroke="#c5a05a" strokeWidth="1.6" />
+                  <rect x="120" y="102" width="20" height="12" rx="3" fill="rgba(197,160,90,.2)" stroke="#c5a05a" strokeWidth="1.3" />
+                  <path d="M104 122 l16 16 M120 122 l-16 16" fill="none" stroke="rgba(197,160,90,.4)" strokeWidth="1.2" strokeLinecap="round" />
+                  <g className="xv-spark" stroke="#e0c082" strokeWidth="1.6" strokeLinecap="round" transform-origin="166 126">
+                    <line x1="166" y1="119" x2="166" y2="133" />
+                    <line x1="159" y1="126" x2="173" y2="126" />
+                  </g>
+                </svg>
+              </div>
+              <div className="cat-meta">
+                <h3 className="cat-title">Xvacatures</h3>
+                <p className="cat-desc">Adult-industry jobs across Europe — vacancies offered &amp; work wanted.</p>
+                <a href="/jobs" className="cat-cta" onClick={e => e.stopPropagation()}>Browse jobs →</a>
               </div>
             </article>
 

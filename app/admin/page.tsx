@@ -578,6 +578,11 @@ export default function AdminPage() {
               )}
             </button>
           ))}
+          <a href="/admin/community" className="adm-tab-btn" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '0.75rem 1.5rem', textDecoration: 'none', background: 'transparent', borderLeft: '2px solid transparent', color: 'var(--t2, #8c8880)', font: '400 13px/1 var(--sans)' }}>
+            <i className="ti ti-building-community" style={{ fontSize: '16px' }} aria-hidden="true" />
+            <span style={{ flex: 1 }}>Community</span>
+            <i className="ti ti-external-link" style={{ fontSize: '13px', opacity: 0.6 }} aria-hidden="true" />
+          </a>
         </nav>
         <div className="adm-sidebar-footer" style={{ padding: '1rem 1.5rem', borderTop: '0.5px solid var(--b, rgba(255,255,255,0.06))' }}>
           <button onClick={() => window.location.href = '/'} style={{ width: '100%', padding: '0.6rem', background: 'transparent', border: '0.5px solid var(--b2, rgba(255,255,255,0.1))', borderRadius: 'var(--r, 8px)', color: 'var(--t3, #4c4a47)', cursor: 'pointer', font: '400 12px/1 var(--sans)' }}>← Back to site</button>

@@ -2274,11 +2274,15 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <a href="/private-reception?cat=experiences" class="nd-sub-link" style="padding-left:40px;font-size:12px"><i class="ti ti-sparkles"></i> Experiences</a>
       <div class="nd-group-hd">Venues</div>
       <a href="/nightlife" class="nd-sub-link"><i class="ti ti-glass-cocktail"></i> Nightlife</a>
+      <a href="/venues" class="nd-sub-link"><i class="ti ti-building-store"></i> All Venues</a>
+      <a href="/swingers" class="nd-sub-link"><i class="ti ti-key"></i> Swinger &amp; Parenclubs</a>
+      <a href="/fetish" class="nd-sub-link"><i class="ti ti-chain"></i> Fetish &amp; Domina</a>
       <a href="/rentals" class="nd-sub-link"><i class="ti ti-building"></i> Rentals</a>
       <a href="/hotels" class="nd-sub-link"><i class="ti ti-bed"></i> Hotels</a>
       <div class="nd-group-hd">More</div>
       <a href="/creators" class="nd-sub-link"><i class="ti ti-camera"></i> Creators</a>
       <a href="/events" class="nd-sub-link"><i class="ti ti-calendar-event"></i> Events</a>
+      <a href="/jobs" class="nd-sub-link"><i class="ti ti-briefcase"></i> Jobs &amp; Vacancies</a>
       <a href="/shop" class="nd-sub-link"><i class="ti ti-shopping-bag"></i> Adult Shop</a>
       <div class="nd-group-hd">Information</div>
       <a href="/regulations" class="nd-sub-link"><i class="ti ti-scale"></i> Regulation &amp; Rights</a>
@@ -3120,7 +3124,11 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           <a href="/escorts">Escorts</a>
           <a href="/private-reception?cat=companionship">Companionship</a>
           <a href="/nightlife">Nightlife</a>
+          <a href="/venues">Venues</a>
+          <a href="/swingers">Swinger &amp; Parenclubs</a>
+          <a href="/fetish">Fetish &amp; Domina</a>
           <a href="/events">Events</a>
+          <a href="/jobs">Jobs &amp; Vacancies</a>
           <a href="/creators">Creators</a>
           <a href="/rentals">Rentals</a>
           <a href="/livestreams">Live Shows</a>

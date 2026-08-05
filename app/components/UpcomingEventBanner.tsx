@@ -11,14 +11,17 @@ type Ev = {
   venue_name: string | null
   city: string | null
   date_start: string | null
+  date_end: string | null
   time_start: string | null
   image_url: string | null
+  category: string | null
 }
 
-// Homepage "upcoming events" band — shows the next two upcoming events side by
-// side (soonest first, featured preferred). Portals into #upcomingEventMount.
+// Homepage "upcoming" band — left: the next party/nightlife event; right: the
+// next fair/expo (category = 'expo'). Portals into #upcomingEventMount.
 export default function UpcomingEventBanner() {
-  const [evs, setEvs] = useState<Ev[]>([])
+  const [party, setParty] = useState<Ev | null>(null)
+  const [expo, setExpo] = useState<Ev | null>(null)
   const [mountEl, setMountEl] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
@@ -30,32 +33,40 @@ export default function UpcomingEventBanner() {
     let cancelled = false
     const supabase = createClient()
     const today = new Date().toISOString().slice(0, 10)
-    supabase
-      .from('events')
-      .select('slug,title,description,venue_name,city,date_start,time_start,image_url,featured')
-      .eq('active', true)
-      .gte('date_start', today)
-      .order('featured', { ascending: false })
-      .order('date_start', { ascending: true })
-      .limit(2)
-      .then(({ data }) => {
-        if (!cancelled && data && data.length) setEvs(data as Ev[])
-      })
+    const cols = 'slug,title,description,venue_name,city,date_start,date_end,time_start,image_url,category,featured'
+
+    // Left: soonest non-expo event (parties/nightlife), featured first.
+    supabase.from('events').select(cols)
+      .eq('active', true).gte('date_start', today).neq('category', 'expo')
+      .order('featured', { ascending: false }).order('date_start', { ascending: true })
+      .limit(1)
+      .then(({ data }) => { if (!cancelled && data && data.length) setParty(data[0] as Ev) })
+
+    // Right: soonest fair / expo.
+    supabase.from('events').select(cols)
+      .eq('active', true).gte('date_start', today).eq('category', 'expo')
+      .order('featured', { ascending: false }).order('date_start', { ascending: true })
+      .limit(1)
+      .then(({ data }) => { if (!cancelled && data && data.length) setExpo(data[0] as Ev) })
+
     return () => { cancelled = true }
   }, [])
 
-  if (!evs.length) return null
+  if (!party && !expo) return null
 
-  const fmt = (ev: Ev) => {
-    const dateLabel = ev.date_start
-      ? new Date(ev.date_start).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long' })
-      : ''
-    const loc = [ev.venue_name, ev.city].filter(Boolean).join(' · ')
-    return { dateLabel, loc }
+  const dateRange = (ev: Ev) => {
+    if (!ev.date_start) return ''
+    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' }
+    const s = new Date(ev.date_start)
+    if (ev.date_end && ev.date_end !== ev.date_start) {
+      const e = new Date(ev.date_end)
+      return `${s.toLocaleDateString('en-GB', opts)} – ${e.toLocaleDateString('en-GB', { ...opts, year: 'numeric' })}`
+    }
+    return s.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'long' })
   }
 
-  const card = (ev: Ev, eyebrow: string) => {
-    const { dateLabel, loc } = fmt(ev)
+  const card = (ev: Ev, eyebrow: string, icon: string) => {
+    const loc = [ev.venue_name, ev.city].filter(Boolean).join(' · ')
     return (
       <a
         key={ev.slug}
@@ -76,14 +87,14 @@ export default function UpcomingEventBanner() {
           }}
         />
         <div style={{ padding: '16px 20px 18px', display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
-          <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#e8c97a' }}>
-            {eyebrow}
+          <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#e8c97a', display: 'flex', alignItems: 'center', gap: 6 }}>
+            <i className={`ti ${icon}`} style={{ fontSize: 12 }} /> {eyebrow}
           </div>
           <div style={{ font: '400 22px/1.15 "Cormorant Garamond", Georgia, serif', color: '#f2ede4', margin: '7px 0 6px' }}>
             {ev.title}
           </div>
           <div style={{ font: '400 12.5px/1.5 Poppins, sans-serif', color: 'rgba(236,232,225,0.62)' }}>
-            {dateLabel}{ev.time_start ? ` · ${ev.time_start}` : ''}{loc ? ` · ${loc}` : ''}
+            {dateRange(ev)}{ev.time_start ? ` · ${ev.time_start}` : ''}{loc ? ` · ${loc}` : ''}
           </div>
           {ev.description && (
             <div style={{ font: '300 12.5px/1.5 Poppins, sans-serif', color: 'rgba(236,232,225,0.5)', marginTop: 8, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
@@ -98,14 +109,14 @@ export default function UpcomingEventBanner() {
               boxShadow: '0 8px 24px rgba(197,160,90,0.26)',
             }}
           >
-            View event <span aria-hidden="true">&rarr;</span>
+            {ev.category === 'expo' ? 'View fair' : 'View event'} <span aria-hidden="true">&rarr;</span>
           </span>
         </div>
       </a>
     )
   }
 
-  const single = evs.length === 1
+  const single = !party || !expo
 
   const band = (
     <>
@@ -120,8 +131,8 @@ export default function UpcomingEventBanner() {
         }
       `}</style>
       <div className="upev-band" style={single ? { gridTemplateColumns: '1fr', maxWidth: 980 } : undefined}>
-        {card(evs[0], 'Upcoming event')}
-        {evs[1] && card(evs[1], 'Also coming up')}
+        {party && card(party, 'Upcoming event', 'ti-confetti')}
+        {expo && card(expo, 'Fairs & expos', 'ti-building-store')}
       </div>
     </>
   )

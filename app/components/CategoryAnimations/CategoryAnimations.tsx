@@ -415,7 +415,7 @@ export default function CategoryAnimations() {
                   <path className="lv-wave" d="M164 66 q14 14 0 30" fill="none" stroke="rgba(197,160,90,.45)" strokeWidth="1.2" strokeLinecap="round" />
                   <path className="lv-wave" d="M174 58 q22 22 0 46" fill="none" stroke="rgba(197,160,90,.3)" strokeWidth="1.1" strokeLinecap="round" />
                   <rect x="102" y="66" width="56" height="42" rx="6" fill="rgba(197,160,90,.05)" stroke="#c5a05a" strokeWidth="1.6" />
-                  <path d="M124 78 l16 9 -16 9 z" fill="#e0c082" />
+                  <path className="lv-play" d="M124 78 l16 9 -16 9 z" fill="#e0c082" />
                   <rect x="100" y="120" width="46" height="18" rx="9" fill="rgba(226,80,79,.16)" stroke="#e2504f" strokeWidth="1.2" />
                   <circle className="lv-dot" cx="111" cy="129" r="3.4" fill="#e2504f" />
                   <text x="119" y="133" fontSize="9" fontWeight="700" letterSpacing="1.5" fill="#e2504f" fontFamily="Poppins, sans-serif">LIVE</text>
@@ -443,25 +443,23 @@ export default function CategoryAnimations() {
                   </defs>
                   <circle cx="130" cy="102" r="58" fill="url(#glow-xjobs)" />
                   <text x="198" y="56" fontSize="40" fontFamily="Playfair Display, Georgia, serif" fontStyle="italic" fill="rgba(197,160,90,.10)">X</text>
-                  {/* lanyard clip */}
-                  <rect x="125" y="40" width="10" height="9" rx="2" fill="rgba(197,160,90,.2)" stroke="#c5a05a" strokeWidth="1.2" />
-                  <path d="M122 49 h16 v6 a8 8 0 0 1 -16 0 z" fill="none" stroke="#c5a05a" strokeWidth="1.4" strokeLinejoin="round" />
-                  {/* badge card */}
-                  <rect x="86" y="64" width="88" height="98" rx="11" fill="rgba(197,160,90,.05)" stroke="#c5a05a" strokeWidth="1.6" />
-                  <rect x="120" y="72" width="20" height="5" rx="2.5" fill="none" stroke="rgba(197,160,90,.5)" strokeWidth="1.2" />
-                  {/* avatar */}
-                  <circle cx="112" cy="102" r="13" fill="none" stroke="#c5a05a" strokeWidth="1.5" />
-                  <circle cx="112" cy="98" r="4.6" fill="#e0c082" />
-                  <path d="M104 110 q8 -8 16 0" fill="none" stroke="#e0c082" strokeWidth="1.6" strokeLinecap="round" />
-                  {/* name / role lines */}
-                  <line x1="132" y1="96" x2="160" y2="96" stroke="#c5a05a" strokeWidth="1.7" strokeLinecap="round" />
-                  <line x1="132" y1="104" x2="154" y2="104" stroke="rgba(197,160,90,.45)" strokeWidth="1.3" strokeLinecap="round" />
-                  <line x1="98" y1="130" x2="162" y2="130" stroke="rgba(197,160,90,.35)" strokeWidth="1.2" strokeLinecap="round" />
-                  <line x1="98" y1="138" x2="150" y2="138" stroke="rgba(197,160,90,.35)" strokeWidth="1.2" strokeLinecap="round" />
-                  {/* hiring spark */}
-                  <g className="xj-spark" stroke="#e0c082" strokeWidth="1.6" strokeLinecap="round" transform-origin="152 150">
-                    <line x1="152" y1="144" x2="152" y2="156" />
-                    <line x1="146" y1="150" x2="158" y2="150" />
+                  {/* badge (swings on its lanyard via GSAP) */}
+                  <g className="xj-badge">
+                    <rect x="125" y="40" width="10" height="9" rx="2" fill="rgba(197,160,90,.2)" stroke="#c5a05a" strokeWidth="1.2" />
+                    <path d="M122 49 h16 v6 a8 8 0 0 1 -16 0 z" fill="none" stroke="#c5a05a" strokeWidth="1.4" strokeLinejoin="round" />
+                    <rect x="86" y="64" width="88" height="98" rx="11" fill="rgba(197,160,90,.05)" stroke="#c5a05a" strokeWidth="1.6" />
+                    <rect x="120" y="72" width="20" height="5" rx="2.5" fill="none" stroke="rgba(197,160,90,.5)" strokeWidth="1.2" />
+                    <circle cx="112" cy="102" r="13" fill="none" stroke="#c5a05a" strokeWidth="1.5" />
+                    <circle cx="112" cy="98" r="4.6" fill="#e0c082" />
+                    <path d="M104 110 q8 -8 16 0" fill="none" stroke="#e0c082" strokeWidth="1.6" strokeLinecap="round" />
+                    <line className="xj-line" x1="132" y1="96" x2="160" y2="96" stroke="#c5a05a" strokeWidth="1.7" strokeLinecap="round" />
+                    <line x1="132" y1="104" x2="154" y2="104" stroke="rgba(197,160,90,.45)" strokeWidth="1.3" strokeLinecap="round" />
+                    <line x1="98" y1="130" x2="162" y2="130" stroke="rgba(197,160,90,.35)" strokeWidth="1.2" strokeLinecap="round" />
+                    <line x1="98" y1="138" x2="150" y2="138" stroke="rgba(197,160,90,.35)" strokeWidth="1.2" strokeLinecap="round" />
+                    <g className="xj-spark" stroke="#e0c082" strokeWidth="1.6" strokeLinecap="round">
+                      <line x1="152" y1="144" x2="152" y2="156" />
+                      <line x1="146" y1="150" x2="158" y2="150" />
+                    </g>
                   </g>
                 </svg>
               </div>

@@ -452,6 +452,57 @@
     return tl;
   }
 
+  /* ── LIVE — broadcast waves, blinking record dot, pulsing play ── */
+  function buildLive() {
+    const root = document.querySelector('#cat-live');
+    if (!root) return null;
+    const waves = root.querySelectorAll('.lv-wave');
+    const dot   = root.querySelector('.lv-dot');
+    const play  = root.querySelector('.lv-play');
+
+    // waves emit outward: fade + slight grow, staggered inner→outer
+    waves.forEach((w, i) => {
+      gsap.set(w, { transformOrigin: '130px 87px' });
+      gsap.fromTo(w,
+        { opacity: 0, scale: 0.6 },
+        { opacity: 0.6, scale: 1.1, duration: 1.4, ease: 'sine.out',
+          yoyo: true, repeat: -1, delay: (i % 2) * 0.35 });
+    });
+    // record dot blink
+    if (dot) gsap.to(dot, { opacity: 0.25, duration: 0.7, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    // play button breathe
+    if (play) {
+      gsap.set(play, { transformOrigin: '50% 50%' });
+      gsap.to(play, { scale: 1.14, duration: 1.1, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    }
+    return gsap.to({}, { duration: 1, repeat: -1 });
+  }
+
+  /* ── XJOBS — badge swings on its lanyard, hiring spark twinkles ── */
+  function buildXjobs() {
+    const root = document.querySelector('#cat-xjobs');
+    if (!root) return null;
+    const badge = root.querySelector('.xj-badge');
+    const spark = root.querySelector('.xj-spark');
+    const line  = root.querySelector('.xj-line');
+
+    if (badge) {
+      gsap.set(badge, { svgOrigin: '130 46' });
+      gsap.fromTo(badge, { rotation: -2.4 },
+        { rotation: 2.4, duration: 2.4, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    }
+    if (spark) {
+      gsap.set(spark, { transformOrigin: '50% 50%' });
+      gsap.to(spark, { scale: 1.25, opacity: 0.5, duration: 1.2, yoyo: true, repeat: -1, ease: 'sine.inOut' });
+    }
+    if (line) {
+      const len = 28;
+      gsap.set(line, { strokeDasharray: len, strokeDashoffset: len });
+      gsap.to(line, { strokeDashoffset: 0, duration: 1.1, repeat: -1, repeatDelay: 2.2, ease: 'power2.out' });
+    }
+    return gsap.to({}, { duration: 1, repeat: -1 });
+  }
+
   /* ────────────────────────────────────────────────────────────
      Boot — build all timelines, pause when off-screen
      ──────────────────────────────────────────────────────────── */
@@ -465,6 +516,8 @@
     { id: '#cat-hotels',     build: buildKeycard },
     { id: '#cat-events',     build: buildChampagne },
     { id: '#cat-shop',       build: buildRibbon },
+    { id: '#cat-live',       build: buildLive },
+    { id: '#cat-xjobs',      build: buildXjobs },
   ];
 
   cards.forEach(c => {

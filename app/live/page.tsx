@@ -205,6 +205,19 @@ export default function LivePage() {
           </div>
         </div>
 
+        {/* Live umbrella — cams · shows · chat */}
+        <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 24px 22px', display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 999, fontSize: 13, fontWeight: 600, border: '0.5px solid #c5a05a', background: 'rgba(197,160,90,0.15)', color: '#e0c082' }}>
+            <i className="ti ti-video" aria-hidden="true" /> Live Cams
+          </span>
+          <a href="/livestreams" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 999, fontSize: 13, fontWeight: 600, textDecoration: 'none', border: '0.5px solid rgba(255,255,255,0.14)', color: 'rgba(236,232,225,0.7)' }}>
+            <i className="ti ti-broadcast" aria-hidden="true" /> Live Shows
+          </a>
+          <a href="/messages" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, padding: '9px 16px', borderRadius: 999, fontSize: 13, fontWeight: 600, textDecoration: 'none', border: '0.5px solid rgba(255,255,255,0.14)', color: 'rgba(236,232,225,0.7)' }}>
+            <i className="ti ti-message-circle" aria-hidden="true" /> Live Chat
+          </a>
+        </div>
+
         {/* Category tabs */}
         <div className="lp-tabs">
           {CATEGORIES.map(c => (

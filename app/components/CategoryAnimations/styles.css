@@ -101,7 +101,7 @@
 #cat-events::after,
 #cat-shop::after,
 #cat-live::after,
-#cat-xvacatures::after {
+#cat-xjobs::after {
   content: ''; position: absolute; inset: 0;
   pointer-events: none;
   z-index: 0;
@@ -117,14 +117,14 @@
 #cat-events::after     { background: radial-gradient(ellipse at 50% 30%, rgba(197,160,90,0.12), transparent 60%); }
 #cat-shop::after       { background: radial-gradient(ellipse at 50% 50%, rgba(232,212,168,0.10), transparent 60%); }
 #cat-live::after       { background: radial-gradient(ellipse at 50% 40%, rgba(226,80,79,0.14), transparent 62%); }
-#cat-xvacatures::after { background: radial-gradient(ellipse at 50% 45%, rgba(197,160,90,0.10), transparent 60%); }
+#cat-xjobs::after      { background: radial-gradient(ellipse at 50% 45%, rgba(197,160,90,0.10), transparent 60%); }
 .cat-card:hover::after { opacity: 1; }
 
 /* New-category icon motion (killed by the reduced-motion block below) */
 .cat-live .lv-dot  { animation: lvPulse 1.6s ease-in-out infinite; transform-origin: center; }
 .cat-live .lv-wave { animation: lvWave 2.6s ease-out infinite; opacity: .5; }
 .cat-live .lv-wave:nth-of-type(3), .cat-live .lv-wave:nth-of-type(5) { animation-delay: .3s; }
-.cat-xvac .xv-spark { animation: xvSpark 2.4s ease-in-out infinite; }
+.cat-xjobs .xj-spark { animation: xvSpark 2.4s ease-in-out infinite; }
 @keyframes lvPulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 @keyframes lvWave  { 0% { opacity: 0; } 40% { opacity: .5; } 100% { opacity: 0; } }
 @keyframes xvSpark { 0%, 100% { opacity: .5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.18); } }

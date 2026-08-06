@@ -431,31 +431,42 @@ export default function CategoryAnimations() {
               </div>
             </article>
 
-            {/* 10. XVACATURES — Adult-industry jobs */}
-            <article className="cat-card cat-xvac" id="cat-xvacatures" data-anim="xvac" onClick={go('/jobs')}>
+            {/* 10. XJOBS — Adult-industry jobs (ID name-badge) */}
+            <article className="cat-card cat-xjobs" id="cat-xjobs" data-anim="xjobs" onClick={go('/jobs')}>
               <div className="cat-canvas">
                 <svg viewBox="0 0 260 200" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
                   <defs>
-                    <radialGradient id="glow-xvac" cx="50%" cy="48%" r="52%">
+                    <radialGradient id="glow-xjobs" cx="50%" cy="50%" r="52%">
                       <stop offset="0%" stopColor="#e0c082" stopOpacity=".28" />
                       <stop offset="70%" stopColor="#e0c082" stopOpacity="0" />
                     </radialGradient>
                   </defs>
-                  <circle cx="130" cy="98" r="58" fill="url(#glow-xvac)" />
-                  <text x="196" y="54" fontSize="40" fontFamily="Playfair Display, Georgia, serif" fontStyle="italic" fill="rgba(197,160,90,.10)">X</text>
-                  <rect x="82" y="82" width="96" height="66" rx="8" fill="rgba(197,160,90,.05)" stroke="#c5a05a" strokeWidth="1.6" />
-                  <path d="M110 82 v-10 a6 6 0 0 1 6 -6 h28 a6 6 0 0 1 6 6 v10" fill="none" stroke="#c5a05a" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                  <line x1="82" y1="108" x2="178" y2="108" stroke="#c5a05a" strokeWidth="1.6" />
-                  <rect x="120" y="102" width="20" height="12" rx="3" fill="rgba(197,160,90,.2)" stroke="#c5a05a" strokeWidth="1.3" />
-                  <path d="M104 122 l16 16 M120 122 l-16 16" fill="none" stroke="rgba(197,160,90,.4)" strokeWidth="1.2" strokeLinecap="round" />
-                  <g className="xv-spark" stroke="#e0c082" strokeWidth="1.6" strokeLinecap="round" transform-origin="166 126">
-                    <line x1="166" y1="119" x2="166" y2="133" />
-                    <line x1="159" y1="126" x2="173" y2="126" />
+                  <circle cx="130" cy="102" r="58" fill="url(#glow-xjobs)" />
+                  <text x="198" y="56" fontSize="40" fontFamily="Playfair Display, Georgia, serif" fontStyle="italic" fill="rgba(197,160,90,.10)">X</text>
+                  {/* lanyard clip */}
+                  <rect x="125" y="40" width="10" height="9" rx="2" fill="rgba(197,160,90,.2)" stroke="#c5a05a" strokeWidth="1.2" />
+                  <path d="M122 49 h16 v6 a8 8 0 0 1 -16 0 z" fill="none" stroke="#c5a05a" strokeWidth="1.4" strokeLinejoin="round" />
+                  {/* badge card */}
+                  <rect x="86" y="64" width="88" height="98" rx="11" fill="rgba(197,160,90,.05)" stroke="#c5a05a" strokeWidth="1.6" />
+                  <rect x="120" y="72" width="20" height="5" rx="2.5" fill="none" stroke="rgba(197,160,90,.5)" strokeWidth="1.2" />
+                  {/* avatar */}
+                  <circle cx="112" cy="102" r="13" fill="none" stroke="#c5a05a" strokeWidth="1.5" />
+                  <circle cx="112" cy="98" r="4.6" fill="#e0c082" />
+                  <path d="M104 110 q8 -8 16 0" fill="none" stroke="#e0c082" strokeWidth="1.6" strokeLinecap="round" />
+                  {/* name / role lines */}
+                  <line x1="132" y1="96" x2="160" y2="96" stroke="#c5a05a" strokeWidth="1.7" strokeLinecap="round" />
+                  <line x1="132" y1="104" x2="154" y2="104" stroke="rgba(197,160,90,.45)" strokeWidth="1.3" strokeLinecap="round" />
+                  <line x1="98" y1="130" x2="162" y2="130" stroke="rgba(197,160,90,.35)" strokeWidth="1.2" strokeLinecap="round" />
+                  <line x1="98" y1="138" x2="150" y2="138" stroke="rgba(197,160,90,.35)" strokeWidth="1.2" strokeLinecap="round" />
+                  {/* hiring spark */}
+                  <g className="xj-spark" stroke="#e0c082" strokeWidth="1.6" strokeLinecap="round" transform-origin="152 150">
+                    <line x1="152" y1="144" x2="152" y2="156" />
+                    <line x1="146" y1="150" x2="158" y2="150" />
                   </g>
                 </svg>
               </div>
               <div className="cat-meta">
-                <h3 className="cat-title">Xvacatures</h3>
+                <h3 className="cat-title">Xjobs</h3>
                 <p className="cat-desc">Adult-industry jobs across Europe — vacancies offered &amp; work wanted.</p>
                 <a href="/jobs" className="cat-cta" onClick={e => e.stopPropagation()}>Browse jobs →</a>
               </div>

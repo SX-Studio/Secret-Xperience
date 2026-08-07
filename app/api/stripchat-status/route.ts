@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 // Live status for the Stripchat profile cards on the homepage.
 // Queries Stripchat's public model API server-side (no CORS in the browser);
 // cached for 60s at the edge so we never hammer their API.
-const MODELS = ['IdaJonesy', 'Onlyxlicious_sc', 'Jenny-Mystery-X', 'VlaamseYaira']
+const MODELS = ['Martyca_Beee', 'IdaJonesy', 'Onlyxlicious_sc', 'Jenny-Mystery-X', 'VlaamseYaira']
 
 export const dynamic = 'force-dynamic'
 

@@ -1459,7 +1459,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     }
     ;(window as any).activeFilters = activeFilters
     let currentPage = 0
-    const PAGE_SIZE = 12
+    const PAGE_SIZE = 100
     let totalListings: any[] = []
     let liveProviderIds = new Set<string>()
 

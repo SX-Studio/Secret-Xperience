@@ -53,6 +53,25 @@
 }
 .cx-card:hover .cx-photo { transform: scale(1.05); }
 
+/* headline overlay — semi-transparent, italic serif, in the card's accent colour */
+.cx-head {
+  position: absolute;
+  top: 14px; left: 15px; right: 15px;
+  z-index: 4;
+  pointer-events: none;
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(18px, 1.55vw, 23px);
+  line-height: 1.12;
+  letter-spacing: .01em;
+  opacity: 0.82;
+  text-shadow: 0 2px 14px rgba(0,0,0,.7), 0 0 2px rgba(0,0,0,.5);
+  text-wrap: balance;
+  transition: opacity .3s var(--ease-out, cubic-bezier(.2,.8,.4,1));
+}
+.cx-card:hover .cx-head { opacity: 1; }
+
 /* ── Section foot ───────────────────────────────────────────── */
 .section-foot {
   margin-top: 3.5rem; text-align: center; color: var(--t3);

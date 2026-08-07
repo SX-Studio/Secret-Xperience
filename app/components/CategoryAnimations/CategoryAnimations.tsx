@@ -2,20 +2,21 @@
 
 import './styles.css'
 
-// Ten category cards — each is a full-bleed branded image (photo + icon + label
-// baked in), linking to its category. Images live at /categories/<slug>.jpg.
+// Ten category cards — full-bleed branded image (photo + icon + label baked in),
+// with the category headline overlaid as semi-transparent italic-serif text in the
+// card's accent colour. Images live at /categories/<slug>.jpg.
 
-const CATS: { label: string; slug: string; route: string }[] = [
-  { label: 'Escorts',    slug: 'escorts',    route: '/escorts' },
-  { label: 'Companions', slug: 'companions', route: '/companionship' },
-  { label: 'Nightlife',  slug: 'nightlife',  route: '/nightlife' },
-  { label: 'Creators',   slug: 'creators',   route: '/creators' },
-  { label: 'Rentals',    slug: 'rentals',    route: '/rentals' },
-  { label: 'Hotels',     slug: 'hotels',     route: '/hotels' },
-  { label: 'Events',     slug: 'events',     route: '/events' },
-  { label: 'Shop',       slug: 'shop',       route: '/shop' },
-  { label: 'Live',       slug: 'live',       route: '/live' },
-  { label: 'Jobs',       slug: 'jobs',       route: '/jobs' },
+const CATS: { label: string; slug: string; route: string; headline: string; accent: string }[] = [
+  { label: 'Escorts',    slug: 'escorts',    route: '/escorts',       headline: 'Your secret side',        accent: '#e6c98a' },
+  { label: 'Companions', slug: 'companions', route: '/companionship', headline: 'Never arrive alone',       accent: '#e3ba86' },
+  { label: 'Nightlife',  slug: 'nightlife',  route: '/nightlife',     headline: 'Where the night opens',    accent: '#ef6d86' },
+  { label: 'Creators',   slug: 'creators',   route: '/creators',      headline: 'Follow every obsession',   accent: '#c79bef' },
+  { label: 'Rentals',    slug: 'rentals',    route: '/rentals',       headline: 'A place to disappear',     accent: '#edc074' },
+  { label: 'Hotels',     slug: 'hotels',     route: '/hotels',        headline: 'Check in. Tell no one.',   accent: '#5fe0c4' },
+  { label: 'Events',     slug: 'events',     route: '/events',        headline: 'On the guest list',        accent: '#e6c98a' },
+  { label: 'Shop',       slug: 'shop',       route: '/shop',          headline: 'Dressed for the dark',     accent: '#ef8fb0' },
+  { label: 'Live',       slug: 'live',       route: '/live',          headline: 'Live, and watching you',   accent: '#f0665f' },
+  { label: 'Jobs',       slug: 'jobs',       route: '/jobs',          headline: 'Work on your terms',       accent: '#e6c98a' },
 ]
 
 export default function CategoryAnimations() {
@@ -38,6 +39,7 @@ export default function CategoryAnimations() {
             <a key={c.route} href={c.route} className="cx-card" aria-label={c.label}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img className="cx-photo" src={`/categories/${c.slug}.jpg`} alt={c.label} loading="lazy" />
+              <span className="cx-head" style={{ color: c.accent }}>{c.headline}</span>
             </a>
           ))}
         </div>

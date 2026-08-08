@@ -17,6 +17,7 @@ const CATS: { label: string; slug: string; route: string; headline: string; acce
   { label: 'Shop',       slug: 'shop',       route: '/shop',          headline: 'Dressed for the dark',     accent: '#ef8fb0' },
   { label: 'Live',       slug: 'live',       route: '/live',          headline: 'Live, and watching you',   accent: '#f0665f' },
   { label: 'Jobs',       slug: 'jobs',       route: '/jobs',          headline: 'Work on your terms',       accent: '#e6c98a' },
+  { label: 'Pride',      slug: 'pride',      route: '/pride',         headline: 'All colours, after dark', accent: '#c79bef' },
 ]
 
 export default function CategoryAnimations() {

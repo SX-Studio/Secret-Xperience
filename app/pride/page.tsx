@@ -25,12 +25,14 @@ const SPECTRUM = 'linear-gradient(90deg,#e0507a,#b96bd8,#6b8be0,#3fd0c4,#e6c07a)
 // sub-tabs → which identity tags qualify
 const TABS: { key: string; label: string; icon: string; match: (t: string[]) => boolean }[] = [
   { key: 'all',    label: 'Everyone', icon: 'ti-sparkles',      match: () => true },
-  { key: 'men',    label: 'Men',      icon: 'ti-gender-male',    match: (t) => t.includes('type:men') },
+  { key: 'men',    label: 'Men',      icon: 'ti-gender-male',    match: (t) => t.includes('orientation:gay') || t.includes('orientation:bi') },
   { key: 'trans',  label: 'Trans',    icon: 'ti-gender-transgender', match: (t) => t.includes('type:trans') },
   { key: 'couples',label: 'Couples',  icon: 'ti-heart-handshake',match: (t) => t.includes('type:couple') },
 ]
 
-const PRIDE_TAGS = ['type:men', 'type:trans', 'type:couple', 'orientation:gay', 'orientation:bi', 'type:nonbinary']
+// Only gay/bi men, trans and couples belong in Pride — straight male escorts
+// (type:men + orientation:straight) are deliberately excluded.
+const PRIDE_TAGS = ['orientation:gay', 'orientation:bi', 'type:trans', 'type:couple', 'type:nonbinary']
 
 function price(a: number | null, b: number | null) {
   if (a && b) return `€${a}–€${b}`

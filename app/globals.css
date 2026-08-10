@@ -1727,3 +1727,32 @@ footer{background:var(--bg1);border-top:0.5px solid var(--b);padding:2.5rem 1.5r
   .dp-price-cards{grid-template-columns:repeat(2,1fr)}
 }
 
+
+/* ============================================================
+   Pride mode — site-wide, toggled by app/components/PrideMode.tsx
+   (adds class `pride-mode` to <html>). Purely additive/decorative
+   so it can never break a page's layout.
+   ============================================================ */
+@keyframes prideRibbon { 0% { background-position: 0% 50% } 100% { background-position: 200% 50% } }
+
+html.pride-mode body::before,
+html.pride-mode body::after {
+  content: "";
+  position: fixed;
+  left: 0; right: 0;
+  height: 5px;
+  z-index: 9500;
+  pointer-events: none;
+  background: linear-gradient(90deg,#e0507a,#e6a15a,#e6c07a,#3fd0c4,#6b8be0,#b96bd8,#e0507a);
+  background-size: 200% 100%;
+  animation: prideRibbon 7s linear infinite;
+}
+html.pride-mode body::before { top: 0; }
+html.pride-mode body::after  { bottom: 0; }
+
+/* spectral wash on the gold eyebrow/accent labels */
+html.pride-mode .t-eyebrow-gold {
+  background: linear-gradient(90deg,#e0507a,#b96bd8,#6b8be0,#3fd0c4,#e6c07a);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+html.pride-mode ::selection { background: rgba(185,107,216,0.45); }

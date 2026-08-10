@@ -3,6 +3,7 @@ import Script from 'next/script'
 import CookieBanner from './components/CookieBanner'
 import AttributionTracker from './components/AttributionTracker'
 import PageviewTracker from './components/PageviewTracker'
+import PrideMode from './components/PrideMode'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -58,6 +59,9 @@ const themeBootstrap = `
   } catch (e) {
     document.documentElement.dataset.theme = 'velvet';
   }
+  try {
+    if (localStorage.prideMode === 'on') document.documentElement.classList.add('pride-mode');
+  } catch (e) {}
 })();
 `
 
@@ -366,6 +370,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CookieBanner />
         <AttributionTracker />
         <PageviewTracker />
+        <PrideMode />
       </body>
     </html>
   )

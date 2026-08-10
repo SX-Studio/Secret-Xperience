@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '../lib/supabase'
+import LockerRoom from '../components/LockerRoom'
 
 type L = {
   id: string
@@ -160,6 +161,8 @@ export default function PridePage() {
             <p style={{ color: 'rgba(236,232,225,0.6)', marginTop: 10 }}>No one’s out to play in this filter yet — be the first flame 🔥</p>
           </div>
         )}
+
+        <LockerRoom />
 
         <p style={{ marginTop: '2.5rem', fontSize: 11.5, color: 'rgba(236,232,225,0.35)', textAlign: 'center', lineHeight: 1.6, maxWidth: 640, marginInline: 'auto' }}>
           A safe, consent-first space. Everyone here is 18+ and independent. Respect pronouns, ask before you assume, and report anything that isn’t kind. Meetup-requests only — no on-platform payments for companionship.

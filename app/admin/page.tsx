@@ -459,7 +459,7 @@ export default function AdminPage() {
   if (!isAdmin) return null
 
   return (
-    <div className="adm-shell" style={{ minHeight: '100vh', background: 'var(--bg, #050505)', color: 'var(--t, #ece8e1)', fontFamily: 'var(--sans)', display: 'flex' }}>
+    <div className="adm-shell" style={{ height: '100vh', overflow: 'hidden', background: 'var(--bg, #050505)', color: 'var(--t, #ece8e1)', fontFamily: 'var(--sans)', display: 'flex' }}>
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
         *{box-sizing:border-box}
@@ -500,7 +500,10 @@ export default function AdminPage() {
             z-index: 110; backdrop-filter: blur(2px);
           }
 
-          .adm-main { overflow: visible !important; }
+          /* On mobile the sidebar is a fixed drawer, so let the page scroll normally */
+          .adm-shell { height: auto !important; overflow: visible !important; }
+          .adm-main { overflow: visible !important; min-height: 0 !important; }
+          .adm-content { overflow: visible !important; }
           .adm-main-header {
             flex-direction: row !important; align-items: center !important; gap: 10px !important;
             flex-wrap: wrap !important; padding: 1rem !important;
@@ -555,7 +558,7 @@ export default function AdminPage() {
       <div className={`adm-nav-overlay${navOpen ? ' open' : ''}`} onClick={() => setNavOpen(false)} aria-hidden={!navOpen} />
 
       {/* ── Sidebar ── */}
-      <div className={`adm-sidebar${navOpen ? ' open' : ''}`} style={{ width: '220px', background: 'var(--bg1, #080808)', borderRight: '0.5px solid var(--b, rgba(255,255,255,0.06))', display: 'flex', flexDirection: 'column', flexShrink: 0, position: 'sticky', top: 0, height: '100vh' }}>
+      <div className={`adm-sidebar${navOpen ? ' open' : ''}`} style={{ width: '220px', background: 'var(--bg1, #080808)', borderRight: '0.5px solid var(--b, rgba(255,255,255,0.06))', display: 'flex', flexDirection: 'column', flexShrink: 0, position: 'sticky', top: 0, height: '100vh', overflowY: 'auto' }}>
         <div className="adm-sidebar-brand" style={{ padding: '1.5rem', borderBottom: '0.5px solid var(--b, rgba(255,255,255,0.06))' }}>
           <div style={{ fontFamily: 'var(--serif)', color: 'var(--gold, #c5a05a)', fontSize: '18px', marginBottom: '6px' }}>SecretXperience</div>
           <div style={{ display: 'inline-block', background: 'var(--gbg)', color: 'var(--gold)', border: '0.5px solid var(--gbrd)', borderRadius: '20px', padding: '3px 10px', font: '600 10px/1 var(--sans)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>Admin</div>
@@ -590,7 +593,7 @@ export default function AdminPage() {
       </div>
 
       {/* ── Main ── */}
-      <div className="adm-main" style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <div className="adm-main" style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
         {/* ── Page header ── */}
         <div className="adm-main-header" style={{ background: 'var(--bg1, #080808)', borderBottom: '0.5px solid var(--b, rgba(255,255,255,0.06))', padding: '1rem 2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>

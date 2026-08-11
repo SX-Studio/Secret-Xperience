@@ -50,8 +50,11 @@ function isAvailableNow(tags: string[] | null): boolean {
   })
 }
 
+const PRIDE_TAGS = ['orientation:gay', 'orientation:bi', 'type:trans', 'type:trans woman', 'type:couple', 'type:nonbinary']
+
 const CATS = [
   { v: 'all',          l: 'All',              icon: 'ti-sparkles' },
+  { v: '__pride',      l: '🏳️‍🌈 Pride',        icon: 'ti-rainbow' },
   { v: 'escorts',      l: 'Companions',       icon: 'ti-user' },
   { v: 'creators',     l: 'Creators',         icon: 'ti-camera' },
   { v: 'nightlife',    l: 'Nightlife',        icon: 'ti-building' },
@@ -75,6 +78,13 @@ export default function DiscoverPage() {
 
   const cardRef   = useRef<HTMLDivElement>(null)
   const draggable = useRef<any>(null)
+
+  // Deep-link: /discover?vibe=pride opens straight into the Pride vibe
+  useEffect(() => {
+    if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('vibe') === 'pride') {
+      setCategory('__pride')
+    }
+  }, [])
 
   useEffect(() => {
     const supabase = createClient()
@@ -117,6 +127,8 @@ export default function DiscoverPage() {
 
     if (cat === '__verified') {
       q = q.eq('verified', true)
+    } else if (cat === '__pride') {
+      q = q.overlaps('tags', PRIDE_TAGS)
     } else if (cat === '__available') {
       // Filter client-side below
     } else if (cat !== 'all') {

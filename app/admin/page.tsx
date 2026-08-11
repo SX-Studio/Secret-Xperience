@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '../lib/supabase'
 import { detectFocalPoint, imageFromUrl } from '../lib/imageFocus'
 
-const TABS = ['Listings', 'Users', 'Verification', 'Reports', 'Bookings', 'Newsletter', 'Contacts', 'Acquisition', 'Keywords', 'Tools'] as const
+const TABS = ['Listings', 'Users', 'Verification', 'Reports', 'Bookings', 'Payouts', 'Newsletter', 'Contacts', 'Acquisition', 'Keywords', 'Tools'] as const
 type Tab = typeof TABS[number]
 
 const TAB_ICONS: Record<Tab, string> = {
@@ -13,6 +13,7 @@ const TAB_ICONS: Record<Tab, string> = {
   Verification: 'shield-check',
   Reports: 'flag',
   Bookings: 'calendar-event',
+  Payouts: 'cash',
   Newsletter: 'mail',
   Contacts: 'address-book',
   Acquisition: 'chart-arrows-vertical',
@@ -49,9 +50,29 @@ export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('Listings')
-  const [badges, setBadges] = useState<Record<Tab, number>>({ Listings: 0, Users: 0, Verification: 0, Reports: 0, Bookings: 0, Newsletter: 0, Contacts: 0, Acquisition: 0, Keywords: 0, Tools: 0 })
+  const [badges, setBadges] = useState<Record<Tab, number>>({ Listings: 0, Users: 0, Verification: 0, Reports: 0, Bookings: 0, Payouts: 0, Newsletter: 0, Contacts: 0, Acquisition: 0, Keywords: 0, Tools: 0 })
   const [reports, setReports] = useState<any[]>([])
   const [reportWorking, setReportWorking] = useState<string | null>(null)
+  const [payouts, setPayouts] = useState<any[]>([])
+  const [payoutWorking, setPayoutWorking] = useState<string | null>(null)
+
+  async function loadPayouts() {
+    const supabase = createClient()
+    const { data: reqs } = await supabase.from('gift_payout_requests').select('*').order('created_at', { ascending: false })
+    const rows = reqs || []
+    const ids = Array.from(new Set(rows.map((r: any) => r.recipient_id)))
+    let profs: Record<string, any> = {}
+    let earns: Record<string, any> = {}
+    if (ids.length) {
+      const [{ data: pd }, { data: ed }] = await Promise.all([
+        supabase.from('profiles').select('id, full_name, email').in('id', ids),
+        supabase.from('gift_earnings').select('recipient_id, earned_cents, paid_cents').in('recipient_id', ids),
+      ])
+      profs = Object.fromEntries((pd || []).map((p: any) => [p.id, p]))
+      earns = Object.fromEntries((ed || []).map((e: any) => [e.recipient_id, e]))
+    }
+    setPayouts(rows.map((r: any) => ({ ...r, recipient: profs[r.recipient_id] || null, earnings: earns[r.recipient_id] || null })))
+  }
   const currentTab = useRef<Tab>('Listings')
   const [listings, setListings] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
@@ -121,6 +142,7 @@ export default function AdminPage() {
         supabase.from('reports').select('*').order('created_at', { ascending: false }),
       ])
       setReports(rr.data || [])
+      loadPayouts()
       // newsletter_subscribers is service-role-only; fetch via server route
       fetch('/api/newsletter/list')
         .then(r => r.ok ? r.json() : { subscribers: [] })
@@ -602,7 +624,7 @@ export default function AdminPage() {
             <div style={{ minWidth: 0 }}>
             <h1 style={{ fontFamily: 'var(--serif)', fontWeight: 500, fontSize: '36px', color: 'var(--t, #ece8e1)', margin: 0, lineHeight: 1.1 }}>{tab}</h1>
             <div style={{ font: '300 11px/1 var(--sans)', color: 'var(--t3, #4c4a47)', marginTop: '4px', letterSpacing: '0.04em' }}>
-              {tab === 'Listings' ? `${filteredListings.length} listings` : tab === 'Users' ? `${filteredUsers.length} users` : tab === 'Reports' ? `${reports.filter(r => r.status === 'open').length} open · ${reports.length} total` : tab === 'Newsletter' ? (search ? `${filteredNlSubs.length} of ${nlSubCount ?? '…'} subscribers` : `${nlSubCount ?? '…'} subscribers`) : tab === 'Contacts' ? `${optinContacts.length} opted-in · ${leads.length} leads` : tab === 'Acquisition' ? `${acqTotal} tracked signups · ${acq.length} sources` : tab === 'Keywords' ? `${kwResults.length ? `${kwResults.length} results` : 'SEO research'}` : tab === 'Tools' ? 'Admin tools' : `${filteredBookings.length} bookings`}
+              {tab === 'Listings' ? `${filteredListings.length} listings` : tab === 'Users' ? `${filteredUsers.length} users` : tab === 'Reports' ? `${reports.filter(r => r.status === 'open').length} open · ${reports.length} total` : tab === 'Payouts' ? `${payouts.filter(p => p.status === 'requested').length} pending · ${payouts.length} total` : tab === 'Newsletter' ? (search ? `${filteredNlSubs.length} of ${nlSubCount ?? '…'} subscribers` : `${nlSubCount ?? '…'} subscribers`) : tab === 'Contacts' ? `${optinContacts.length} opted-in · ${leads.length} leads` : tab === 'Acquisition' ? `${acqTotal} tracked signups · ${acq.length} sources` : tab === 'Keywords' ? `${kwResults.length ? `${kwResults.length} results` : 'SEO research'}` : tab === 'Tools' ? 'Admin tools' : `${filteredBookings.length} bookings`}
             </div>
             </div>
           </div>
@@ -1539,6 +1561,56 @@ export default function AdminPage() {
                             {s === 'reviewing' ? 'Mark reviewing' : s === 'resolved' ? 'Resolve' : 'Dismiss'}
                           </button>
                         ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )
+          })()}
+
+          {tab === 'Payouts' && (() => {
+            const PST: Record<string, string> = { requested: '#e0a050', paid: '#4caf7d', rejected: '#7c7a77' }
+            async function markPaid(id: string) {
+              setPayoutWorking(id)
+              const supabase = createClient()
+              const upd = { status: 'paid', paid_at: new Date().toISOString() }
+              const { error } = await supabase.from('gift_payout_requests').update(upd).eq('id', id)
+              if (!error) setPayouts(prev => prev.map(p => p.id === id ? { ...p, ...upd } : p))
+              setPayoutWorking(null)
+            }
+            const visible = payouts.filter(p => !search ||
+              `${p.recipient?.full_name || ''} ${p.recipient?.email || ''} ${p.status}`.toLowerCase().includes(search.toLowerCase()))
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {visible.length === 0 && (
+                  <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', padding: '3rem', textAlign: 'center', color: 'var(--t3, #4c4a47)' }}>
+                    No gift-coin payout requests {search ? 'match your search' : 'yet'}.
+                  </div>
+                )}
+                {visible.map(p => {
+                  const earned = p.earnings ? p.earnings.earned_cents / 100 : null
+                  const paidTotal = p.earnings ? p.earnings.paid_cents / 100 : null
+                  return (
+                    <div key={p.id} style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', padding: '1.25rem 1.5rem' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                          <span style={{ fontFamily: 'var(--serif)', fontSize: '24px', color: 'var(--gold, #c5a05a)' }}>€{(p.amount_cents / 100).toFixed(2)}</span>
+                          <span style={{ color: PST[p.status] || '#888', font: '600 10px/1 var(--sans)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{p.status}</span>
+                        </div>
+                        <span style={{ color: 'var(--t3, #4c4a47)', fontSize: '11px' }}>{new Date(p.created_at).toLocaleString('en-GB')}</span>
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '12px', color: 'var(--t2, #8c8880)', marginBottom: '14px' }}>
+                        <span><i className="ti ti-user" style={{ marginRight: 5 }} />{p.recipient?.full_name || '—'}</span>
+                        {p.recipient?.email && <span><i className="ti ti-mail" style={{ marginRight: 5 }} /><a href={`mailto:${p.recipient.email}`} style={{ color: 'var(--t2, #8c8880)', textDecoration: 'none' }}>{p.recipient.email}</a></span>}
+                        <a href={`/profile/${p.recipient_id}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--t2, #8c8880)', textDecoration: 'none' }}><i className="ti ti-external-link" style={{ marginRight: 5 }} />Profile</a>
+                        {earned !== null && <span title="Lifetime earned / paid out"><i className="ti ti-gift" style={{ marginRight: 5 }} />€{earned.toFixed(2)} earned · €{(paidTotal ?? 0).toFixed(2)} paid</span>}
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <button disabled={payoutWorking === p.id || p.status === 'paid'} onClick={() => markPaid(p.id)}
+                          style={{ background: p.status === 'paid' ? 'var(--gbg, rgba(197,160,90,0.08))' : 'transparent', border: '0.5px solid var(--b2, rgba(255,255,255,0.1))', borderRadius: '8px', padding: '6px 14px', color: p.status === 'paid' ? 'var(--gold, #c5a05a)' : 'var(--t2, #8c8880)', font: '500 12px/1 var(--sans)', cursor: payoutWorking === p.id || p.status === 'paid' ? 'default' : 'pointer', opacity: payoutWorking === p.id ? 0.5 : 1 }}>
+                          {p.status === 'paid' ? '✓ Paid' : 'Mark as paid'}
+                        </button>
                       </div>
                     </div>
                   )

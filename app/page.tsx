@@ -2361,6 +2361,47 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
               display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem',
             }}
           >
+        {/* MariskaX partner card */}
+        <a
+          href="https://mariskax.com/"
+          target="_blank"
+          rel="noopener noreferrer nofollow sponsored"
+          title="MariskaX.com — international porn production studio"
+          aria-label="MariskaX.com — international porn production studio (opens in a new tab)"
+          style={{ display: 'flex', minWidth: 0, textDecoration: 'none' }}
+        >
+          <div
+            style={{
+              flex: 1, minHeight: 158, position: 'relative', overflow: 'hidden',
+              display: 'flex', alignItems: 'center',
+              border: '0.5px solid rgba(210,150,80,0.4)', borderRadius: 18, padding: '20px 26px',
+              boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
+            }}
+          >
+            <img
+              src="/promos/mariskax-bg.webp"
+              alt="MariskaX.com — international porn production studio"
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 0 }}
+            />
+            <div
+              aria-hidden="true"
+              style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(18,10,6,0.8) 0%, rgba(18,10,6,0.32) 40%, rgba(18,10,6,0) 62%)' }}
+            />
+            <div style={{ position: 'relative', zIndex: 2, alignSelf: 'flex-end', width: '100%' }}>
+              <span
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',
+                  background: 'linear-gradient(135deg,#e0a94f,#c0316e 60%,#8f1f52)', color: '#fff',
+                  font: '700 13px/1 Poppins, sans-serif', letterSpacing: '0.03em', padding: '12px 20px',
+                  borderRadius: 11, boxShadow: '0 8px 24px rgba(192,49,110,0.32)',
+                }}
+              >
+                MariskaX.com <span aria-hidden="true">&rarr;</span>
+              </span>
+            </div>
+          </div>
+        </a>
+
         {/* Sex Vakanties partner card */}
         <a
           href="https://www.sexvakanties.be/"
@@ -2984,6 +3025,16 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   <div style="background:var(--bg1);padding:2.5rem 1.5rem 0;">
     <div style="max-width:1200px;margin:0 auto;">
       <p style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin:0 0 10px;">✦ Sponsored Feature</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;align-items:stretch;">
+      <a href="https://mariskax.com/" target="_blank" rel="noopener noreferrer nofollow sponsored" aria-label="MariskaX.com — international porn production studio" style="display:block;position:relative;overflow:hidden;border-radius:20px;border:1px solid rgba(210,150,80,0.5);min-height:300px;box-shadow:0 14px 44px rgba(0,0,0,0.55);text-decoration:none;transition:transform .15s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(224,169,79,0.9)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(210,150,80,0.5)'">
+        <img src="/promos/mariskax-bg.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;" />
+        <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(10,6,4,0.88) 0%, rgba(10,6,4,0.4) 42%, rgba(10,6,4,0.12) 72%, rgba(10,6,4,0.35) 100%);"></div>
+        <div style="position:relative;min-height:300px;padding:clamp(1.75rem,4vw,3rem);display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:16px;">
+          <img src="/promos/mariskax-logo.png" alt="MariskaX.com" style="width:min(80%,320px);height:auto;display:block;filter:drop-shadow(0 3px 14px rgba(0,0,0,0.9));" />
+          <div style="font-size:12px;color:rgba(255,255,255,0.8);line-height:1.5;letter-spacing:0.06em;text-transform:uppercase;text-shadow:0 1px 8px rgba(0,0,0,0.9);">International porn production studio</div>
+          <span style="display:inline-block;padding:12px 28px;background:linear-gradient(90deg,#e0a94f,#c0316e);border-radius:10px;color:#fff;font:600 13.5px var(--sans);letter-spacing:0.03em;">Visit MariskaX.com →</span>
+        </div>
+      </a>
       <a href="https://victoriasecretgarden.be/" target="_blank" rel="noopener noreferrer nofollow sponsored" aria-label="Victoria Secret Garden — escort agency Brussels" style="display:block;position:relative;overflow:hidden;border-radius:20px;border:1px solid rgba(232,90,140,0.45);min-height:300px;box-shadow:0 14px 44px rgba(0,0,0,0.55);text-decoration:none;transition:transform .15s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(255,130,175,0.85)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(232,90,140,0.45)'">
         <img src="/promos/vsg-bg.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%;" />
         <div style="position:absolute;inset:0;background:linear-gradient(to right, rgba(12,8,10,0.82) 0%, rgba(12,8,10,0.35) 45%, rgba(12,8,10,0.15) 70%, rgba(12,8,10,0.55) 100%);"></div>
@@ -2996,6 +3047,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           <span style="display:inline-block;padding:12px 28px;background:linear-gradient(90deg,#ff5c8a,#e0356e);border-radius:10px;color:#fff;font:600 13.5px var(--sans);letter-spacing:0.03em;">Bezoek Victoria Secret Garden →</span>
         </div>
       </a>
+      </div>
     </div>
   </div>
 

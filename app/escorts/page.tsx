@@ -49,21 +49,21 @@ const ESCORT_TYPES = [
 ]
 
 const SEXUAL_ORIENTATION = [
-  { value: 'all', label: 'Any' },
   ...ORIENTATIONS,
+  { value: 'all', label: 'Any' },
 ]
 
 const MEET_TYPES = [
-  { value: 'all',     label: 'Any' },
   { value: 'incall',  label: 'Incall / Private' },
   { value: 'outcall', label: 'Outcall / Escort' },
   { value: 'both',    label: 'Both' },
+  { value: 'all',     label: 'Any' },
 ]
 
-const ETHNICITY_FILTER = ['Any', ...ETHNICITIES]
-const HAIR_COLORS = ['Any', ...HAIR_COLOURS]
-const BUILDS_FILTER = ['Any', ...BUILDS]
-const CITIES      = ['All Cities', 'Brussels', 'Antwerp', 'Ghent', 'Grimbergen', 'Amsterdam', 'Berlin', 'Paris', 'Cologne', 'Rotterdam']
+const ETHNICITY_FILTER = [...ETHNICITIES, 'Any']
+const HAIR_COLORS = [...HAIR_COLOURS, 'Any']
+const BUILDS_FILTER = [...BUILDS, 'Any']
+const CITIES      = ['Brussels', 'Antwerp', 'Ghent', 'Grimbergen', 'Amsterdam', 'Berlin', 'Paris', 'Cologne', 'Rotterdam', 'All Cities']
 
 const SERVICES_LIST = ['69','Anal','BDSM','Body Massage','Couples','Cum on Body','Cum on Face','Deep Throat','Doggy Style','Domina','Duo','Erotic Massage','Facesitting','Fetish','Foot Worship','French Kissing','GFE','Golden Shower','Handjob','Kissing','Lap Dance','Massage','Mistress','Oral','Prostate Massage','Rimming','Roleplay','Spanking','Squirting','Strap-on','Striptease','Tantra','Thai Massage','Threesome','Toys']
 

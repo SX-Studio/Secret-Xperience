@@ -2642,28 +2642,27 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <div class="fsec">
         <div class="flbl">Orientation</div>
         <div class="etype-list">
-          <button class="etype active" data-ori="all">All</button>
           <button class="etype" data-ori="straight">Straight</button>
           <button class="etype" data-ori="gay">Gay</button>
           <button class="etype" data-ori="bisexual">Bisexual</button>
           <button class="etype" data-ori="for all">For All</button>
+          <button class="etype active" data-ori="all">All</button>
         </div>
       </div>
 
       <div class="fsec">
         <div class="flbl">Meet Type</div>
         <div class="etype-list">
-          <button class="etype active" data-meet="all">All</button>
           <button class="etype" data-meet="incall">Incall</button>
           <button class="etype" data-meet="outcall">Outcall</button>
           <button class="etype" data-meet="both">Both</button>
+          <button class="etype active" data-meet="all">All</button>
         </div>
       </div>
 
       <div class="fsec">
         <div class="flbl">City</div>
         <div class="etype-list">
-          <button class="etype active" data-city-f="all">All cities</button>
           <button class="etype" data-city-f="Brussels">Brussels</button>
           <button class="etype" data-city-f="Antwerp">Antwerp</button>
           <button class="etype" data-city-f="Ghent">Ghent</button>
@@ -2671,6 +2670,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           <button class="etype" data-city-f="Bruges">Bruges</button>
           <button class="etype" data-city-f="Amsterdam">Amsterdam</button>
           <button class="etype" data-city-f="Rotterdam">Rotterdam</button>
+          <button class="etype active" data-city-f="all">All cities</button>
         </div>
       </div>
 

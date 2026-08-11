@@ -36,31 +36,31 @@ type Listing = {
 }
 
 const HOST_TYPES = [
-  { value: 'all',          label: 'All',           icon: '✦' },
   { value: 'women',        label: 'Women',         icon: '♀' },
   { value: 'men',          label: 'Men',           icon: '♂' },
   { value: 'trans-woman',  label: 'Trans Woman',   icon: '⚧' },
   { value: 'non-binary',   label: 'Non-Binary',    icon: '⊕' },
   { value: 'couples',      label: 'Couples',       icon: '♥' },
+  { value: 'all',          label: 'All',           icon: '✦' },
 ]
 
 const CATEGORIES = [
-  { value: 'all',           label: 'All Services' },
   { value: 'companionship', label: 'Companionship' },
   { value: 'massage',       label: 'Massage' },
   { value: 'domination',    label: 'Domination' },
   { value: 'experiences',   label: 'Experiences' },
+  { value: 'all',           label: 'All Services' },
 ]
 
 const SEXUAL_ORIENTATION = [
-  { value: 'all', label: 'Any' },
   ...ORIENTATIONS,
+  { value: 'all', label: 'Any' },
 ]
 
-const ETHNICITY_FILTER = ['Any', ...ETHNICITIES]
-const HAIR_COLORS  = ['Any', ...HAIR_COLOURS]
-const BUILDS_FILTER = ['Any', ...BUILDS]
-const CITIES       = ['All Cities', 'Brussels', 'Antwerp', 'Ghent', 'Grimbergen', 'Amsterdam', 'Berlin', 'Paris', 'Cologne', 'Rotterdam']
+const ETHNICITY_FILTER = [...ETHNICITIES, 'Any']
+const HAIR_COLORS  = [...HAIR_COLOURS, 'Any']
+const BUILDS_FILTER = [...BUILDS, 'Any']
+const CITIES       = ['Brussels', 'Antwerp', 'Ghent', 'Grimbergen', 'Amsterdam', 'Berlin', 'Paris', 'Cologne', 'Rotterdam', 'All Cities']
 
 const SERVICES_LIST = [
   'GFE', 'BDSM', 'Massage', 'Tantric', 'Roleplay', 'Dinner Date',
@@ -283,7 +283,7 @@ export default function PrivateReceptionPage() {
     return false
   })
 
-  const [hostType, setHostType]         = useState('all')
+  const [hostType, setHostType]         = useState('women')
   const [category, setCategory]         = useState(() => {
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search).get('cat')

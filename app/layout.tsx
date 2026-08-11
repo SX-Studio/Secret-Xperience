@@ -104,7 +104,7 @@ const sxTranslationsScript = `
     'Sign In':          {fr:'Se connecter',   nl:'Inloggen',       de:'Anmelden',         es:'Iniciar sesión',  it:'Accedi',           pt:'Iniciar Sessão',   pl:'Zaloguj się',      ro:'Conectare'},
     'Log In':           {fr:'Se connecter',   nl:'Inloggen',       de:'Anmelden',         es:'Iniciar sesión',  it:'Accedi',           pt:'Iniciar Sessão',   pl:'Zaloguj się',      ro:'Conectare'},
     'Create Account':   {fr:'Créer un compte',nl:'Account aanmaken',de:'Konto erstellen', es:'Crear cuenta',    it:'Crea account',     pt:'Criar Conta',      pl:'Utwórz konto',     ro:'Creează cont'},
-    'Sign Up':          {fr:'S\'inscrire',    nl:'Registreren',    de:'Registrieren',     es:'Registrarse',     it:'Registrati',       pt:'Registar',         pl:'Zarejestruj się',  ro:'Înregistrare'},
+    'Sign Up':          {fr:"S'inscrire",     nl:'Registreren',    de:'Registrieren',     es:'Registrarse',     it:'Registrati',       pt:'Registar',         pl:'Zarejestruj się',  ro:'Înregistrare'},
     'Sign in with Google':{fr:'Connexion avec Google',nl:'Inloggen met Google',de:'Mit Google anmelden',es:'Entrar con Google',it:'Accedi con Google',pt:'Entrar com Google',pl:'Zaloguj z Google',ro:'Conectare cu Google'},
     'Log Out':          {fr:'Déconnexion',    nl:'Uitloggen',      de:'Abmelden',         es:'Cerrar sesión',   it:'Esci',             pt:'Terminar Sessão',  pl:'Wyloguj',          ro:'Deconectare'},
     'Sign Out':         {fr:'Déconnexion',    nl:'Uitloggen',      de:'Abmelden',         es:'Cerrar sesión',   it:'Esci',             pt:'Terminar Sessão',  pl:'Wyloguj',          ro:'Deconectare'},

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { createClient } from '../lib/supabase'
 import LockerRoom from '../components/LockerRoom'
-import { Aurora, Spotlight, Particles, FlagWipe, useBurst, SPRING } from '../components/pride/PrideFX'
+import { Aurora, Spotlight, Particles, PresenceOrbs, Magnetic, FlagWipe, PrideRain, Constellation, useBurst, useRipples, useTilt, SPRING } from '../components/pride/PrideFX'
 
 type L = {
   id: string; title: string; age: number | null; city: string | null; country: string | null
@@ -52,6 +52,14 @@ const TABS: { key: string; label: string; icon: string; match: (t: string[]) => 
 ]
 const PRIDE_TAGS = ['orientation:gay', 'orientation:bi', 'type:trans', 'type:trans woman', 'type:couple', 'type:nonbinary']
 
+const CHAPTERS = [
+  { min: 0,  name: 'Warming up' },
+  { min: 25, name: 'Cruising' },
+  { min: 50, name: 'After hours' },
+  { min: 80, name: 'The Backroom' },
+]
+const chapterOf = (v: number) => CHAPTERS.reduce((acc, c, i) => (v >= c.min ? i : acc), 0)
+
 function price(a: number | null, b: number | null) { if (a && b) return `€${a}–€${b}`; if (a) return `from €${a}`; return 'POA' }
 const tribeHay = (l: L) => `${l.title || ''} ${(l.tags || []).join(' ')}`.toLowerCase()
 const matchTribe = (l: L, kw: string[]) => { const h = tribeHay(l); return kw.some(k => h.includes(k)) }
@@ -68,17 +76,41 @@ export default function PridePage() {
   const [loading, setLoading] = useState(true)
   const [liked, setLiked] = useState<Set<string>>(new Set())
 
-  // Vibe meter — the room warms up the more you play with it
+  // Vibe meter — the room warms up the more you play with it (chaptered journey)
   const [vibe, setVibe] = useState(0)
-  const [afterHours, setAfterHours] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
   const [flagWipe, setFlagWipe] = useState<{ id: number; grad: string; x: number; y: number } | null>(null)
+  const [raining, setRaining] = useState(false)
+  const [present, setPresent] = useState(0)
   const { fire, layer } = useBurst()
+  const { spawn: ripple, layer: rippleLayer } = useRipples()
+  const { px, py } = useTilt()
   const wipeId = useRef(0)
+  const prevChap = useRef(0)
+  const keyBuf = useRef('')
+  const pressTimer = useRef<any>(null)
+
+  const chapIdx = chapterOf(vibe)
+  const chapter = CHAPTERS[chapIdx]
+  const backroom = chapIdx >= 3
+
+  function rainNow() { setRaining(true); setToast('🌈 Pride!'); setTimeout(() => setRaining(false), 4500); setTimeout(() => setToast(t => (t === '🌈 Pride!' ? null : t)), 2500) }
 
   useEffect(() => {
-    try { const f = localStorage.getItem('sx_pride_flag'); if (f && FLAGS.some(x => x.key === f)) setFlag(f) } catch {}
+    let savedFlag: string | null = null
+    try { savedFlag = localStorage.getItem('sx_pride_flag'); if (savedFlag && FLAGS.some(x => x.key === savedFlag)) setFlag(savedFlag) } catch {}
     try { const lk = JSON.parse(localStorage.getItem('sx_pride_liked') || '[]'); setLiked(new Set(lk)) } catch {}
+    // Returning-guest welcome — greet by their flag and pre-warm the room
+    try {
+      if (localStorage.getItem('sx_pride_seen') && savedFlag) {
+        const fl = FLAGS.find(x => x.key === savedFlag)
+        setToast(`${fl?.emoji || '🏳️‍🌈'} Welcome back — your ${fl?.label || 'Pride'} corner is warm`)
+        setVibe(v => Math.min(100, v + 15))
+        setTimeout(() => setToast(t => (t && t.includes('Welcome back') ? null : t)), 4000)
+      }
+      localStorage.setItem('sx_pride_seen', '1')
+    } catch {}
+    setPresent(18 + Math.floor(Math.random() * 44))
     const supabase = createClient()
     supabase.from('listings')
       .select('id,title,age,city,country,price_from,price_to,images,tags,services,category,subcategory,verified,meet_type')
@@ -89,24 +121,35 @@ export default function PridePage() {
   }, [])
 
   const ACC = FLAGS.find(f => f.key === flag)?.grad || SPECTRUM
-  const intensity = afterHours ? 1 : vibe / 100
+  const intensity = backroom ? 1 : vibe / 100
 
-  function bump(n = 8) {
-    setVibe(v => {
-      const nv = Math.min(100, v + n)
-      if (v < 100 && nv >= 100) celebrate()
-      return nv
-    })
-  }
-  function celebrate() {
-    setAfterHours(true)
-    setToast('✦ After hours unlocked — the room is yours')
-    const cx = window.innerWidth / 2, cy = window.innerHeight * 0.4
-    fire(cx, cy, 'confetti', 22)
-    setTimeout(() => fire(cx - 80, cy + 30, 'heart', 14), 160)
-    setTimeout(() => fire(cx + 80, cy + 30, 'confetti', 16), 300)
-    setTimeout(() => setToast(null), 4200)
-  }
+  function bump(n = 8) { setVibe(v => Math.min(100, v + n)) }
+
+  // Chapter transitions — announce each tier and celebrate reaching the Backroom
+  useEffect(() => {
+    if (chapIdx > prevChap.current) {
+      const msg = `✦ ${chapter.name} unlocked`
+      setToast(msg)
+      setTimeout(() => setToast(t => (t === msg ? null : t)), 3500)
+      if (chapIdx >= 3 && typeof window !== 'undefined') {
+        const cx = window.innerWidth / 2, cy = window.innerHeight * 0.4
+        fire(cx, cy, 'confetti', 22)
+        setTimeout(() => fire(cx - 80, cy + 30, 'heart', 14), 160)
+      }
+    }
+    prevChap.current = chapIdx
+  }, [chapIdx]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Easter egg — type "pride" anywhere to make it rain
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.length !== 1) return
+      keyBuf.current = (keyBuf.current + e.key.toLowerCase()).slice(-5)
+      if (keyBuf.current === 'pride') { keyBuf.current = ''; rainNow() }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   function pickFlag(k: string, e: React.MouseEvent) {
     setFlag(k); try { localStorage.setItem('sx_pride_flag', k) } catch {}
     const g = FLAGS.find(f => f.key === k)?.grad || SPECTRUM
@@ -141,7 +184,7 @@ export default function PridePage() {
   const hankyCount = (svc: string[]) => svc.length === 0 ? items.length : items.filter(i => matchHanky(i, svc)).length
 
   return (
-    <div style={{ background: afterHours ? '#05040c' : '#080612', minHeight: '100vh', color: '#ece8e1', transition: 'background 1.2s ease', position: 'relative' }}>
+    <div onPointerDown={(e) => ripple(e.clientX, e.clientY)} style={{ background: backroom ? '#0a0308' : '#080612', minHeight: '100vh', color: '#ece8e1', transition: 'background 1.2s ease', position: 'relative' }}>
       <style>{`
         @keyframes prideShift { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
         @keyframes prMarquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
@@ -153,15 +196,25 @@ export default function PridePage() {
       `}</style>
 
       {/* Ambient layers */}
-      <Spotlight on={!afterHours || true} />
+      <Spotlight on />
       {layer}
+      {rippleLayer}
       <FlagWipe trigger={flagWipe} />
+      <PrideRain on={raining} />
+      {backroom && <div aria-hidden style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 2, background: 'radial-gradient(ellipse at 50% 50%, transparent 42%, rgba(170,20,44,0.18) 100%)', mixBlendMode: 'screen' }} />}
 
-      {/* Vibe meter ribbon */}
+      {/* Vibe meter ribbon + chapter chip */}
       <div style={{ position: 'sticky', top: 64, zIndex: 150, height: 3, background: 'rgba(255,255,255,0.05)' }}>
         <motion.div style={{ height: '100%', backgroundImage: ACC, backgroundSize: '200% 100%', transformOrigin: 'left' }}
           animate={{ scaleX: vibe / 100 }} transition={SPRING} />
       </div>
+      {vibe > 0 && (
+        <div style={{ position: 'sticky', top: 67, zIndex: 149, display: 'flex', justifyContent: 'center', pointerEvents: 'none' }}>
+          <motion.span layout style={{ marginTop: 6, padding: '3px 12px', borderRadius: 999, background: 'rgba(12,8,20,0.82)', border: '0.5px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(8px)', font: '700 9px/1 Poppins, sans-serif', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(236,232,225,0.78)' }}>
+            {chapter.name} · {vibe}%
+          </motion.span>
+        </div>
+      )}
 
       <AnimatePresence>
         {toast && (
@@ -181,13 +234,23 @@ export default function PridePage() {
 
       {/* hero */}
       <section style={{ padding: '4.5rem 1.5rem 2rem', textAlign: 'center', position: 'relative', overflow: 'hidden', borderBottom: '0.5px solid rgba(255,255,255,0.06)' }}>
-        <Aurora intensity={intensity} />
+        <Aurora intensity={intensity} px={px} py={py} />
         <Particles intensity={intensity} />
+        <PresenceOrbs n={8} />
+        {present > 0 && (
+          <div style={{ position: 'absolute', top: 16, right: 18, zIndex: 3, display: 'inline-flex', alignItems: 'center', gap: 7, padding: '5px 12px', borderRadius: 999, background: 'rgba(12,8,20,0.6)', border: '0.5px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(8px)', font: '600 11px/1 Poppins, sans-serif', color: 'rgba(236,232,225,0.7)' }}>
+            <motion.span animate={{ opacity: [1, 0.4, 1], scale: [1, 1.3, 1] }} transition={{ duration: 2, repeat: Infinity }} style={{ width: 7, height: 7, borderRadius: '50%', background: '#26d4a0', boxShadow: '0 0 8px #26d4a0' }} />
+            {present} cruising now
+          </div>
+        )}
         <div style={{ position: 'relative', zIndex: 2, maxWidth: 760, margin: '0 auto' }}>
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
             style={{ font: '700 11px/1 Poppins, sans-serif', letterSpacing: '0.3em', textTransform: 'uppercase', marginBottom: '1.1rem', backgroundImage: ACC, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>Pride · Spectrum · Everyone welcome</motion.div>
           <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.05 }}
-            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2.2rem,5vw,3.4rem)', fontWeight: 400, lineHeight: 1.12, margin: '0 0 1rem' }}>
+            onPointerDown={() => { pressTimer.current = setTimeout(rainNow, 600) }}
+            onPointerUp={() => clearTimeout(pressTimer.current)} onPointerLeave={() => clearTimeout(pressTimer.current)}
+            title="Press and hold…"
+            style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 'clamp(2.2rem,5vw,3.4rem)', fontWeight: 400, lineHeight: 1.12, margin: '0 0 1rem', cursor: 'default', userSelect: 'none' }}>
             After dark, <em style={{ fontStyle: 'italic', backgroundImage: ACC, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>all colours.</em>
           </motion.h1>
           <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.15 }}
@@ -219,8 +282,9 @@ export default function PridePage() {
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '2rem 1.5rem 4rem', position: 'relative', zIndex: 2 }}>
 
         {/* Cruise Control */}
+        <Magnetic strength={0.22} style={{ marginBottom: '2rem' }}>
         <motion.a href="/discover?vibe=pride" onClick={() => bump(4)} whileHover={rm ? {} : { y: -3 }} whileTap={{ scale: 0.99 }} transition={SPRING}
-          style={{ display: 'flex', alignItems: 'center', gap: 18, textDecoration: 'none', borderRadius: 18, padding: '20px 24px', marginBottom: '2rem', position: 'relative', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(20,14,26,0.6)' }}>
+          style={{ display: 'flex', alignItems: 'center', gap: 18, textDecoration: 'none', borderRadius: 18, padding: '20px 24px', position: 'relative', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(20,14,26,0.6)' }}>
           <div aria-hidden style={{ position: 'absolute', inset: 0, backgroundImage: ACC, opacity: 0.14 }} />
           <motion.div animate={rm ? {} : { scale: [1, 1.06, 1] }} transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
             style={{ position: 'relative', width: 56, height: 56, borderRadius: 16, backgroundImage: ACC, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 10px 30px rgba(0,0,0,0.4)' }}>
@@ -232,6 +296,7 @@ export default function PridePage() {
           </div>
           <i className="ti ti-arrow-right" style={{ position: 'relative', color: '#f2ede4', fontSize: 24, flexShrink: 0 }} />
         </motion.a>
+        </Magnetic>
 
         {/* Tonight's Lineup */}
         {items.filter(i => i.images?.[0]).length > 3 && (
@@ -357,6 +422,9 @@ export default function PridePage() {
                   {l.images?.[0]
                     ? <motion.img className="pr-photo" src={l.images[0]} alt={l.title} loading="lazy" variants={{ rest: { scale: 1 }, h: { scale: 1.06 } }} transition={{ duration: 0.7, ease: [0.2, 0.8, 0.4, 1] }} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <div style={{ width: '100%', height: '100%', backgroundImage: ACC, opacity: .25 }} />}
+                  {/* frosted-to-clear reveal */}
+                  {!rm && l.images?.[0] && <motion.div aria-hidden initial={{ opacity: 1 }} whileInView={{ opacity: 0 }} viewport={{ once: true, margin: '-30px' }} transition={{ duration: 0.7, ease: 'easeOut' }}
+                    style={{ position: 'absolute', inset: 0, background: 'rgba(18,12,24,0.4)', backdropFilter: 'blur(9px)', WebkitBackdropFilter: 'blur(9px)', pointerEvents: 'none' }} />}
                   {/* sheen sweep */}
                   {!rm && <motion.div aria-hidden variants={{ rest: { x: '-120%', opacity: 0 }, h: { x: '220%', opacity: 1 } }} transition={{ duration: 0.9, ease: 'easeOut' }}
                     style={{ position: 'absolute', top: 0, bottom: 0, width: '55%', transform: 'skewX(-18deg)', background: 'linear-gradient(90deg,transparent,rgba(255,255,255,0.16),transparent)', pointerEvents: 'none' }} />}
@@ -389,6 +457,8 @@ export default function PridePage() {
             <p style={{ color: 'rgba(236,232,225,0.6)', marginTop: 10 }}>No one&rsquo;s out to play in this filter yet — be the first flame 🔥</p>
           </div>
         )}
+
+        <Constellation stars={items.filter(i => liked.has(i.id)).map(i => ({ id: i.id, title: i.title, img: i.images?.[0] || null }))} accent={ACC} />
 
         <LockerRoom />
 

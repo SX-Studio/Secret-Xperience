@@ -2387,7 +2387,10 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
               aria-hidden="true"
               style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to top, rgba(18,10,6,0.8) 0%, rgba(18,10,6,0.32) 40%, rgba(18,10,6,0) 62%)' }}
             />
-            <div style={{ position: 'relative', zIndex: 2, alignSelf: 'flex-end', width: '100%' }}>
+            <div style={{ position: 'relative', zIndex: 2, alignSelf: 'flex-end', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+              <div style={{ font: '600 10px/1.4 Poppins, sans-serif', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(240,214,160,0.92)', textShadow: '0 1px 8px rgba(0,0,0,0.9)' }}>
+                International porn production studio
+              </div>
               <span
                 style={{
                   display: 'inline-flex', alignItems: 'center', gap: 8, whiteSpace: 'nowrap',

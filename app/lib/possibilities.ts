@@ -28,7 +28,7 @@ export const POSSIBILITY_GROUPS: PossibilityGroup[] = [
     key: 'foreplay',
     label: 'Foreplay',
     items: [
-      'Anal fingering', 'With dental dam', 'Deepthroat', 'With condom',
+      'Anal fingering', 'Cunnilingus', 'With dental dam', 'Deepthroat', 'With condom',
       'To the end', 'Without a condom', 'Nipple sucking', 'French kissing',
       'Fingering', 'Kissing',
     ],

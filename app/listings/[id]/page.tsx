@@ -970,13 +970,24 @@ export default function ListingDetailPage() {
                     : (p?.whatsapp || ((listing as any).whatsapp_optin ? (p?.phone || (listing as any).contact_phone) : null) || null)
                   const waVerified = !!(p?.whatsapp && p?.whatsapp_verified)
                   const waDigits = waNum ? String(waNum).replace(/[^0-9]/g, '') : ''
+                  // Belgian numbers shown as +32 (0) 4XX XX XX XX; tel: stays clean (+32…).
+                  const fmtPhone = (raw: any) => {
+                    const d = String(raw).replace(/\D/g, '')
+                    if (d.startsWith('32') && d.length >= 10) {
+                      const n = d.slice(2)
+                      const grouped = n.length === 9 ? n.replace(/(\d{3})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4') : n
+                      return `+32 (0) ${grouped}`
+                    }
+                    return '+' + d
+                  }
+                  const telClean = (raw: any) => '+' + String(raw).replace(/\D/g, '')
                   if (!phoneNum && !waNum) return null
                   return (
                     <div style={{ borderTop: '0.5px solid rgba(255,255,255,0.07)', paddingTop: '1rem', marginTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {phoneNum && (
-                        <a href={`tel:${phoneNum}`} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#ece8e1', fontFamily: "'Poppins',sans-serif", fontSize: '14px' }}>
+                        <a href={`tel:${telClean(phoneNum)}`} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#ece8e1', fontFamily: "'Poppins',sans-serif", fontSize: '14px' }}>
                           <span style={{ fontSize: '16px' }}>📞</span>
-                          <span style={{ letterSpacing: '0.02em' }}>{phoneNum}</span>
+                          <span style={{ letterSpacing: '0.02em' }}>{fmtPhone(phoneNum)}</span>
                           {phoneVerified && <span style={{ marginLeft: 'auto', fontSize: '10px', fontWeight: 700, color: '#1dc98f', background: 'rgba(29,201,143,0.1)', border: '0.5px solid rgba(29,201,143,0.35)', borderRadius: '20px', padding: '2px 7px' }}>✓</span>}
                         </a>
                       )}

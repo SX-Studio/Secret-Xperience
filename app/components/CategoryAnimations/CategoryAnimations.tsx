@@ -8,7 +8,7 @@ import './styles.css'
 
 const CATS: { label: string; slug: string; route: string; headline: string; accent: string }[] = [
   { label: 'Escorts',    slug: 'escorts',    route: '/escorts',       headline: 'Your secret side',        accent: '#e6c98a' },
-  { label: 'Companions', slug: 'companions', route: '/companionship', headline: 'Never arrive alone',       accent: '#e3ba86' },
+  { label: 'Private Reception', slug: 'companions', route: '/private-reception', headline: 'Never arrive alone', accent: '#e3ba86' },
   { label: 'Nightlife',  slug: 'nightlife',  route: '/nightlife',     headline: 'Where the night opens',    accent: '#ef6d86' },
   { label: 'Creators',   slug: 'creators',   route: '/creators',      headline: 'Follow every obsession',   accent: '#c79bef' },
   { label: 'Rentals',    slug: 'rentals',    route: '/rentals',       headline: 'A place to disappear',     accent: '#edc074' },

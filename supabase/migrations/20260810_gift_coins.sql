@@ -1,0 +1,6 @@
+-- Gift coins system: catalog (40 gifts), gift_wallets, gift_orders, gift_sends,
+-- gift_earnings, gift_payout_requests + RLS + SECURITY DEFINER functions
+-- send_gift(recipient, gift, message) and request_gift_payout().
+-- 1 coin = 10 cents reference; recipient earns 2/3; payout threshold EUR 10.
+-- (Applied to project duwuzaelmggldhkgoebn via apply_migration on 2026-08-10.)
+-- Full statements identical to the applied migration "gift_coins_system".

@@ -1122,6 +1122,9 @@ export default function ListingDetailPage() {
                         Send Message
                       </button>
                     )}
+                    <a href={`/gifts?to=${listing.profile_id}`} className="ld-msg-btn" style={{ textAlign: 'center', textDecoration: 'none', display: 'block' }}>
+                      🎁 Send a gift
+                    </a>
                   </>
                 ) : (
                   <div style={{

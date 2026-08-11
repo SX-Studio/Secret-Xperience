@@ -90,6 +90,31 @@ async function handle(req: NextRequest) {
     { auth: { autoRefreshToken: false, persistSession: false } }
   )
 
+  // Gift-coin bundle purchase (custom3=gift) → credit gift_wallets, not tokens.
+  if ((params.custom3 || '').toLowerCase() === 'gift') {
+    const { data: gorder } = await admin.from('gift_orders').select('*').eq('id', orderId).maybeSingle()
+    if (!gorder) return new NextResponse('Order not found', { status: 404 })
+    if (gorder.user_id !== userId) return new NextResponse('User mismatch', { status: 400 })
+    if (gorder.status === 'completed') return new NextResponse('OK', { status: 200 }) // idempotent
+
+    await admin.from('gift_wallets').upsert(
+      { user_id: userId, balance: 0, total_purchased: 0 },
+      { onConflict: 'user_id', ignoreDuplicates: true }
+    )
+    const { data: gw } = await admin.from('gift_wallets').select('balance, total_purchased').eq('user_id', userId).single()
+    const { error: gwErr } = await admin.from('gift_wallets').update({
+      balance:         (gw?.balance ?? 0) + gorder.coins,
+      total_purchased: (gw?.total_purchased ?? 0) + gorder.coins,
+      updated_at:      new Date().toISOString(),
+    }).eq('user_id', userId)
+    if (gwErr) { console.error('Verotel webhook: gift wallet credit failed', gwErr); return new NextResponse('Wallet update failed', { status: 500 }) }
+
+    await admin.from('gift_orders').update({
+      status: 'completed', provider_order_id: saleId, completed_at: new Date().toISOString(),
+    }).eq('id', orderId)
+    return new NextResponse('OK', { status: 200 })
+  }
+
   const { data: order } = await admin
     .from('payment_orders')
     .select('*')

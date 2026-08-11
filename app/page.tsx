@@ -2302,13 +2302,18 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 ` }} />
       <CategoryAnimations />
 
-      {/* Curated partners — SDC card (left) + banner grid (right) */}
-      <div
-        style={{
-          display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: '1.25rem',
-          maxWidth: 1400, margin: '2.75rem auto 0.5rem', padding: '0 1rem',
-        }}
-      >
+      {/* Curated partners — uniform banner grid */}
+      <div style={{ maxWidth: 1400, margin: '2.75rem auto 0.5rem', padding: '0 1rem' }}>
+          <div style={{ textAlign: 'center', marginBottom: '1.1rem' }}>
+            <div style={{ font: '600 11px/1 Poppins, sans-serif', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.8)' }}>
+              Curated Partners
+            </div>
+          </div>
+          <div
+            style={{
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem',
+            }}
+          >
         {/* SDC.com partner card */}
         <a
           href="https://www.sdc.com/swingers-nederland.html"
@@ -2316,25 +2321,21 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           rel="noopener noreferrer nofollow sponsored"
           title="SDC.com — Swingers Date Club"
           aria-label="SDC.com — Swingers Date Club (opens in a new tab)"
-          style={{ flex: '0 0 210px', display: 'flex', textDecoration: 'none' }}
+          style={{ display: 'flex', minWidth: 0, textDecoration: 'none' }}
         >
           <div
             style={{
-              flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12,
+              flex: 1, minHeight: 158, overflow: 'hidden',
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12,
               background: 'linear-gradient(160deg, rgba(30,22,14,0.96), rgba(14,10,16,0.96))',
-              border: '0.5px solid rgba(197,160,90,0.45)', borderRadius: 18, padding: '20px 18px',
-              boxShadow: '0 18px 50px rgba(0,0,0,0.5)',
+              border: '0.5px solid rgba(197,160,90,0.45)', borderRadius: 18, padding: '20px 26px',
+              boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
             }}
           >
-            <div style={{ font: '600 10px/1 Poppins, sans-serif', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.8)' }}>
-              Curated Partner
-            </div>
             <img
               src="/promos/sdc-logo.png"
               alt="SDC.com"
-              width={150}
-              height={150}
-              style={{ width: 150, height: 150, objectFit: 'contain', filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.45))' }}
+              style={{ height: 74, width: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 6px 18px rgba(0,0,0,0.45))' }}
             />
             <span
               style={{
@@ -2349,18 +2350,6 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           </div>
         </a>
 
-        {/* Banner grid column */}
-        <div style={{ flex: '1 1 640px', minWidth: 0 }}>
-          <div style={{ textAlign: 'center', marginBottom: '1.1rem' }}>
-            <div style={{ font: '600 11px/1 Poppins, sans-serif', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.8)' }}>
-              Curated Partners
-            </div>
-          </div>
-          <div
-            style={{
-              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem',
-            }}
-          >
         {/* MariskaX partner card */}
         <a
           href="https://mariskax.com/"
@@ -2656,7 +2645,6 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           </div>
         </a>
           </div>
-        </div>
       </div>
 
       <div dangerouslySetInnerHTML={{ __html: `

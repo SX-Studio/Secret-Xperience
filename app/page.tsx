@@ -2381,7 +2381,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
             <img
               src="/promos/mariskax-bg.webp"
               alt="MariskaX.com — international porn production studio"
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 22%', zIndex: 0 }}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 15%', zIndex: 0 }}
             />
             <div
               aria-hidden="true"

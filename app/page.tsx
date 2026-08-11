@@ -1450,7 +1450,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       minRating: 0, priceMax: null,
       cities: [] as string[],
       meetTypes: [] as string[],
-      escortTypes: [] as string[],
+      escortTypes: ['women'] as string[],
       orientations: [] as string[],
       services: [] as string[],
       languages: [] as string[],
@@ -1561,7 +1561,23 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       if (filters.trending) query = query.eq('trending', true)
       if (filters.minRating > 0) query = query.gte('rating', filters.minRating)
       if (filters.priceMax) query = query.lte('price_from', filters.priceMax)
-      if (filters.escortTypes && filters.escortTypes.length > 0) query = query.overlaps('tags', filters.escortTypes.map((t: string) => 'type:' + t.toLowerCase()))
+      // Gender/type is single-select. Default (Women) HIDES gay/trans/men/couples/
+      // non-binary from the homepage — those only appear when explicitly chosen.
+      {
+        const sel = ((filters.escortTypes && filters.escortTypes[0]) || 'women').toLowerCase()
+        const HIDE_ON_HOME = '{type:men,type:trans,"type:trans woman","type:trans man",type:couple,type:nonbinary,type:non-binary}'
+        if (sel === 'all') {
+          // no type filter — show everything
+        } else if (sel === 'women') {
+          query = query.not('tags', 'ov', HIDE_ON_HOME)
+        } else if (sel === 'trans woman') {
+          query = query.overlaps('tags', ['type:trans woman', 'type:trans'])
+        } else if (sel === 'trans man') {
+          query = query.overlaps('tags', ['type:trans man'])
+        } else {
+          query = query.overlaps('tags', ['type:' + sel])
+        }
+      }
       if (filters.orientations && filters.orientations.length > 0) query = query.overlaps('tags', filters.orientations.map((o: string) => 'orientation:' + o.toLowerCase()))
       if (filters.hairs && filters.hairs.length > 0) query = query.overlaps('tags', filters.hairs)
       if (filters.builds && filters.builds.length > 0) query = query.overlaps('tags', filters.builds)
@@ -1772,25 +1788,14 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       })
     })
 
-    // Wire escort type buttons (multi-select)
+    // Wire escort type buttons (single-select). Default is Women; gay/trans/men/
+    // couples/non-binary stay hidden on the homepage until explicitly chosen here.
     document.querySelectorAll('[data-etype]').forEach(function(btn) {
       btn.addEventListener('click', function() {
-        const val = (btn as HTMLElement).dataset.etype || ''
-        if (val === 'all') {
-          activeFilters.escortTypes = []
-          document.querySelectorAll('[data-etype]').forEach(b => b.classList.remove('active'))
-          btn.classList.add('active')
-        } else {
-          document.querySelector('[data-etype="all"]')?.classList.remove('active')
-          if (activeFilters.escortTypes.includes(val)) {
-            activeFilters.escortTypes = activeFilters.escortTypes.filter((v: string) => v !== val)
-            btn.classList.remove('active')
-            if (activeFilters.escortTypes.length === 0) document.querySelector('[data-etype="all"]')?.classList.add('active')
-          } else {
-            activeFilters.escortTypes.push(val)
-            btn.classList.add('active')
-          }
-        }
+        const val = (btn as HTMLElement).dataset.etype || 'women'
+        document.querySelectorAll('[data-etype]').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        activeFilters.escortTypes = [val]
         fetchListings(activeFilters)
       })
     })
@@ -1926,14 +1931,14 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 
     // Wire reset button
     document.getElementById('resetFilters')?.addEventListener('click', function() {
-      activeFilters.escortTypes = []; activeFilters.orientations = []
+      activeFilters.escortTypes = ['women']; activeFilters.orientations = []
       activeFilters.meetTypes = []; activeFilters.cities = []
       activeFilters.hairs = []; activeFilters.builds = []
       activeFilters.verified = false; activeFilters.premium = false; activeFilters.trending = false
       activeFilters.priceMax = null; activeFilters.minRating = 0
       activeFilters.services = []; activeFilters.languages = []
       document.querySelectorAll('[data-etype]').forEach(b => b.classList.remove('active'))
-      document.querySelector('[data-etype="all"]')?.classList.add('active')
+      document.querySelector('[data-etype="women"]')?.classList.add('active')
       document.querySelectorAll('[data-ori]').forEach(b => b.classList.remove('active'))
       document.querySelector('[data-ori="all"]')?.classList.add('active')
       document.querySelectorAll('[data-meet]').forEach(b => b.classList.remove('active'))
@@ -2623,14 +2628,14 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <div class="fsec">
         <div class="flbl">Escort Type</div>
         <div class="etype-list">
-          <button class="etype active" data-etype="all">All</button>
-          <button class="etype" data-etype="women">Women</button>
-          <button class="etype" data-etype="men">Men</button>
+          <button class="etype active" data-etype="women">Women</button>
+          <button class="etype" data-etype="men">Men / Gigolo</button>
           <button class="etype" data-etype="trans woman">Trans Woman</button>
           <button class="etype" data-etype="trans man">Trans Man</button>
           <button class="etype" data-etype="non-binary">Non-Binary</button>
           <button class="etype" data-etype="couples">Couples</button>
           <button class="etype" data-etype="fetish">Fetish</button>
+          <button class="etype" data-etype="all">All</button>
         </div>
       </div>
 

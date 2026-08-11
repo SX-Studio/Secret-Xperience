@@ -38,7 +38,6 @@ type Listing = {
 
 /* ── Filter config ──────────────────────────────────────── */
 const ESCORT_TYPES = [
-  { value: 'all',        label: 'All',           icon: '✦' },
   { value: 'women',      label: 'Women',         icon: '♀' },
   { value: 'men',        label: 'Men / Gigolo',  icon: '♂' },
   { value: 'trans-woman',label: 'Trans Woman',   icon: '⚧' },
@@ -46,6 +45,7 @@ const ESCORT_TYPES = [
   { value: 'non-binary', label: 'Non-Binary',    icon: '⊕' },
   { value: 'couples',    label: 'Couples',       icon: '♥' },
   { value: 'fetish',     label: 'Fetish',        icon: '◈' },
+  { value: 'all',        label: 'All',           icon: '✦' },
 ]
 
 const SEXUAL_ORIENTATION = [
@@ -279,7 +279,7 @@ export default function EscortsPage() {
   })
 
   // Filter state
-  const [escortType, setEscortType]     = useState('all')
+  const [escortType, setEscortType]     = useState('women')
   const [orientation, setOrientation]   = useState('all')
   const [meetType, setMeetType]         = useState('all')
   const [city, setCity]                 = useState('All Cities')

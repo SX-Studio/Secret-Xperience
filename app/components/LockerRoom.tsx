@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { createClient } from '../lib/supabase'
 
 type Post = { id: string; handle: string; body: string; vibe: string | null; created_at: string }
@@ -20,6 +21,7 @@ function ago(iso: string) {
 }
 
 export default function LockerRoom() {
+  const rm = useReducedMotion()
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(true)
   const [handle, setHandle] = useState('')
@@ -99,13 +101,21 @@ export default function LockerRoom() {
         <p style={{ textAlign: 'center', color: 'rgba(236,232,225,0.5)' }}>Loading the wall…</p>
       ) : posts.length ? (
         <div style={{ columns: '220px', columnGap: '14px', maxWidth: 1100, margin: '0 auto' }}>
-          {posts.map((p) => {
+          <AnimatePresence initial={false}>
+          {posts.map((p, i) => {
             const n = seed(p.id)
             const tilt = (n % 5) - 2
             return (
-              <div key={p.id} style={{ breakInside: 'avoid', marginBottom: 14, transform: `rotate(${tilt * 0.5}deg)`,
+              <motion.div key={p.id}
+                initial={rm ? { opacity: 0 } : { opacity: 0, y: -26, rotate: tilt * 0.5 - 8, scale: 0.85 }}
+                whileInView={{ opacity: 1, y: 0, rotate: tilt * 0.5, scale: 1 }}
+                viewport={{ once: true, margin: '-30px' }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 22, delay: Math.min(i, 10) * 0.03 }}
+                whileHover={rm ? {} : { scale: 1.03, rotate: 0, zIndex: 2 }}
+                style={{ breakInside: 'avoid', marginBottom: 14,
                 background: `linear-gradient(160deg, ${TINTS[n % TINTS.length]}, rgba(20,14,26,0.6))`,
-                border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '13px 15px', position: 'relative' }}>
+                border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 14, padding: '13px 15px', position: 'relative', cursor: 'default' }}>
                 <span style={{ position: 'absolute', top: -1, left: 14, right: 14, height: 2, background: SPECTRUM, borderRadius: 2, opacity: .7 }} />
                 <div style={{ fontSize: 22, lineHeight: 1, marginBottom: 8 }}>{p.vibe || '🏳️‍🌈'}</div>
                 <p style={{ margin: '0 0 10px', font: '400 14px/1.5 Poppins, sans-serif', color: '#efe9df', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{p.body}</p>
@@ -113,9 +123,10 @@ export default function LockerRoom() {
                   <span style={{ fontWeight: 600, color: '#c79bef' }}>{p.handle}</span>
                   <span style={{ color: 'rgba(236,232,225,0.4)' }}>{ago(p.created_at)}</span>
                 </div>
-              </div>
+              </motion.div>
             )
           })}
+          </AnimatePresence>
         </div>
       ) : (
         <p style={{ textAlign: 'center', color: 'rgba(236,232,225,0.6)' }}>The wall’s empty — be the first to write something ✍️</p>

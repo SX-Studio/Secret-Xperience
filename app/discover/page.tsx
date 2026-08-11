@@ -158,7 +158,9 @@ export default function DiscoverPage() {
         const x = this.x
         const rot = x * 0.08
         const opacity = Math.max(0.4, 1 - Math.abs(x) / 400)
-        gsap.set(el, { rotation: rot, opacity })
+        const glow = x > 30 ? `0 0 44px rgba(38,212,160,${Math.min(0.55, x / 320)})`
+          : x < -30 ? `0 0 44px rgba(224,80,122,${Math.min(0.55, -x / 320)})` : '0 20px 60px rgba(0,0,0,0.5)'
+        gsap.set(el, { rotation: rot, opacity, boxShadow: glow })
         const likeEl = el.querySelector<HTMLElement>('.disc-like-ind')
         const skipEl = el.querySelector<HTMLElement>('.disc-skip-ind')
         if (likeEl) likeEl.style.opacity = x > 30  ? String(Math.min(1, (x - 30) / 80))  : '0'
@@ -171,7 +173,7 @@ export default function DiscoverPage() {
         } else if (x < -120) {
           flyOut('skip')
         } else {
-          gsap.to(el, { x: 0, rotation: 0, opacity: 1, duration: 0.35, ease: 'back.out(2)' })
+          gsap.to(el, { x: 0, rotation: 0, opacity: 1, boxShadow: '0 20px 60px rgba(0,0,0,0.5)', duration: 0.35, ease: 'back.out(2)' })
           const likeEl = el.querySelector<HTMLElement>('.disc-like-ind')
           const skipEl = el.querySelector<HTMLElement>('.disc-skip-ind')
           if (likeEl) likeEl.style.opacity = '0'

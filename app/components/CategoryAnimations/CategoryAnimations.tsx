@@ -18,6 +18,7 @@ const CATS: { label: string; slug: string; route: string; headline: string; acce
   { label: 'Shop',       slug: 'shop',       route: '/shop',          headline: 'Dressed for the dark',     accent: '#ef8fb0' },
   { label: 'Live',       slug: 'live',       route: '/live',          headline: 'Live, and watching you',   accent: '#f0665f' },
   { label: 'Jobs',       slug: 'jobs',       route: '/jobs',          headline: 'Work on your terms',       accent: '#e6c98a' },
+  { label: 'Videos',     slug: 'videos',     route: '/videos',        headline: 'Watch in full frame',      accent: '#c79bef' },
 ]
 
 export default function CategoryAnimations() {
@@ -25,7 +26,7 @@ export default function CategoryAnimations() {
     <section className="cat-anim-section" data-screen-label="Category explainer">
       <div className="section-inner">
         <header className="section-head">
-          <span className="t-eyebrow t-eyebrow-gold">TEN WORLDS · ONE MEMBERSHIP</span>
+          <span className="t-eyebrow t-eyebrow-gold">TWELVE WORLDS · ONE MEMBERSHIP</span>
           <h2 className="t-display section-title">
             Step into a world<br /><em>beyond ordinary.</em>
           </h2>

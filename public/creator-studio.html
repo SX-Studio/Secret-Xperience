@@ -61,6 +61,7 @@
   .vis-toggle .knob{position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:var(--surface); box-shadow:0 1px 2px rgba(0,0,0,.25); transition:left .15s ease;}
   .vis-toggle.on{background:var(--accent);}
   .vis-toggle.on .knob{left:14px;}
+  .vis-locked{flex:none;margin-right:8px;color:var(--text-faint);font-size:12px;display:inline-flex;align-items:center;justify-content:center;width:30px;height:18px;opacity:.7;cursor:not-allowed;}
   .side-foot{margin-top:auto; display:flex; flex-direction:column; gap:10px;}
   .status-pill{display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text-muted); background:var(--surface-2); border:1px solid var(--border); padding:8px 10px; border-radius:999px;}
   .dot{width:7px; height:7px; border-radius:50%; background:var(--ok);}
@@ -275,11 +276,11 @@
       </div>
       <div class="nav-item" data-target="appearance">
         <a href="#appearance"><span class="n">02</span> Appearance</a>
-        <button class="vis-toggle" data-target="appearance" title="Visible on public profile" aria-label="Toggle Appearance visible on public profile"><span class="knob"></span></button>
+        <span class="vis-locked" title="Always private — dashboard only" aria-label="Appearance is always private">🔒</span>
       </div>
       <div class="nav-item" data-target="stats">
         <a href="#stats"><span class="n">03</span> Insights</a>
-        <button class="vis-toggle" data-target="stats" title="Visible on public profile" aria-label="Toggle Insights visible on public profile"><span class="knob"></span></button>
+        <span class="vis-locked" title="Always private — dashboard only" aria-label="Insights is always private">🔒</span>
       </div>
       <div class="nav-item" data-target="content">
         <a href="#content"><span class="n">04</span> Content</a>
@@ -295,7 +296,7 @@
       </div>
       <div class="nav-item" data-target="wallet">
         <a href="#wallet"><span class="n">07</span> Wallet</a>
-        <button class="vis-toggle" data-target="wallet" title="Visible on public profile" aria-label="Toggle Wallet visible on public profile"><span class="knob"></span></button>
+        <span class="vis-locked" title="Always private — dashboard only" aria-label="Wallet is always private">🔒</span>
       </div>
       <div class="nav-item" data-target="gifts">
         <a href="#gifts"><span class="n">08</span> Gifts</a>
@@ -1349,6 +1350,8 @@
     LEDGER = data.ledger||[]; GIFTS = data.gifts||[]; STATS = data.stats||{};
     REV = data.revenueByMonth||[]; ACT = data.activity14||[];
     CONFIG = mergeConfig(data.config);
+    // Appearance / Insights / Wallet are always private — never exposable on the public profile.
+    ['appearance','stats','wallet'].forEach(k=>{ CONFIG.sections[k] = false; });
 
     // Profile
     document.getElementById('displayName').value = PROFILE.full_name || '';

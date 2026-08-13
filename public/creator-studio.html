@@ -950,7 +950,7 @@
       headline: document.getElementById('headlineDisplay').textContent,
     }, 'Profile saved');
   });
-  document.querySelectorAll('.profile-actions .btn-ghost, .side-foot .btn-ghost').forEach(b=>b.addEventListener('click', ()=>{ window.open('/creators', '_blank'); }));
+  document.querySelectorAll('.profile-actions .btn-ghost, .side-foot .btn-ghost').forEach(b=>b.addEventListener('click', ()=>{ const path = window.__pubUrl ? '/'+window.__pubUrl.split('/').slice(1).join('/') : '/creators'; window.open(path, '_blank'); }));
 
   /* ---------- Charts ---------- */
   function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
@@ -1357,7 +1357,8 @@
     document.querySelector('#profile .verified').style.display = PROFILE.verified ? '' : 'none';
     if(PROFILE.headline){ document.getElementById('headlineDisplay').textContent=PROFILE.headline; document.getElementById('headlineInput').value=PROFILE.headline; }
     if(PROFILE.bio){ document.getElementById('bioDisplay').textContent=PROFILE.bio; document.getElementById('bioInput').value=PROFILE.bio; }
-    document.getElementById('shareUrl').value = PROFILE.username ? `secretxperience.eu/creators?c=${PROFILE.username}` : 'secretxperience.eu/creators';
+    window.__pubUrl = PROFILE.username ? `secretxperience.eu/c/${PROFILE.username}` : 'secretxperience.eu/creators';
+    document.getElementById('shareUrl').value = window.__pubUrl;
 
     // Config-driven UI
     if(CONFIG.theme){ theme = Object.assign({}, defaults, CONFIG.theme);

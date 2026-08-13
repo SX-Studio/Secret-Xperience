@@ -36,21 +36,24 @@ export default async function CreatorPublicPage({ params }: { params: { username
   const { data: { session } } = await supabase.auth.getSession()
 
   let isSelf = false, isFollowing = false, viewerBalance = 0
+  let subscription: { tierName: string; currentPeriodEnd: string; cancelAtPeriodEnd: boolean } | null = null
   if (session) {
     isSelf = session.user.id === creator.id
     const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { autoRefreshToken: false, persistSession: false } })
-    const [{ data: f }, { data: w }] = await Promise.all([
+    const [{ data: f }, { data: w }, { data: s }] = await Promise.all([
       admin.from('creator_follows').select('follower_id').eq('follower_id', session.user.id).eq('creator_id', creator.id).maybeSingle(),
       admin.from('user_wallets').select('balance').eq('user_id', session.user.id).maybeSingle(),
+      admin.from('creator_subscriptions').select('tier_name, current_period_end, cancel_at_period_end').eq('subscriber_id', session.user.id).eq('creator_id', creator.id).eq('status', 'active').maybeSingle(),
     ])
     isFollowing = !!f
     viewerBalance = w?.balance ?? 0
+    if (s) subscription = { tierName: s.tier_name, currentPeriodEnd: s.current_period_end, cancelAtPeriodEnd: s.cancel_at_period_end }
   }
 
   return (
     <PublicProfile
       creator={creator}
-      viewer={{ loggedIn: !!session, isSelf, isFollowing, balance: viewerBalance }}
+      viewer={{ loggedIn: !!session, isSelf, isFollowing, balance: viewerBalance, subscription }}
     />
   )
 }

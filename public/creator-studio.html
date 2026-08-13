@@ -1306,8 +1306,10 @@
   function renderStats(){
     const grid = document.querySelector('#stats .stat-grid');
     if(grid) grid.innerHTML = `
+      <div class="stat-card"><span class="stat-label">Subscribers</span><div class="stat-value">${(STATS.subscribers||0).toLocaleString()}</div><div class="stat-delta up">${(STATS.mrrTokens||0).toLocaleString()} tokens / mo</div></div>
+      <div class="stat-card"><span class="stat-label">Followers</span><div class="stat-value">${(STATS.followers||0).toLocaleString()}</div><div class="stat-delta">Free follows</div></div>
       <div class="stat-card"><span class="stat-label">Wallet balance</span><div class="stat-value">${(STATS.balance||0).toLocaleString()} tok</div><div class="stat-delta">Available now</div></div>
-      <div class="stat-card"><span class="stat-label">Tokens earned</span><div class="stat-value">${(STATS.tokensEarned||0).toLocaleString()}</div><div class="stat-delta up">Purchases + gifts</div></div>
+      <div class="stat-card"><span class="stat-label">Tokens earned</span><div class="stat-value">${(STATS.tokensEarned||0).toLocaleString()}</div><div class="stat-delta up">Subs · gifts · purchases</div></div>
       <div class="stat-card"><span class="stat-label">Gifts received</span><div class="stat-value">${(STATS.giftsCount||0).toLocaleString()}</div><div class="stat-delta up">${(STATS.giftTokens||0).toLocaleString()} tokens</div></div>
       <div class="stat-card"><span class="stat-label">Content posts</span><div class="stat-value">${(STATS.posts||0).toLocaleString()}</div><div class="stat-delta">${(STATS.likes||0).toLocaleString()} likes</div></div>`;
     // relabel chart panels to reflect real data

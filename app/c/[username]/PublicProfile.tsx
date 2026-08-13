@@ -9,7 +9,11 @@ const GIFT_AMOUNTS = [
   { tokens: 200, emoji: '💎', label: 'Diamond' },
 ]
 
-type Viewer = { loggedIn: boolean; isSelf: boolean; isFollowing: boolean; balance: number }
+type Subscription = { tierName: string; currentPeriodEnd: string; cancelAtPeriodEnd: boolean }
+type Viewer = { loggedIn: boolean; isSelf: boolean; isFollowing: boolean; balance: number; subscription: Subscription | null }
+
+const tokensForEuro = (euro: any) => Math.max(1, Math.round((Number(euro) || 0) * 10))
+const fmtDate = (iso: string) => { try { return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) } catch { return iso } }
 
 export default function PublicProfile({ creator, viewer }: { creator: PublicCreator; viewer: Viewer }) {
   const cfg = creator.config || {}
@@ -24,7 +28,10 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
   const [giftTokens, setGiftTokens] = useState(creator.giftTokens)
   const [balance, setBalance] = useState(viewer.balance)
   const [giftOpen, setGiftOpen] = useState(false)
+  const [subscription, setSubscription] = useState<Subscription | null>(viewer.subscription)
+  const [subTier, setSubTier] = useState<any | null>(null) // tier being confirmed in the modal
   const [toast, setToast] = useState<string | null>(null)
+  const isSubscriber = !!subscription
 
   const notify = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2800) }
   const initial = (creator.full_name || 'C').trim().charAt(0).toUpperCase()
@@ -52,6 +59,21 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
     if (!viewer.loggedIn) { window.location.href = `/login?next=/c/${creator.username}`; return }
     if (viewer.isSelf) { notify('You cannot gift yourself'); return }
     setGiftOpen(true)
+  }
+
+  function startSubscribe(tier: any) {
+    if (!viewer.loggedIn) { window.location.href = `/login?next=/c/${creator.username}`; return }
+    if (viewer.isSelf) { notify('This is your own profile'); return }
+    setSubTier(tier)
+  }
+  async function cancelResume(cancel: boolean) {
+    try {
+      const r = await fetch('/api/creators/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ creatorId: creator.id, action: cancel ? 'cancel' : 'resume' }) })
+      const j = await r.json()
+      if (!r.ok) { notify(j.error || 'Could not update'); return }
+      setSubscription((s) => s ? { ...s, cancelAtPeriodEnd: cancel } : s)
+      notify(cancel ? 'Membership will not renew' : 'Membership renewal re-enabled')
+    } catch { notify('Could not update') }
   }
 
   function share() {
@@ -107,6 +129,10 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
         .cp-tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
         .cp-tier{border:.5px solid var(--b,rgba(255,255,255,.09));border-radius:16px;padding:22px;background:var(--bg1,rgba(255,255,255,.03));display:flex;flex-direction:column;gap:12px;position:relative}
         .cp-tier.hi{border-color:var(--acc);box-shadow:0 0 0 1px var(--acc) inset}
+        .cp-tier.cur{border-color:#26d4a0;box-shadow:0 0 0 1px #26d4a0 inset}
+        .cp-tier.cur .tag{background:#26d4a0}
+        .cp-substatus{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border:.5px solid #26d4a0;background:color-mix(in srgb,#26d4a0 12%,transparent);border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:13.5px;color:var(--t2,#a9a49c)}
+        .cp-substatus b{color:var(--t,#ece8e1)}
         .cp-tier .tag{position:absolute;top:-10px;right:16px;font:600 10px var(--sans);letter-spacing:.05em;text-transform:uppercase;background:var(--acc);color:#fff;padding:3px 10px;border-radius:999px}
         .cp-tier .tn{font-family:var(--serif,'Cormorant Garamond',serif);font-size:20px}
         .cp-tier .tp{font-family:var(--serif,'Cormorant Garamond',serif);font-size:26px;color:var(--acc)}
@@ -201,27 +227,52 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
               <div className="cp-empty">No posts yet — follow to be notified when {creator.full_name} shares something.</div>
             ) : (
               <div className="cp-grid">
-                {publicPosts.map((p) => <ContentCard key={p.id} p={p} accent={accent} onLocked={openGift} />)}
+                {publicPosts.map((p) => <ContentCard key={p.id} p={p} isSubscriber={isSubscriber} onLocked={() => { const t = tiers[0]; if (p.visibility === 'subscribers' && t) startSubscribe(t); else openGift() }} />)}
               </div>
             )}
           </div>
         )}
 
-        {/* PRICING */}
+        {/* PRICING / MEMBERSHIP */}
         {show('pricing') && tiers.length > 0 && (
           <div className="cp-section">
             <h2 className="cp-h">Membership</h2>
-            <p className="cp-hsub">Support {creator.full_name} and unlock members-only content.</p>
-            <div className="cp-tiers">
-              {tiers.map((t, i) => (
-                <div className={`cp-tier ${t.highlight ? 'hi' : ''}`} key={i}>
-                  {t.tag && <span className="tag">{t.tag}</span>}
-                  <div className="tn">{t.name}</div>
-                  <div className="tp">€{t.price}<small> / month</small></div>
-                  <ul>{String(t.perks || '').split('\n').filter(Boolean).map((perk: string, j: number) => <li key={j}>{perk}</li>)}</ul>
-                  <button className="cp-support" onClick={openGift}>Support {creator.full_name.split(' ')[0]}</button>
+            <p className="cp-hsub">Subscribe with tokens to unlock members-only content. Renews monthly — cancel anytime.</p>
+
+            {subscription && (
+              <div className="cp-substatus">
+                <div>
+                  <b>You're a {subscription.tierName} member.</b>{' '}
+                  {subscription.cancelAtPeriodEnd
+                    ? <span>Access ends {fmtDate(subscription.currentPeriodEnd)}.</span>
+                    : <span>Renews {fmtDate(subscription.currentPeriodEnd)}.</span>}
                 </div>
-              ))}
+                {subscription.cancelAtPeriodEnd
+                  ? <button className="cp-btn on" onClick={() => cancelResume(false)}>Resume membership</button>
+                  : <button className="cp-btn" onClick={() => cancelResume(true)}>Cancel renewal</button>}
+              </div>
+            )}
+
+            <div className="cp-tiers">
+              {tiers.map((t, i) => {
+                const current = subscription && subscription.tierName === t.name
+                const tok = tokensForEuro(t.price)
+                return (
+                  <div className={`cp-tier ${t.highlight ? 'hi' : ''} ${current ? 'cur' : ''}`} key={i}>
+                    {current ? <span className="tag">Your plan</span> : t.tag && <span className="tag">{t.tag}</span>}
+                    <div className="tn">{t.name}</div>
+                    <div className="tp">€{t.price}<small> / month · {tok} tokens</small></div>
+                    <ul>{String(t.perks || '').split('\n').filter(Boolean).map((perk: string, j: number) => <li key={j}>{perk}</li>)}</ul>
+                    {viewer.isSelf ? (
+                      <button className="cp-support" disabled style={{ opacity: .5, cursor: 'default' }}>Your tier</button>
+                    ) : current ? (
+                      <button className="cp-support" disabled style={{ opacity: .6, cursor: 'default' }}>✓ Current plan</button>
+                    ) : (
+                      <button className="cp-support" onClick={() => startSubscribe(t)}>{subscription ? 'Switch to this' : `Subscribe · ${tok} tokens`}</button>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
@@ -245,6 +296,20 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
         )}
       </div>
 
+      {subTier && (
+        <SubscribeModal
+          creator={creator} tier={subTier} balance={balance} switching={!!subscription}
+          onClose={() => setSubTier(null)}
+          onNeedTokens={() => { window.location.href = '/tokens' }}
+          onDone={(res) => {
+            setSubTier(null)
+            if (res.switched) { setSubscription((s) => s ? { ...s, tierName: res.tierName, cancelAtPeriodEnd: false } : s); notify(`Switched to ${res.tierName}`) }
+            else { setSubscription({ tierName: res.subscription.tier_name, currentPeriodEnd: res.subscription.current_period_end, cancelAtPeriodEnd: false }); if (typeof res.newBalance === 'number') setBalance(res.newBalance); notify(`You're now a ${res.subscription.tier_name} member 🎉`) }
+          }}
+          notify={notify}
+        />
+      )}
+
       {giftOpen && (
         <GiftModal
           creator={creator} accent={accent} balance={balance}
@@ -260,8 +325,8 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
   )
 }
 
-function ContentCard({ p, accent, onLocked }: { p: PublicPost; accent: string; onLocked: () => void }) {
-  const locked = p.visibility !== 'public'
+function ContentCard({ p, isSubscriber, onLocked }: { p: PublicPost; isSubscriber: boolean; onLocked: () => void }) {
+  const locked = p.visibility === 'ppv' || (p.visibility === 'subscribers' && !isSubscriber)
   const isVideo = p.media_type === 'video'
   const blur = locked ? Math.max(8, Number(p.blur) || 8) : Number(p.blur) || 0
   const label = p.visibility === 'ppv' ? `€${(Number(p.price) || 0).toFixed(2)}` : p.visibility === 'subscribers' ? 'Members' : ''
@@ -325,6 +390,53 @@ function GiftModal({ creator, accent, balance, onClose, onSent, onNeedTokens, no
           <div style={{ display: 'flex', gap: 8 }}>
             <button className="cp-btn" style={{ height: 40 }} onClick={onClose}>Cancel</button>
             <button className="cp-btn acc" style={{ height: 40 }} onClick={send} disabled={busy}>{busy ? 'Sending…' : `Send ${sel}`}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SubscribeModal({ creator, tier, balance, switching, onClose, onDone, onNeedTokens, notify }: {
+  creator: PublicCreator; tier: any; balance: number; switching: boolean
+  onClose: () => void; onDone: (res: any) => void; onNeedTokens: () => void; notify: (m: string) => void
+}) {
+  const [busy, setBusy] = useState(false)
+  const tok = tokensForEuro(tier.price)
+  const perks = String(tier.perks || '').split('\n').filter(Boolean)
+  const low = !switching && balance < tok
+
+  async function confirm() {
+    setBusy(true)
+    try {
+      const r = await fetch('/api/creators/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ creatorId: creator.id, tierName: tier.name }) })
+      const j = await r.json()
+      if (r.status === 402) { notify('Not enough tokens — top up first'); onNeedTokens(); return }
+      if (r.status === 401) { window.location.href = `/login?next=/c/${creator.username}`; return }
+      if (!r.ok) { notify(j.error || 'Could not subscribe'); return }
+      onDone(j)
+    } catch { notify('Could not subscribe') } finally { setBusy(false) }
+  }
+
+  return (
+    <div className="cp-modal" onClick={onClose}>
+      <div className="cp-sheet" onClick={(e) => e.stopPropagation()}>
+        <h3>{switching ? `Switch to ${tier.name}` : `Subscribe · ${tier.name}`}</h3>
+        <div style={{ fontSize: 13, color: 'var(--t3,#6f6b64)' }}>
+          {switching ? 'Your new tier applies from the next renewal — no charge now.' : `€${tier.price} / month, billed as ${tok} tokens from your wallet. Renews every 30 days — cancel anytime.`}
+        </div>
+        {perks.length > 0 && (
+          <ul style={{ listStyle: 'none', padding: 0, margin: '14px 0', display: 'flex', flexDirection: 'column', gap: 7 }}>
+            {perks.map((p, i) => <li key={i} style={{ fontSize: 13.5, color: 'var(--t2,#a9a49c)', display: 'flex', gap: 8 }}><span style={{ color: 'var(--acc)' }}>✓</span>{p}</li>)}
+          </ul>
+        )}
+        <div className="cp-mfoot">
+          <span className="bal">Balance: {balance.toLocaleString()} tokens{low && <span style={{ color: '#e0607a' }}> · need {tok}</span>}</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="cp-btn" style={{ height: 40 }} onClick={onClose}>Cancel</button>
+            {low
+              ? <button className="cp-btn acc" style={{ height: 40 }} onClick={onNeedTokens}>Get tokens</button>
+              : <button className="cp-btn acc" style={{ height: 40 }} onClick={confirm} disabled={busy}>{busy ? 'Processing…' : switching ? 'Confirm switch' : `Subscribe · ${tok}`}</button>}
           </div>
         </div>
       </div>

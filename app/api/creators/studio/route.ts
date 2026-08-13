@@ -47,12 +47,14 @@ export async function GET() {
   const uid = session.user.id
   const db = admin()
 
-  const [profileRes, postsRes, walletRes, ledgerRes, giftsRes] = await Promise.all([
+  const [profileRes, postsRes, walletRes, ledgerRes, giftsRes, subsRes, followRes] = await Promise.all([
     db.from('profiles').select('id, full_name, username, avatar_url, cover_url, bio, headline, verified, role, studio_config').eq('id', uid).maybeSingle(),
     db.from('creator_posts').select('id, title, caption, media_url, media_type, visibility, blur, price, like_count, created_at').eq('creator_id', uid).eq('active', true).order('created_at', { ascending: false }),
     db.from('user_wallets').select('balance, total_purchased, total_spent').eq('user_id', uid).maybeSingle(),
     db.from('token_ledger').select('created_at, type, description, amount, balance_after').eq('user_id', uid).order('created_at', { ascending: false }).limit(300),
     db.from('creator_gifts').select('id, amount_tokens, message, created_at, sender:sender_id(full_name, username)').eq('creator_id', uid).order('created_at', { ascending: false }).limit(50),
+    db.from('creator_subscriptions').select('price_tokens').eq('creator_id', uid).eq('status', 'active'),
+    db.from('creator_follows').select('creator_id', { count: 'exact', head: true }).eq('creator_id', uid),
   ])
 
   const profile = profileRes.data || { id: uid }
@@ -92,6 +94,7 @@ export async function GET() {
   })
 
   const giftTokens = gifts.reduce((a, g) => a + (g.amount_tokens || 0), 0)
+  const activeSubs = subsRes.data || []
   const stats = {
     balance: wallet.balance || 0,
     tokensEarned: (wallet.total_purchased || 0) + giftTokens,
@@ -99,6 +102,9 @@ export async function GET() {
     giftTokens,
     posts: posts.length,
     likes: posts.reduce((a: number, p: any) => a + (p.like_count || 0), 0),
+    subscribers: activeSubs.length,
+    mrrTokens: activeSubs.reduce((a: number, s: any) => a + (s.price_tokens || 0), 0),
+    followers: followRes.count || 0,
   }
 
   return NextResponse.json({

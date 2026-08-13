@@ -681,7 +681,43 @@
     setTimeout(()=>t.remove(), 2600);
   }
 
-  /* ============ VISIBILITY TOGGLES (per section: public profile vs dashboard-only) ============ */
+  /* ===================== DATA LAYER (live, same-origin) ===================== */
+  const API = '/api/creators/studio';
+  let PROFILE={}, POSTS=[], WALLET={balance:0}, LEDGER=[], GIFTS=[], STATS={}, REV=[], ACT=[];
+
+  const DEFAULTS = {
+    theme: null,
+    sections: { profile:true, appearance:false, stats:false, content:true, pricing:true, share:true, wallet:false, gifts:true },
+    categories: [ {label:'Photo sets',on:true},{label:'Video',on:true},{label:'Livestreams',on:false},{label:'Custom requests',on:false} ],
+    tiers: [
+      {name:'Fan', price:'9', perks:'Full photo library\nWeekly posts\nDirect messages', highlight:false},
+      {name:'Subscriber', price:'19', perks:'Everything in Fan\nAll videos included\nMonthly livestream access', highlight:true, tag:'Most popular'},
+      {name:'VIP', price:'39', perks:'Everything in Subscriber\n1 custom request / month\nPriority replies', highlight:false},
+    ],
+    ppvDefault: '9.00',
+    giftsEnabled: true,
+    giftAudience: { visitors:true, fans:true, members:true },
+    goal: { type:'charity', text:"I support a good cause — every gift I receive goes toward a charity I'm currently saving for. Send a gift and help me reach the goal.", target:2000 },
+    giftCatalog: [ {emoji:'☕',label:'Coffee',amount:3},{emoji:'🌹',label:'Rose',amount:5},{emoji:'🍾',label:'Bubbly',amount:15},{emoji:'💎',label:'Diamond',amount:50} ],
+  };
+  let CONFIG = JSON.parse(JSON.stringify(DEFAULTS));
+
+  async function api(payload){
+    const r = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    let j = {}; try { j = await r.json(); } catch(e){}
+    if(!r.ok) throw new Error(j.error || 'Request failed');
+    return j;
+  }
+  let cfgTimer=null;
+  function persistConfig(note){
+    clearTimeout(cfgTimer);
+    cfgTimer = setTimeout(()=>{ api({action:'config', config:CONFIG}).then(()=>{ if(note) showToast(note); }).catch(err=>showToast(err.message)); }, 500);
+  }
+  function saveProfile(patch, note){
+    api(Object.assign({action:'profile'}, patch)).then(()=>{ if(note) showToast(note); }).catch(err=>showToast(err.message));
+  }
+
+  /* ============ VISIBILITY TOGGLES (public profile vs dashboard-only) ============ */
   document.querySelectorAll('.vis-toggle').forEach(btn=>{
     btn.addEventListener('click', (e)=>{
       e.preventDefault();
@@ -692,7 +728,9 @@
         flag.classList.toggle('on', on);
         flag.innerHTML = `<span class="fdot"></span> ${on ? 'Visible on public profile' : 'Dashboard only'}`;
       }
-      showToast((on ? 'Now visible on your public profile' : 'Hidden from your public profile'));
+      CONFIG.sections[target] = on;
+      persistConfig();
+      showToast(on ? 'Now visible on your public profile' : 'Hidden from your public profile');
     });
   });
   document.querySelectorAll('.nav-item a').forEach(link=>{
@@ -701,6 +739,15 @@
       link.closest('.nav-item').classList.add('active');
     });
   });
+  function applySectionToggles(){
+    document.querySelectorAll('.vis-toggle').forEach(btn=>{
+      const target = btn.dataset.target;
+      const on = !!CONFIG.sections[target];
+      btn.classList.toggle('on', on);
+      const flag = document.getElementById('flag-'+target);
+      if(flag){ flag.classList.toggle('on', on); flag.innerHTML = `<span class="fdot"></span> ${on ? 'Visible on public profile' : 'Dashboard only'}`; }
+    });
+  }
 
   /* ============ THEME ENGINE ============ */
   const fontOptions = [
@@ -714,7 +761,7 @@
   const defaults = {font:'inter', accent:'#3e5c76', tone:96, warmth:30, tint:5, contrast:40, radius:10};
   let theme = Object.assign({}, defaults);
 
-  function hexToRgb(hex){ hex=hex.replace('#',''); if(hex.length===3) hex=hex.split('').map(c=>c+c).join(''); const n=parseInt(hex,16); return {r:(n>>16)&255, g:(n>>8)&255, b:n&255}; }
+  function hexToRgb(hex){ hex=(hex||'#3e5c76').replace('#',''); if(hex.length===3) hex=hex.split('').map(c=>c+c).join(''); const n=parseInt(hex,16); return {r:(n>>16)&255, g:(n>>8)&255, b:n&255}; }
   function rgbToHex(r,g,b){ return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join(''); }
   function mix(hex, targetHex, amt){ const a=hexToRgb(hex), b=hexToRgb(targetHex); return rgbToHex(a.r+(b.r-a.r)*amt, a.g+(b.g-a.g)*amt, a.b+(b.b-a.b)*amt); }
   function luminance(hex){ const {r,g,b}=hexToRgb(hex); return (0.299*r+0.587*g+0.114*b)/255; }
@@ -776,6 +823,7 @@
 
     if(typeof rerenderCharts === 'function') rerenderCharts();
   }
+  function themeChanged(){ CONFIG.theme = Object.assign({}, theme); persistConfig(); }
 
   function buildFontGrid(){
     const grid = document.getElementById('fontGrid');
@@ -786,31 +834,32 @@
       </button>
     `).join('');
     grid.querySelectorAll('.font-card').forEach(btn=>{
-      btn.addEventListener('click', ()=>{ theme.font = btn.dataset.key; applyTheme(); showToast('Typography updated'); });
+      btn.addEventListener('click', ()=>{ theme.font = btn.dataset.key; applyTheme(); themeChanged(); showToast('Typography updated'); });
     });
   }
   function buildSwatches(){
     const row = document.getElementById('colorSwatches');
     row.innerHTML = colorPresets.map(c=>`<button type="button" class="color-swatch" data-color="${c}" style="background:${c};" aria-label="Set accent color ${c}"></button>`).join('');
     row.querySelectorAll('.color-swatch').forEach(sw=>{
-      sw.addEventListener('click', ()=>{ theme.accent = sw.dataset.color; applyTheme(); showToast('Accent color updated'); });
+      sw.addEventListener('click', ()=>{ theme.accent = sw.dataset.color; applyTheme(); themeChanged(); showToast('Accent color updated'); });
     });
   }
   buildFontGrid();
   buildSwatches();
 
   document.getElementById('accentPicker').addEventListener('input', e=>{ theme.accent = e.target.value; applyTheme(); });
+  document.getElementById('accentPicker').addEventListener('change', themeChanged);
   document.getElementById('applyHexBtn').addEventListener('click', ()=>{
     let v = document.getElementById('accentHex').value.trim();
     if(!v.startsWith('#')) v = '#'+v;
-    if(/^#([0-9a-f]{6}|[0-9a-f]{3})$/i.test(v)){ theme.accent = v; applyTheme(); showToast('Accent color updated'); }
+    if(/^#([0-9a-f]{6}|[0-9a-f]{3})$/i.test(v)){ theme.accent = v; applyTheme(); themeChanged(); showToast('Accent color updated'); }
     else showToast('Enter a valid hex color, e.g. #3E5C76');
   });
-  document.getElementById('toneSlider').addEventListener('input', e=>{ theme.tone = parseInt(e.target.value); applyTheme(); });
-  document.getElementById('warmthSlider').addEventListener('input', e=>{ theme.warmth = parseInt(e.target.value); applyTheme(); });
-  document.getElementById('tintSlider').addEventListener('input', e=>{ theme.tint = parseInt(e.target.value); applyTheme(); });
-  document.getElementById('contrastSlider').addEventListener('input', e=>{ theme.contrast = parseInt(e.target.value); applyTheme(); });
-  document.getElementById('radiusSlider').addEventListener('input', e=>{ theme.radius = parseInt(e.target.value); applyTheme(); });
+  [['toneSlider','tone'],['warmthSlider','warmth'],['tintSlider','tint'],['contrastSlider','contrast'],['radiusSlider','radius']].forEach(([id,key])=>{
+    const el = document.getElementById(id);
+    el.addEventListener('input', e=>{ theme[key] = parseInt(e.target.value); applyTheme(); });
+    el.addEventListener('change', themeChanged);
+  });
   document.getElementById('resetThemeBtn').addEventListener('click', ()=>{
     theme = Object.assign({}, defaults);
     document.getElementById('toneSlider').value = theme.tone;
@@ -818,25 +867,47 @@
     document.getElementById('tintSlider').value = theme.tint;
     document.getElementById('contrastSlider').value = theme.contrast;
     document.getElementById('radiusSlider').value = theme.radius;
-    applyTheme();
+    applyTheme(); themeChanged();
     showToast('Appearance reset to default');
   });
 
-  /* ---------- Cover / avatar upload ---------- */
+  /* ---------- Cover / avatar / content upload (live to storage) ---------- */
   let pendingTarget = null;
   const hiddenInput = document.getElementById('hiddenFileInput');
-  document.getElementById('editCoverBtn').addEventListener('click', ()=>{ pendingTarget='cover'; hiddenInput.click(); });
-  document.getElementById('editAvatarBtn').addEventListener('click', ()=>{ pendingTarget='avatar'; hiddenInput.click(); });
-  hiddenInput.addEventListener('change', (e)=>{
-    const file = e.target.files[0]; if(!file) return;
-    const url = URL.createObjectURL(file);
-    if(pendingTarget==='cover'){ document.getElementById('coverImg').style.backgroundImage = `url(${url})`; showToast('Background photo updated'); }
-    else if(pendingTarget==='avatar'){ const av=document.getElementById('avatarImg'); av.style.backgroundImage=`url(${url})`; av.textContent=''; showToast('Profile photo updated'); }
-    else if(pendingTarget && pendingTarget.startsWith('gallery:')){
-      const id = pendingTarget.split(':')[1]; const item = galleryItems.find(g=>g.id==id);
-      if(item){ item.img = url; renderGallery(); showToast('Content updated'); }
+  document.getElementById('editCoverBtn').addEventListener('click', ()=>{ pendingTarget='cover'; hiddenInput.accept='image/*'; hiddenInput.click(); });
+  document.getElementById('editAvatarBtn').addEventListener('click', ()=>{ pendingTarget='avatar'; hiddenInput.accept='image/*'; hiddenInput.click(); });
+
+  async function uploadFile(file, target){
+    const fd = new FormData(); fd.append('file', file); fd.append('target', target);
+    const r = await fetch(API+'/upload', { method:'POST', body: fd });
+    let j={}; try{ j=await r.json(); }catch(e){}
+    if(!r.ok) throw new Error(j.error || 'Upload failed');
+    return j;
+  }
+  hiddenInput.addEventListener('change', async (e)=>{
+    const file = e.target.files[0]; hiddenInput.value=''; if(!file) return;
+    const target = pendingTarget; pendingTarget=null;
+    if(target==='cover' || target==='avatar'){
+      showToast('Uploading…');
+      try{
+        const {url} = await uploadFile(file, target);
+        if(target==='cover'){ document.getElementById('coverImg').style.backgroundImage = `url(${url})`; }
+        else { const av=document.getElementById('avatarImg'); av.style.backgroundImage=`url(${url})`; av.textContent=''; }
+        showToast(target==='cover'?'Background photo updated':'Profile photo updated');
+      }catch(err){ showToast(err.message); }
+    } else if(target==='content-new' || (target && target.startsWith('content-replace:'))){
+      showToast('Uploading…');
+      try{
+        const {url, type} = await uploadFile(file, 'content');
+        if(target==='content-new'){
+          const {post} = await api({action:'post_create', mediaUrl:url, mediaType:type, title:'New upload', visibility:'public', blur:0, price:0});
+          POSTS.unshift(post); renderGallery(); showToast('Content added');
+        } else {
+          const id = target.split(':')[1]; const it = POSTS.find(p=>p.id===id);
+          if(it){ it.media_url=url; it.media_type=type; renderGallery(); showToast('Content updated'); }
+        }
+      }catch(err){ showToast(err.message); }
     }
-    hiddenInput.value=''; pendingTarget=null;
   });
 
   /* ---------- Popovers ---------- */
@@ -854,19 +925,40 @@
     pop.querySelector('[data-cancel]').addEventListener('click', ()=>{ input.value=display.textContent; updateCount(); pop.classList.remove('open'); });
     pop.addEventListener('click', (e)=>e.stopPropagation());
   }
-  wirePopover('openHeadlinePop','headlinePopover','headlineInput','headlineDisplay','headlineCount');
-  wirePopover('openBioPop','bioPopover','bioInput','bioDisplay','bioCount');
+  wirePopover('openHeadlinePop','headlinePopover','headlineInput','headlineDisplay','headlineCount', ()=>{
+    saveProfile({ headline: document.getElementById('headlineDisplay').textContent });
+  });
+  wirePopover('openBioPop','bioPopover','bioInput','bioDisplay','bioCount', ()=>{
+    saveProfile({ bio: document.getElementById('bioDisplay').textContent });
+  });
   wirePopover('openGoalPop','goalPopover','goalTextInput','goalTextDisplay','goalCount', ()=>{
     const typeLabels = {charity:'Supporting a good cause', personal:'Personal goal', other:'Other goal'};
-    document.getElementById('goalTypeChip').textContent = typeLabels[document.getElementById('goalTypeInput').value];
+    const type = document.getElementById('goalTypeInput').value;
+    document.getElementById('goalTypeChip').textContent = typeLabels[type];
+    CONFIG.goal.type = type; CONFIG.goal.text = document.getElementById('goalTextDisplay').textContent;
+    persistConfig();
   });
   document.addEventListener('click', ()=>{ document.querySelectorAll('.popover.open').forEach(p=>p.classList.remove('open')); });
+
+  /* ---------- Profile save + preview ---------- */
+  const profSaveBtn = document.querySelector('#profile .profile-actions .btn-accent');
+  if(profSaveBtn) profSaveBtn.addEventListener('click', ()=>{
+    saveProfile({
+      full_name: document.getElementById('displayName').value,
+      username: document.getElementById('handleName').value,
+      bio: document.getElementById('bioDisplay').textContent,
+      headline: document.getElementById('headlineDisplay').textContent,
+    }, 'Profile saved');
+  });
+  document.querySelectorAll('.profile-actions .btn-ghost, .side-foot .btn-ghost').forEach(b=>b.addEventListener('click', ()=>{ window.open('/creators', '_blank'); }));
 
   /* ---------- Charts ---------- */
   function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
 
   function buildLineChart(svgEl, data, color){
+    if(!svgEl) return;
     const w=560,h=200,pad=24;
+    if(!data.length) data=[0,0];
     const max=Math.max(...data), min=Math.min(...data);
     const stepX=(w-pad*2)/(data.length-1);
     const scaleY=v=>h-pad-((v-min)/(max-min||1))*(h-pad*1.6);
@@ -881,62 +973,58 @@
     data.forEach((v,i)=>{ const x=pad+i*stepX, y=scaleY(v); svg += `<circle cx="${x}" cy="${y}" r="${i===data.length-1?4:2.4}" fill="${color}"/>`; });
     svgEl.innerHTML = svg;
   }
-  function buildDonut(svgEl, segments){
+  function buildDonut(svgEl, segments, centerText){
+    if(!svgEl) return;
     const cx=70, cy=70, r=52, sw=18; let angle=-90, out='';
     const circumference = 2*Math.PI*r;
+    const total = segments.reduce((a,s)=>a+s.value,0) || 1;
     segments.forEach(seg=>{
-      const len=(seg.value/100)*circumference;
+      const pct = (seg.value/total)*100;
+      const len=(pct/100)*circumference;
       out += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${seg.color}" stroke-width="${sw}" stroke-dasharray="${len} ${circumference-len}" stroke-dashoffset="${-((angle+90)/360)*circumference}" transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>`;
-      angle += (seg.value/100)*360;
+      angle += (pct/100)*360;
     });
     out += `<circle cx="${cx}" cy="${cy}" r="${r-sw/2-4}" fill="${cssVar('--surface')||'#fff'}"/>`;
-    out += `<text x="${cx}" y="${cy+5}" text-anchor="middle" font-family="${cssVar('--font-display')||'Inter'}" font-size="17" fill="${cssVar('--text')||'#1c1c1f'}">6,932</text>`;
+    out += `<text x="${cx}" y="${cy+5}" text-anchor="middle" font-family="${cssVar('--font-display')||'Inter'}" font-size="17" fill="${cssVar('--text')||'#1c1c1f'}">${centerText}</text>`;
     svgEl.innerHTML = out;
   }
-  function buildStackedBars(svgEl, rows, labels, colors){
+  function buildBars(svgEl, values, labels, color){
+    if(!svgEl) return;
     const w=700,h=190,pad=30, gap=18;
-    const barW = (w-pad*2-gap*(rows.length-1))/rows.length;
-    const max = Math.max(...rows.map(r=>r.sub+r.ppv+r.tip));
+    const barW = (w-pad*2-gap*(values.length-1))/values.length;
+    const max = Math.max(1, ...values);
     let out='';
-    rows.forEach((r,i)=>{
-      const x = pad + i*(barW+gap); const totalH=(h-pad*1.6); let y=h-pad;
-      [['sub',colors[0]],['ppv',colors[1]],['tip',colors[2]]].forEach(([key,color])=>{
-        const val=r[key]; const segH=(val/max)*totalH; y-=segH;
-        out += `<rect x="${x}" y="${y}" width="${barW}" height="${segH}" rx="3" fill="${color}"/>`;
-      });
+    values.forEach((val,i)=>{
+      const x = pad + i*(barW+gap); const totalH=(h-pad*1.6);
+      const segH=(val/max)*totalH; const y=(h-pad)-segH;
+      out += `<rect x="${x}" y="${y}" width="${barW}" height="${Math.max(0,segH)}" rx="3" fill="${color}"/>`;
       out += `<text x="${x+barW/2}" y="${h-8}" text-anchor="middle" font-size="11" fill="${cssVar('--text-faint')||'#93939c'}" font-family="${cssVar('--font-body')||'Inter'}">${labels[i]}</text>`;
     });
     svgEl.innerHTML = out;
   }
 
-  const trafficSets = {
-    '14 days': [1200,1340,1180,1500,1720,1610,1890,2040,1930,2210,2380,2260,2510,2690],
-    '30 days': [900,1000,950,1100,1200,1150,1300,1400,1350,1500,1600,1550,1700,1800,1750,1900,2000,1950,2100,2200,2150,2300,2400,2350,2500,2600,2550,2700,2800,2690],
-    '90 days': [800,850,900,870,950,1000,1050,1020,1100,1150,1200,1180,1250,1300,1350,1320,1400,1450,1500,1480,1550,1600,1650,1620,1700,1750,1800,1780,1850,1900]
-  };
   function rerenderCharts(){
     const accent = cssVar('--accent') || '#3e5c76';
     const warn = cssVar('--warn') || '#b0822f';
     const faint = cssVar('--text-faint') || '#93939c';
-    const rangeSel = document.getElementById('trafficRange');
-    buildLineChart(document.getElementById('trafficChart'), trafficSets[rangeSel.value] || trafficSets['14 days'], accent);
-    buildDonut(document.getElementById('donutChart'), [ {value:82.4,color:faint}, {value:14.1,color:accent}, {value:3.5,color:warn} ]);
-    buildStackedBars(document.getElementById('revChart'), [
-      {sub:1800,ppv:900,tip:220},{sub:1950,ppv:1050,tip:180},{sub:2100,ppv:980,tip:260},
-      {sub:2260,ppv:1240,tip:210},{sub:2400,ppv:1360,tip:300},{sub:2580,ppv:1510,tip:280}
-    ], ['Mar','Apr','May','Jun','Jul','Aug'], [accent, warn, faint]);
+    buildLineChart(document.getElementById('trafficChart'), ACT.length?ACT:[0,0], accent);
+    const pub = POSTS.filter(p=>p.visibility==='public').length;
+    const sub = POSTS.filter(p=>p.visibility==='subscribers').length;
+    const ppv = POSTS.filter(p=>p.visibility==='ppv').length;
+    buildDonut(document.getElementById('donutChart'), [ {value:pub,color:faint},{value:sub,color:accent},{value:ppv,color:warn} ], String(POSTS.length));
+    buildBars(document.getElementById('revChart'), REV.map(m=>m.tokens), REV.map(m=>m.label), accent);
+    const dl = document.querySelector('#stats .donut-wrap .legend');
+    if(dl) dl.innerHTML = `
+      <span><span class="legend-swatch" style="background:${faint};"></span> Public · ${pub}</span>
+      <span><span class="legend-swatch" style="background:${accent};"></span> Subscribers · ${sub}</span>
+      <span><span class="legend-swatch" style="background:${warn};"></span> Pay-per-view · ${ppv}</span>`;
+    const rl = document.querySelector('#revChart').parentElement.querySelector('.legend');
+    if(rl) rl.innerHTML = `<span><span class="legend-swatch" style="background:${accent};"></span> Token income</span>`;
   }
-  document.getElementById('trafficRange').addEventListener('change', rerenderCharts);
+  const trafRange = document.getElementById('trafficRange');
+  if(trafRange) trafRange.addEventListener('change', rerenderCharts);
 
-  /* ---------- Gallery ---------- */
-  const galleryItems = [
-    {id:1, type:'photo', title:'Rooftop set — 24 photos', visibility:'public', price:0, blur:0},
-    {id:2, type:'video', title:'Behind the scenes', visibility:'subscribers', price:0, blur:8},
-    {id:3, type:'photo', title:'Studio session, part I', visibility:'ppv', price:6.5, blur:12},
-    {id:4, type:'video', title:'Livestream replay', visibility:'ppv', price:12, blur:14},
-    {id:5, type:'photo', title:'Golden hour', visibility:'subscribers', price:0, blur:6},
-    {id:6, type:'photo', title:'Studio session, part II', visibility:'public', price:0, blur:0},
-  ];
+  /* ---------- Gallery (live posts) ---------- */
   const gradients = [
     'linear-gradient(150deg,var(--accent-soft),var(--surface-2))',
     'linear-gradient(150deg,var(--surface-2),var(--border))',
@@ -947,22 +1035,26 @@
   ];
   let activeFilter = 'all';
   function visLabel(v){ return v==='public'?'Public':v==='subscribers'?'Subscribers':'Pay-per-view'; }
+  function titleOf(p){ return p.title || p.caption || 'Untitled'; }
 
   function renderGallery(){
     const grid = document.getElementById('galleryGrid');
-    const items = galleryItems.filter(it => activeFilter==='all' || it.visibility===activeFilter);
-    grid.innerHTML = items.map(it=>{
+    const items = POSTS.filter(it => activeFilter==='all' || it.visibility===activeFilter);
+    grid.innerHTML = items.map((it,idx)=>{
       const showLock = it.visibility !== 'public';
+      const price = Number(it.price)||0;
+      const blur = Number(it.blur)||0;
+      const bg = it.media_url ? `url(${it.media_url}) center/cover` : gradients[idx % gradients.length];
       return `
       <div class="g-card" data-id="${it.id}">
         <div class="g-thumb-wrap">
-          <div class="g-thumb" style="background:${it.img?`url(${it.img}) center/cover`:gradients[it.id % gradients.length]}; filter:blur(${it.blur}px);"></div>
-          <div class="g-badge">${it.visibility==='ppv' ? '€'+it.price.toFixed(2) : visLabel(it.visibility)}</div>
-          <div class="g-type">${it.type==='video'?'▶':'◧'}</div>
-          <div class="g-lock ${showLock?'show':''}"><span class="price-tag">${it.visibility==='ppv' ? 'Unlock · €'+it.price.toFixed(2) : 'Subscribers only'}</span></div>
+          <div class="g-thumb" style="background:${bg}; filter:blur(${blur}px);"></div>
+          <div class="g-badge">${it.visibility==='ppv' ? '€'+price.toFixed(2) : visLabel(it.visibility)}</div>
+          <div class="g-type">${it.media_type==='video'?'▶':'◧'}</div>
+          <div class="g-lock ${showLock?'show':''}"><span class="price-tag">${it.visibility==='ppv' ? 'Unlock · €'+price.toFixed(2) : 'Subscribers only'}</span></div>
         </div>
         <div class="g-body">
-          <div class="g-title editable-title" contenteditable="true" data-id="${it.id}" spellcheck="false">${it.title}</div>
+          <div class="g-title editable-title" contenteditable="true" data-id="${it.id}" spellcheck="false">${titleOf(it)}</div>
           <div class="g-controls">
             <div class="g-row">
               <select data-role="visibility" data-id="${it.id}">
@@ -970,17 +1062,16 @@
                 <option value="subscribers" ${it.visibility==='subscribers'?'selected':''}>Subscribers only</option>
                 <option value="ppv" ${it.visibility==='ppv'?'selected':''}>Pay-per-view</option>
               </select>
-              ${it.visibility==='ppv' ? `<input type="number" step="0.5" min="0" value="${it.price}" data-role="price" data-id="${it.id}" style="width:64px;">` : ''}
+              ${it.visibility==='ppv' ? `<input type="number" step="0.5" min="0" value="${price}" data-role="price" data-id="${it.id}" style="width:64px;">` : ''}
             </div>
             <div class="blur-row">
               <span style="font-size:11px; color:var(--text-faint);">Blur</span>
-              <input type="range" min="0" max="20" value="${it.blur}" data-role="blur" data-id="${it.id}">
-              <span class="blur-val">${it.blur}px</span>
+              <input type="range" min="0" max="20" value="${blur}" data-role="blur" data-id="${it.id}">
+              <span class="blur-val">${blur}px</span>
             </div>
           </div>
           <div class="g-foot">
             <div style="display:flex; gap:2px;">
-              <button class="icon-dup" data-role="duplicate" data-id="${it.id}" title="Duplicate">⧉</button>
               <button class="btn btn-ghost" style="font-size:11.5px; padding:6px 12px;" data-role="replace" data-id="${it.id}">Replace</button>
             </div>
             <button class="icon-x" data-role="remove" data-id="${it.id}" aria-label="Remove content">✕</button>
@@ -989,67 +1080,68 @@
       </div>`;
     }).join('') + `<button class="add-tile" id="addTileBtn"><span style="font-size:24px;">＋</span><span style="font-size:12.5px;">Upload content</span></button>`;
 
+    // filter counts
+    const allChip = document.querySelector('.filter-chip[data-filter="all"]');
+    if(allChip) allChip.textContent = `All (${POSTS.length})`;
+
     grid.querySelectorAll('[data-role="visibility"]').forEach(sel=>sel.addEventListener('change', e=>{
-      const item = galleryItems.find(g=>g.id==e.target.dataset.id);
-      item.visibility = e.target.value;
-      if(item.visibility==='ppv' && !item.price) item.price = parseFloat(document.getElementById('ppvDefault').value)||9;
-      if(item.visibility!=='public' && item.blur===0) item.blur = 8;
-      if(item.visibility==='public') item.blur = 0;
-      renderGallery(); showToast('Visibility updated');
+      const it = POSTS.find(g=>g.id===e.target.dataset.id); if(!it) return;
+      it.visibility = e.target.value;
+      if(it.visibility==='ppv' && !Number(it.price)) it.price = parseFloat(document.getElementById('ppvDefault').value)||9;
+      if(it.visibility!=='public' && Number(it.blur)===0) it.blur = 8;
+      if(it.visibility==='public') it.blur = 0;
+      renderGallery();
+      api({action:'post_update', id:it.id, visibility:it.visibility, blur:it.blur, price:it.price}).then(()=>showToast('Visibility updated')).catch(err=>showToast(err.message));
     }));
     grid.querySelectorAll('[data-role="price"]').forEach(inp=>inp.addEventListener('change', e=>{
-      const item = galleryItems.find(g=>g.id==e.target.dataset.id); item.price = parseFloat(e.target.value)||0;
+      const it = POSTS.find(g=>g.id===e.target.dataset.id); if(!it) return; it.price = parseFloat(e.target.value)||0;
+      api({action:'post_update', id:it.id, price:it.price}).then(()=>showToast('Price updated')).catch(err=>showToast(err.message));
     }));
-    grid.querySelectorAll('[data-role="blur"]').forEach(rng=>rng.addEventListener('input', e=>{
-      const item = galleryItems.find(g=>g.id==e.target.dataset.id); item.blur = parseInt(e.target.value);
-      const card = e.target.closest('.g-card');
-      card.querySelector('.g-thumb').style.filter = `blur(${item.blur}px)`;
-      card.querySelector('.blur-val').textContent = item.blur+'px';
-    }));
+    grid.querySelectorAll('[data-role="blur"]').forEach(rng=>{
+      rng.addEventListener('input', e=>{
+        const it = POSTS.find(g=>g.id===e.target.dataset.id); if(!it) return; it.blur = parseInt(e.target.value);
+        const card = e.target.closest('.g-card');
+        card.querySelector('.g-thumb').style.filter = `blur(${it.blur}px)`;
+        card.querySelector('.blur-val').textContent = it.blur+'px';
+      });
+      rng.addEventListener('change', e=>{
+        const it = POSTS.find(g=>g.id===e.target.dataset.id); if(!it) return;
+        api({action:'post_update', id:it.id, blur:it.blur}).catch(err=>showToast(err.message));
+      });
+    });
     grid.querySelectorAll('[data-role="remove"]').forEach(btn=>btn.addEventListener('click', e=>{
-      const id=e.target.dataset.id; const i=galleryItems.findIndex(g=>g.id==id);
-      if(i>-1){ galleryItems.splice(i,1); renderGallery(); showToast('Content removed'); }
-    }));
-    grid.querySelectorAll('[data-role="duplicate"]').forEach(btn=>btn.addEventListener('click', e=>{
-      const id=e.target.dataset.id; const item=galleryItems.find(g=>g.id==id);
-      if(item){ const nextId=Math.max(0,...galleryItems.map(g=>g.id))+1; galleryItems.push(Object.assign({},item,{id:nextId,title:item.title+' (copy)'})); renderGallery(); showToast('Content duplicated'); }
+      const id=e.currentTarget.dataset.id; const i=POSTS.findIndex(g=>g.id===id);
+      if(i>-1){ const removed=POSTS[i]; POSTS.splice(i,1); renderGallery();
+        api({action:'post_delete', id}).then(()=>showToast('Content removed')).catch(err=>{ POSTS.splice(i,0,removed); renderGallery(); showToast(err.message); });
+      }
     }));
     grid.querySelectorAll('[data-role="replace"]').forEach(btn=>btn.addEventListener('click', e=>{
-      pendingTarget = 'gallery:'+e.target.dataset.id; hiddenInput.click();
+      pendingTarget = 'content-replace:'+e.currentTarget.dataset.id; hiddenInput.accept='image/*,video/*'; hiddenInput.click();
     }));
     grid.querySelectorAll('.editable-title').forEach(el=>el.addEventListener('blur', e=>{
-      const item = galleryItems.find(g=>g.id==e.target.dataset.id);
-      if(item){ item.title = e.target.textContent.trim() || item.title; }
+      const it = POSTS.find(g=>g.id===e.target.dataset.id); if(!it) return;
+      const nt = e.target.textContent.trim() || titleOf(it);
+      if(nt!==titleOf(it)){ it.title = nt; api({action:'post_update', id:it.id, title:nt}).catch(err=>showToast(err.message)); }
     }));
     const addTile = document.getElementById('addTileBtn');
-    if(addTile) addTile.addEventListener('click', addNewItem);
+    if(addTile) addTile.addEventListener('click', ()=>{ pendingTarget='content-new'; hiddenInput.accept='image/*,video/*'; hiddenInput.click(); });
   }
-  function addNewItem(){
-    const nextId = Math.max(0,...galleryItems.map(g=>g.id))+1;
-    galleryItems.push({id:nextId, type:'photo', title:'New upload', visibility:'public', price:0, blur:0});
-    renderGallery(); showToast('Content added — set its visibility below');
-  }
-  document.getElementById('topAddBtn').addEventListener('click', addNewItem);
+  document.getElementById('topAddBtn').addEventListener('click', ()=>{ pendingTarget='content-new'; hiddenInput.accept='image/*,video/*'; hiddenInput.click(); });
   document.querySelectorAll('.filter-chip').forEach(chip=>chip.addEventListener('click', ()=>{
     document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
     chip.classList.add('active'); activeFilter = chip.dataset.filter; renderGallery();
   }));
-  renderGallery();
 
-  /* ---------- Pricing tiers ---------- */
-  const tiers = [
-    {name:'Fan', price:'9', perks:'Full photo library\nWeekly posts\nDirect messages', highlight:false},
-    {name:'Subscriber', price:'19', perks:'Everything in Fan\nAll videos included\nMonthly livestream access', highlight:true, tag:'Most popular'},
-    {name:'VIP', price:'39', perks:'Everything in Subscriber\n1 custom request / month\nPriority replies', highlight:false},
-  ];
+  /* ---------- Pricing tiers (persisted to config) ---------- */
   function renderTiers(){
     const grid = document.getElementById('tierGrid');
+    const tiers = CONFIG.tiers;
     grid.innerHTML = tiers.map((t,i)=>`
       <div class="tier-card ${t.highlight?'hi':''}">
         ${t.tag?`<span class="tier-tag">${t.tag}</span>`:''}
-        <input class="tier-name" value="${t.name}" data-i="${i}" data-f="name">
+        <input class="tier-name" value="${(t.name||'').replace(/"/g,'&quot;')}" data-i="${i}" data-f="name">
         <div class="tier-price-row"><span style="color:var(--text-faint);">€</span><input type="number" value="${t.price}" data-i="${i}" data-f="price"><span>/ month</span></div>
-        <textarea class="tier-perks" data-i="${i}" data-f="perks">${t.perks}</textarea>
+        <textarea class="tier-perks" data-i="${i}" data-f="perks">${t.perks||''}</textarea>
         <div class="tier-foot">
           <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-faint);">
             <input type="checkbox" data-i="${i}" data-f="highlight" ${t.highlight?'checked':''} style="width:auto;"> Highlight tier
@@ -1060,21 +1152,36 @@
     `).join('') + `<button class="add-tier" id="addTierBtn">＋ Add tier</button>`;
 
     grid.querySelectorAll('[data-f]').forEach(el=>el.addEventListener('change', e=>{
-      const i=e.target.dataset.i, f=e.target.dataset.f;
+      const i=+e.target.dataset.i, f=e.target.dataset.f;
       if(f==='highlight'){ tiers[i][f]=e.target.checked; tiers[i].tag = e.target.checked ? 'Most popular' : null; renderTiers(); }
       else tiers[i][f]=e.target.value;
+      persistConfig();
     }));
     grid.querySelectorAll('[data-remove-tier]').forEach(btn=>btn.addEventListener('click', e=>{
-      tiers.splice(parseInt(e.target.dataset.removeTier),1); renderTiers();
+      tiers.splice(parseInt(e.currentTarget.dataset.removeTier),1); renderTiers(); persistConfig();
     }));
     document.getElementById('addTierBtn').addEventListener('click', ()=>{
       tiers.push({name:'New tier', price:'15', perks:"Describe what's included", highlight:false});
-      renderTiers(); showToast('Tier added');
+      renderTiers(); persistConfig(); showToast('Tier added');
     });
   }
-  renderTiers();
+  const ppvDefault = document.getElementById('ppvDefault');
+  ppvDefault.addEventListener('change', ()=>{ CONFIG.ppvDefault = ppvDefault.value; persistConfig('Default price saved'); });
 
-  /* ---------- Share links ---------- */
+  /* ---------- Categories ---------- */
+  function renderCategories(){
+    const wrap = document.querySelector('.categories'); if(!wrap) return;
+    wrap.innerHTML = CONFIG.categories.map((c,i)=>`<span class="chip ${c.on?'accent':''}" data-cat="${i}" style="cursor:pointer;">${(c.label||'').replace(/</g,'&lt;')}</span>`).join('')
+      + `<button class="chip" id="addCatBtn" style="cursor:pointer;">+ Add category</button>`;
+    wrap.querySelectorAll('[data-cat]').forEach(ch=>ch.addEventListener('click', ()=>{
+      const i=+ch.dataset.cat; CONFIG.categories[i].on = !CONFIG.categories[i].on; renderCategories(); persistConfig();
+    }));
+    document.getElementById('addCatBtn').addEventListener('click', ()=>{
+      const name = prompt('New category name'); if(name && name.trim()){ CONFIG.categories.push({label:name.trim().slice(0,30), on:true}); renderCategories(); persistConfig(); }
+    });
+  }
+
+  /* ---------- Share ---------- */
   document.getElementById('copyLinkBtn').addEventListener('click', ()=>{
     const input = document.getElementById('shareUrl'); input.select();
     navigator.clipboard?.writeText(input.value).catch(()=>{});
@@ -1082,63 +1189,88 @@
   });
   document.querySelectorAll('[data-share]').forEach(btn=>btn.addEventListener('click', ()=>{
     const kind = btn.dataset.share;
-    if(kind==='embed'){ navigator.clipboard?.writeText(`<iframe src="https://secretxperience.eu/embed/arianoir"></iframe>`).catch(()=>{}); showToast('Embed code copied'); }
-    else showToast('Share link ready — opens ' + kind);
+    const link = 'https://' + document.getElementById('shareUrl').value;
+    const enc = encodeURIComponent(link);
+    const urls = {
+      x: `https://twitter.com/intent/tweet?url=${enc}`,
+      telegram: `https://t.me/share/url?url=${enc}`,
+      reddit: `https://www.reddit.com/submit?url=${enc}`,
+      email: `mailto:?body=${enc}`,
+    };
+    if(kind==='embed'){ navigator.clipboard?.writeText(`<iframe src="${link}"></iframe>`).catch(()=>{}); showToast('Embed code copied'); }
+    else if(urls[kind]){ window.open(urls[kind], '_blank'); }
   }));
 
-  /* ---------- Wallet ---------- */
-  const transactions = [
-    {date:'Aug 12, 2026', fan:'m****23', type:'Subscription', amount:19.00, status:'paid'},
-    {date:'Aug 12, 2026', fan:'j****an', type:'Pay-per-view', amount:12.00, status:'paid'},
-    {date:'Aug 12, 2026', fan:'p****ul', type:'Gift', amount:5.00, status:'paid'},
-    {date:'Aug 11, 2026', fan:'r****88', type:'Tip', amount:15.00, status:'paid'},
-    {date:'Aug 10, 2026', fan:'k****el', type:'Subscription', amount:39.00, status:'paid'},
-    {date:'Aug 09, 2026', fan:'d****ny', type:'Pay-per-view', amount:6.50, status:'pending'},
-    {date:'Aug 08, 2026', fan:'s****ie', type:'Subscription', amount:9.00, status:'paid'},
-    {date:'Aug 07, 2026', fan:'t****om', type:'Tip', amount:25.00, status:'pending'},
-  ];
+  /* ---------- Wallet (live ledger) ---------- */
+  function fmtDate(iso){ try{ return new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }catch(e){ return iso; } }
+  function renderWallet(){
+    const bal = WALLET.balance||0;
+    const balEl = document.querySelector('#wallet .wallet-balance .amt'); if(balEl) balEl.textContent = bal.toLocaleString()+' tok';
+    const head = document.querySelector('#wallet thead tr'); if(head) head.innerHTML = '<th>Date</th><th>Description</th><th>Type</th><th>Amount</th><th>Balance</th>';
+    // repurpose the two side cards to real totals
+    const cards = document.querySelectorAll('#wallet .wallet-top .stat-card .stat-value');
+    if(cards[0]) cards[0].textContent = (WALLET.total_purchased||0).toLocaleString();
+    if(cards[1]) cards[1].textContent = (WALLET.total_spent||0).toLocaleString();
+    const labels = document.querySelectorAll('#wallet .wallet-top .stat-card .stat-label');
+    if(labels[0]) labels[0].textContent = 'Tokens purchased';
+    if(labels[1]) labels[1].textContent = 'Tokens spent';
+    const subs = document.querySelectorAll('#wallet .wallet-top .stat-card span[style*="font-size:12px"]');
+    if(subs[0]) subs[0].textContent = 'Lifetime';
+    if(subs[1]) subs[1].textContent = 'Lifetime';
+    renderTx(document.getElementById('txFilter') ? document.getElementById('txFilter').value : 'all');
+  }
   function renderTx(filter){
     const body = document.getElementById('txBody');
-    const rows = transactions.filter(t=> filter==='all' || t.type===filter);
-    body.innerHTML = rows.map(t=>`<tr><td>${t.date}</td><td>${t.fan}</td><td>${t.type}</td><td>€${t.amount.toFixed(2)}</td><td><span class="status-tag ${t.status}">${t.status==='paid'?'Cleared':'Pending'}</span></td></tr>`).join('')
-      || `<tr><td colspan="5" style="text-align:center; color:var(--text-faint); padding:24px;">No transactions in this filter</td></tr>`;
+    let rows = LEDGER;
+    if(filter==='Subscription') rows = LEDGER.filter(t=>t.type==='purchase');
+    else if(filter==='Pay-per-view'||filter==='Tip'||filter==='Gift') rows = LEDGER.filter(t=>t.type==='spend');
+    body.innerHTML = rows.map(t=>{
+      const amt = (t.amount>0?'+':'') + (t.amount||0);
+      const cls = t.type==='purchase' ? 'paid' : 'pending';
+      return `<tr><td>${fmtDate(t.created_at)}</td><td>${(t.description||'—')}</td><td>${t.type||'—'}</td><td>${amt} tok</td><td>${t.balance_after!=null?t.balance_after+' tok':'—'}</td></tr>`;
+    }).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--text-faint); padding:24px;">No transactions yet</td></tr>`;
   }
-  renderTx('all');
   document.getElementById('txFilter').addEventListener('change', e=>renderTx(e.target.value));
-  document.getElementById('payoutBtn').addEventListener('click', ()=>showToast('Payout requested — funds arrive in 2–3 business days'));
+  document.getElementById('payoutBtn').addEventListener('click', ()=>showToast('Payouts are handled by our team — we’ll be in touch about your balance.'));
 
   /* ---------- Gifts ---------- */
-  document.getElementById('giftsMasterToggle').addEventListener('click', (e)=>{
-    const on = e.currentTarget.classList.toggle('on');
+  const giftsMasterToggle = document.getElementById('giftsMasterToggle');
+  giftsMasterToggle.addEventListener('click', ()=>{
+    const on = giftsMasterToggle.classList.toggle('on');
+    CONFIG.giftsEnabled = on; persistConfig();
     showToast(on ? 'Gifts enabled on your profile' : 'Gifts turned off');
   });
   document.querySelectorAll('[data-audience]').forEach(cb=>cb.addEventListener('change', e=>{
+    CONFIG.giftAudience[e.target.dataset.audience] = e.target.checked; persistConfig();
     showToast((e.target.dataset.audience.charAt(0).toUpperCase()+e.target.dataset.audience.slice(1)) + (e.target.checked ? ' can now send gifts' : ' can no longer send gifts'));
   }));
-  document.getElementById('goalTargetInput').addEventListener('change', ()=>{
-    const target = parseFloat(document.getElementById('goalTargetInput').value)||1;
-    const raised = 1280;
-    const pct = Math.min(100, (raised/target)*100);
-    document.getElementById('goalProgressFill').style.width = pct+'%';
-    showToast('Goal target updated');
+  const goalTargetInput = document.getElementById('goalTargetInput');
+  goalTargetInput.addEventListener('change', ()=>{
+    CONFIG.goal.target = parseFloat(goalTargetInput.value)||1;
+    updateGoalProgress(); persistConfig('Goal target updated');
   });
+  function updateGoalProgress(){
+    const target = parseFloat(CONFIG.goal.target)||1;
+    const raised = STATS.giftTokens||0;
+    const pct = Math.min(100, (raised/target)*100);
+    const fill = document.getElementById('goalProgressFill'); if(fill) fill.style.width = pct+'%';
+    const rEl = document.getElementById('goalRaised'); if(rEl) rEl.textContent = raised.toLocaleString()+' tok';
+    // relabel EUR → tokens next to target input
+    const targetLabel = goalTargetInput.nextSibling;
+    if(targetLabel && targetLabel.nodeType===3) targetLabel.textContent = ' tokens';
+  }
 
-  const giftTiers = [
-    {emoji:'☕', label:'Coffee', amount:3},
-    {emoji:'🌹', label:'Rose', amount:5},
-    {emoji:'🍾', label:'Bubbly', amount:15},
-    {emoji:'💎', label:'Diamond', amount:50},
-  ];
   function renderGiftCatalog(){
     const wrap = document.getElementById('giftCatalog');
+    const giftTiers = CONFIG.giftCatalog;
     wrap.innerHTML = giftTiers.map((g,i)=>`
       <div class="gift-tile">
         <div class="emoji-row">
-          <input type="text" data-role="emoji" data-i="${i}" value="${g.emoji}" maxlength="2">
-          <input type="text" data-role="label" data-i="${i}" value="${g.label}">
+          <input type="text" data-role="emoji" data-i="${i}" value="${(g.emoji||'').replace(/"/g,'&quot;')}" maxlength="2">
+          <input type="text" data-role="label" data-i="${i}" value="${(g.label||'').replace(/"/g,'&quot;')}">
         </div>
         <div style="display:flex; align-items:center; gap:6px;">
-          <span style="color:var(--text-faint); font-size:12.5px;">€</span>
+          <span style="color:var(--text-faint); font-size:12.5px;">◆</span>
           <input type="number" data-role="amount" data-i="${i}" value="${g.amount}" min="1" step="1">
         </div>
         <div class="gt-foot"><button class="icon-x" data-remove-gift="${i}">✕</button></div>
@@ -1146,32 +1278,117 @@
     `).join('') + `<button class="add-gift-tile" id="addGiftBtn">＋ Add gift</button>`;
 
     wrap.querySelectorAll('[data-role]').forEach(inp=>inp.addEventListener('change', e=>{
-      const i=e.target.dataset.i, role=e.target.dataset.role;
+      const i=+e.target.dataset.i, role=e.target.dataset.role;
       if(role==='amount') giftTiers[i].amount = parseFloat(e.target.value)||1;
       else giftTiers[i][role] = e.target.value;
+      persistConfig();
     }));
     wrap.querySelectorAll('[data-remove-gift]').forEach(btn=>btn.addEventListener('click', e=>{
-      giftTiers.splice(parseInt(e.target.dataset.removeGift),1); renderGiftCatalog();
+      giftTiers.splice(parseInt(e.currentTarget.dataset.removeGift),1); renderGiftCatalog(); persistConfig();
     }));
     document.getElementById('addGiftBtn').addEventListener('click', ()=>{
       giftTiers.push({emoji:'🎁', label:'New gift', amount:10});
-      renderGiftCatalog(); showToast('Gift added to catalog');
+      renderGiftCatalog(); persistConfig(); showToast('Gift added to catalog');
     });
   }
-  renderGiftCatalog();
+  function renderGiftsReceived(){
+    const body = document.getElementById('giftBody');
+    body.innerHTML = GIFTS.map(g=>`
+      <tr><td>${fmtDate(g.created_at)}</td><td>${(g.sender_name||'Anonymous')}</td><td>+${g.amount_tokens} tok</td><td>◆ Gift</td><td>${g.message ? g.message.replace(/</g,'&lt;') : '—'}</td></tr>
+    `).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--text-faint); padding:24px;">No gifts yet</td></tr>`;
+    // stat card counts
+    const gv = document.querySelectorAll('#gifts .goal-grid .stat-card .stat-value');
+    if(gv[0]) gv[0].textContent = (STATS.giftsCount||0).toLocaleString();
+    if(gv[1]) gv[1].textContent = (STATS.giftTokens||0).toLocaleString()+' tok';
+  }
 
-  const recentGifts = [
-    {date:'Aug 12, 2026', from:'p****ul', audience:'Member', gift:'🌹 Rose', message:'Love your work!'},
-    {date:'Aug 11, 2026', from:'Visitor', audience:'Visitor', gift:'☕ Coffee', message:''},
-    {date:'Aug 10, 2026', from:'a****na', audience:'Fan', gift:'🍾 Bubbly', message:'For the good cause'},
-    {date:'Aug 09, 2026', from:'j****an', audience:'Member', gift:'💎 Diamond', message:'Keep going!'},
-  ];
-  document.getElementById('giftBody').innerHTML = recentGifts.map(g=>`
-    <tr><td>${g.date}</td><td>${g.from}</td><td>${g.audience}</td><td>${g.gift}</td><td>${g.message || '—'}</td></tr>
-  `).join('');
+  /* ---------- Insights stat tiles (real) ---------- */
+  function renderStats(){
+    const grid = document.querySelector('#stats .stat-grid');
+    if(grid) grid.innerHTML = `
+      <div class="stat-card"><span class="stat-label">Wallet balance</span><div class="stat-value">${(STATS.balance||0).toLocaleString()} tok</div><div class="stat-delta">Available now</div></div>
+      <div class="stat-card"><span class="stat-label">Tokens earned</span><div class="stat-value">${(STATS.tokensEarned||0).toLocaleString()}</div><div class="stat-delta up">Purchases + gifts</div></div>
+      <div class="stat-card"><span class="stat-label">Gifts received</span><div class="stat-value">${(STATS.giftsCount||0).toLocaleString()}</div><div class="stat-delta up">${(STATS.giftTokens||0).toLocaleString()} tokens</div></div>
+      <div class="stat-card"><span class="stat-label">Content posts</span><div class="stat-value">${(STATS.posts||0).toLocaleString()}</div><div class="stat-delta">${(STATS.likes||0).toLocaleString()} likes</div></div>`;
+    // relabel chart panels to reflect real data
+    const tp = document.querySelector('#trafficChart').closest('.panel').querySelector('.panel-title'); if(tp) tp.textContent='Token income — last 14 days';
+    const tps = document.querySelector('#trafficChart').closest('.panel').querySelector('.panel-sub'); if(tps) tps.textContent='Daily inflow';
+    const dp = document.querySelector('#donutChart').closest('.panel').querySelector('.panel-title'); if(dp) dp.textContent='Content mix';
+    const dps = document.querySelector('#donutChart').closest('.panel').querySelector('.panel-sub'); if(dps) dps.textContent='By access level';
+    const rp = document.querySelector('#revChart').closest('.panel').querySelector('.panel-title'); if(rp) rp.textContent='Token income — last 6 months';
+    const rps = document.querySelector('#revChart').closest('.panel').querySelector('.panel-sub'); if(rps) rps.textContent='Purchases & gifts';
+  }
+
+  /* ===================== LOAD ===================== */
+  function mergeConfig(server){
+    const c = JSON.parse(JSON.stringify(DEFAULTS));
+    if(server && typeof server==='object'){
+      for(const k in server){ if(server[k]!==undefined && server[k]!==null) c[k]=server[k]; }
+      // deep-ensure nested defaults exist
+      c.sections = Object.assign({}, DEFAULTS.sections, server.sections||{});
+      c.giftAudience = Object.assign({}, DEFAULTS.giftAudience, server.giftAudience||{});
+      c.goal = Object.assign({}, DEFAULTS.goal, server.goal||{});
+      if(!Array.isArray(c.categories)||!c.categories.length) c.categories = DEFAULTS.categories;
+      if(!Array.isArray(c.tiers)||!c.tiers.length) c.tiers = DEFAULTS.tiers;
+      if(!Array.isArray(c.giftCatalog)||!c.giftCatalog.length) c.giftCatalog = DEFAULTS.giftCatalog;
+    }
+    return c;
+  }
+
+  async function loadStudio(){
+    let data;
+    try {
+      const r = await fetch(API, { headers:{'Accept':'application/json'} });
+      if(r.status===401){ document.getElementById('displayName').value='Please log in'; showToast('Please log in to manage your studio'); return; }
+      data = await r.json();
+    } catch(e){ showToast('Could not load your studio data'); return; }
+
+    PROFILE = data.profile||{}; POSTS = data.posts||[]; WALLET = data.wallet||{balance:0};
+    LEDGER = data.ledger||[]; GIFTS = data.gifts||[]; STATS = data.stats||{};
+    REV = data.revenueByMonth||[]; ACT = data.activity14||[];
+    CONFIG = mergeConfig(data.config);
+
+    // Profile
+    document.getElementById('displayName').value = PROFILE.full_name || '';
+    document.getElementById('handleName').value = PROFILE.username || '';
+    if(PROFILE.avatar_url){ const av=document.getElementById('avatarImg'); av.style.backgroundImage=`url(${PROFILE.avatar_url})`; av.textContent=''; }
+    else { const av=document.getElementById('avatarImg'); av.textContent=(PROFILE.full_name||'A').trim().charAt(0).toUpperCase()||'A'; }
+    if(PROFILE.cover_url) document.getElementById('coverImg').style.backgroundImage=`url(${PROFILE.cover_url})`;
+    document.querySelector('#profile .verified').style.display = PROFILE.verified ? '' : 'none';
+    if(PROFILE.headline){ document.getElementById('headlineDisplay').textContent=PROFILE.headline; document.getElementById('headlineInput').value=PROFILE.headline; }
+    if(PROFILE.bio){ document.getElementById('bioDisplay').textContent=PROFILE.bio; document.getElementById('bioInput').value=PROFILE.bio; }
+    document.getElementById('shareUrl').value = PROFILE.username ? `secretxperience.eu/creators?c=${PROFILE.username}` : 'secretxperience.eu/creators';
+
+    // Config-driven UI
+    if(CONFIG.theme){ theme = Object.assign({}, defaults, CONFIG.theme);
+      document.getElementById('toneSlider').value=theme.tone; document.getElementById('warmthSlider').value=theme.warmth;
+      document.getElementById('tintSlider').value=theme.tint; document.getElementById('contrastSlider').value=theme.contrast;
+      document.getElementById('radiusSlider').value=theme.radius; }
+    applySectionToggles();
+    renderCategories();
+    // headline/bio popover text from config already from profile
+    document.getElementById('goalTextInput').value = CONFIG.goal.text; document.getElementById('goalTextDisplay').textContent = CONFIG.goal.text;
+    document.getElementById('goalTypeInput').value = CONFIG.goal.type;
+    document.getElementById('goalTypeChip').textContent = {charity:'Supporting a good cause',personal:'Personal goal',other:'Other goal'}[CONFIG.goal.type]||'Supporting a good cause';
+    document.getElementById('goalTargetInput').value = CONFIG.goal.target;
+    giftsMasterToggle.classList.toggle('on', CONFIG.giftsEnabled!==false);
+    document.querySelectorAll('[data-audience]').forEach(cb=>{ cb.checked = CONFIG.giftAudience[cb.dataset.audience]!==false; });
+    ppvDefault.value = CONFIG.ppvDefault || '9.00';
+
+    // Renders
+    renderStats();
+    renderGallery();
+    renderTiers();
+    renderWallet();
+    renderGiftCatalog();
+    renderGiftsReceived();
+    updateGoalProgress();
+    applyTheme(); // also rerenders charts
+  }
 
   /* init */
   applyTheme();
+  loadStudio();
 
 })();
 </script>

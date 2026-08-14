@@ -124,6 +124,51 @@ function GiftSuccess({ amount, onClose }: { amount: number; onClose: () => void 
   )
 }
 
+// Content stays hidden inside a fixed 300×400 frame that shows only the creator's
+// profile card. The media isn't even loaded until a visitor double-clicks to reveal.
+function PostMedia({ post, name, avatarUrl, verified }: { post: Post; name: string; avatarUrl?: string | null; verified?: boolean }) {
+  const [revealed, setRevealed] = useState(false)
+  if (!post.media_url) return null
+  const isVideo = post.media_type === 'video'
+  return (
+    <div
+      onDoubleClick={() => setRevealed(r => !r)}
+      title={revealed ? 'Double-click to hide' : 'Double-click to view'}
+      style={{ position: 'relative', width: '300px', maxWidth: '100%', height: '400px', margin: '4px auto 12px', borderRadius: '12px', overflow: 'hidden', background: '#0b0812', border: '0.5px solid var(--b)', cursor: 'pointer', userSelect: 'none' }}
+    >
+      {revealed ? (
+        isVideo ? (
+          <video src={post.media_url!} controls autoPlay playsInline style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', background: '#000' }} />
+        ) : (
+          <img src={post.media_url!} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
+        )
+      ) : (
+        <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(120% 90% at 50% 15%, #241a34, #0b0812)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px', textAlign: 'center', padding: '20px' }}>
+          <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: avatarUrl ? `url(${avatarUrl}) center/cover` : 'linear-gradient(135deg,var(--gold),var(--goldd))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0a0a0a', fontWeight: 700, fontSize: '26px', border: '2px solid rgba(255,255,255,0.14)' }}>
+            {!avatarUrl && name.slice(0, 1).toUpperCase()}
+          </div>
+          <div>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--t)', display: 'flex', alignItems: 'center', gap: '5px', justifyContent: 'center' }}>
+              {name} {verified && <i className="ti ti-rosette-discount-check-filled" style={{ color: 'var(--gold)', fontSize: '14px' }} />}
+            </div>
+            <div style={{ fontSize: '11.5px', color: 'var(--t3)', marginTop: '2px' }}>{timeAgo(post.created_at)}</div>
+          </div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '7px', padding: '8px 15px', borderRadius: '999px', border: '0.5px solid rgba(197,160,90,0.4)', background: 'rgba(197,160,90,0.12)', color: 'var(--gold)', fontSize: '12px', fontWeight: 600, marginTop: '4px' }}>
+            <i className="ti ti-eye" /> Double-click to view
+          </div>
+          <div style={{ fontSize: '10.5px', color: 'var(--t3)', letterSpacing: '.04em' }}>{isVideo ? 'VIDEO' : 'PHOTO'} · discreetly hidden</div>
+        </div>
+      )}
+      {revealed && (
+        <button onClick={e => { e.stopPropagation(); setRevealed(false) }} aria-label="Hide"
+          style={{ position: 'absolute', top: '8px', right: '8px', height: '30px', padding: '0 12px', borderRadius: '999px', border: 'none', background: 'rgba(10,8,16,0.7)', color: '#fff', fontSize: '12px', fontWeight: 600, cursor: 'pointer', backdropFilter: 'blur(4px)' }}>
+          ✕ Hide
+        </button>
+      )}
+    </div>
+  )
+}
+
 function PostCard({ post, me, follows, balance, onFollow, onBalanceChange }: {
   post: Post; me: string | null; follows: Set<string>; balance: number | null
   onFollow: (id: string) => void
@@ -160,14 +205,8 @@ function PostCard({ post, me, follows, balance, onFollow, onBalanceChange }: {
         )}
       </div>
 
-      {/* media */}
-      {post.media_url && (
-        post.media_type === 'video' ? (
-          <video src={post.media_url} controls style={{ width: '100%', maxHeight: '520px', background: '#000', display: 'block' }} />
-        ) : (
-          <img src={post.media_url} alt="" style={{ width: '100%', maxHeight: '560px', objectFit: 'cover', display: 'block' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-        )
-      )}
+      {/* media — hidden behind a 300×400 profile card; double-click to reveal */}
+      {post.media_url && <PostMedia post={post} name={name} avatarUrl={c.avatar_url} verified={!!c.verified} />}
 
       {/* body */}
       <div style={{ padding: '12px 14px 14px' }}>

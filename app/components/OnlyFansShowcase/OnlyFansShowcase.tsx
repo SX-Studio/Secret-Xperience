@@ -44,7 +44,7 @@ export default function OnlyFansShowcase({ portalTo }: { portalTo?: string }) {
 
   const body = (
     <section aria-label="OnlyFans creators" style={{ background: 'var(--bg1, #0a090c)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderLeft: 'none', borderRight: 'none', padding: '3rem 1.5rem 2.5rem' }}>
-      <style>{`
+      <style dangerouslySetInnerHTML={{ __html: `
         .ofx-chip { display:inline-flex; align-items:center; gap:8px; padding:5px 14px 5px 6px; background:var(--bg2, rgba(255,255,255,0.03)); border:0.5px solid rgba(0,174,239,0.22); border-radius:20px; color:var(--t, #ece8e1); font:500 12.5px var(--sans, 'Poppins', sans-serif); text-decoration:none; white-space:nowrap; transition:border-color .15s, background .15s, transform .12s; }
         .ofx-chip:hover { border-color:rgba(0,174,239,0.6); background:rgba(0,174,239,0.08); transform:translateY(-1px); }
         .ofx-chip .ofx-ext { font-size:10px; color:var(--t3, rgba(255,255,255,0.3)); }
@@ -53,7 +53,7 @@ export default function OnlyFansShowcase({ portalTo }: { portalTo?: string }) {
         .ofx-group-label::after { content:''; flex:1; height:0.5px; background:var(--b, rgba(255,255,255,0.06)); }
         .ofx-chips { display:flex; flex-wrap:wrap; gap:8px; }
         @media(max-width:640px){ .ofx-chips { flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; } .ofx-chips::-webkit-scrollbar { display:none; } }
-      `}</style>
+      ` }} />
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.75rem' }}>
           <div>

@@ -49,6 +49,7 @@ function computeThemeVars(theme: any, accent: string): React.CSSProperties | nul
     vars['--t2'] = mixHex(tc, bgNeutral, 0.35)
     vars['--t3'] = mixHex(tc, bgNeutral, 0.6)
   }
+  if (typeof theme.bgImage === 'string' && theme.bgImage.trim()) vars['--bg-image'] = theme.bgImage
   return vars
 }
 
@@ -210,7 +211,7 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
   return (
     <div className="cp" style={{ ['--acc' as any]: accent, ...(themeVars || {}) }}>
       <style dangerouslySetInnerHTML={{ __html: `
-        .cp{min-height:100vh;background:var(--bg,#080612);color:var(--t,#ece8e1);font-family:var(--sans,'Poppins',sans-serif)}
+        .cp{min-height:100vh;background-color:var(--bg,#080612);background-image:var(--bg-image,none);background-attachment:fixed;color:var(--t,#ece8e1);font-family:var(--sans,'Poppins',sans-serif)}
         .cp a{color:inherit}
         .cp-top{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;height:56px;padding:0 18px;background:rgba(8,6,18,.9);backdrop-filter:blur(16px);border-bottom:.5px solid var(--b,rgba(255,255,255,.08))}
         .cp-top a.home{font-family:var(--serif,'Cormorant Garamond',serif);font-size:19px;color:var(--gold,#c5a05a);text-decoration:none}

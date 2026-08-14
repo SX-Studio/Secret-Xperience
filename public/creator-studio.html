@@ -19,7 +19,7 @@
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{background:var(--bg); color:var(--text); font-family:var(--font-body); font-weight:400; -webkit-font-smoothing:antialiased; transition:background .2s ease, color .2s ease;}
+  body{background-color:var(--bg); background-image:var(--bg-image,none); background-attachment:fixed; color:var(--text); font-family:var(--font-body); font-weight:400; -webkit-font-smoothing:antialiased; transition:background .2s ease, color .2s ease;}
   h1,h2,h3,.serif{font-family:var(--font-display);}
   a{color:inherit;}
   ::selection{background:var(--accent-soft); color:var(--accent-strong);}
@@ -170,8 +170,40 @@
   .filter-row{display:flex; gap:8px; flex-wrap:wrap;}
   .filter-chip{font-size:12px; padding:7px 14px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted);}
   .filter-chip.active{border-color:var(--accent); color:var(--accent-strong); background:var(--accent-soft);}
+  /* content folders */
+  .cl-folders{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center;}
+  .cl-folder{display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-size:13px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+  .cl-folder:hover{border-color:var(--accent);}
+  .cl-folder.active{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-strong);}
+  .cl-folder.drop{border-color:var(--accent); background:var(--accent-soft); box-shadow:0 0 0 2px var(--accent) inset;}
+  .cl-folder .fi{font-size:15px;}
+  .cl-folder .fc{font-size:11px; opacity:.7;}
+  .cl-folder .fname{cursor:pointer; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .cl-folder .fx{background:none; border:none; color:var(--text-faint); cursor:pointer; font-size:13px; padding:0 2px;}
+  .cl-folder .fx:hover{color:var(--warn);}
+  .cl-addfolder{border:1.5px dashed var(--border); background:transparent; color:var(--text-faint); border-radius:12px; padding:9px 14px; font-size:13px; cursor:pointer;}
+  .cl-addfolder:hover{border-color:var(--accent); color:var(--accent);}
   .gallery-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;}
   .g-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; display:flex; flex-direction:column;}
+  .g-card.dragging{opacity:.45;}
+  .g-card.drop-before{box-shadow:-3px 0 0 0 var(--accent);}
+  .g-card.drop-after{box-shadow:3px 0 0 0 var(--accent);}
+  .g-drag{position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:3; background:rgba(20,20,25,.55); color:#fff; border-radius:6px; font-size:12px; padding:1px 8px; cursor:grab; opacity:0; transition:opacity .15s ease;}
+  .g-card:hover .g-drag{opacity:1;}
+  /* background templates */
+  .bg-templates{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+  .bg-tpl{position:relative; border-radius:10px; overflow:hidden; cursor:pointer; border:2px solid transparent; aspect-ratio:16/10;}
+  .bg-tpl:hover{border-color:var(--border);}
+  .bg-tpl.active{border-color:var(--accent);}
+  .bg-tpl .swatch{position:absolute; inset:0;}
+  .bg-tpl .nm{position:absolute; left:0; right:0; bottom:0; font-size:10px; padding:3px 6px; color:#fff; background:linear-gradient(to top,rgba(0,0,0,.6),transparent); text-align:left;}
+  .bg-tpl .chk{position:absolute; top:4px; right:4px; width:16px; height:16px; border-radius:50%; background:var(--accent); color:#fff; font-size:10px; display:none; align-items:center; justify-content:center;}
+  .bg-tpl.active .chk{display:flex;}
+  .bg-confirm{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:120; display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--accent); border-radius:14px; padding:12px 18px; box-shadow:var(--shadow); font-size:13.5px; color:var(--text);}
+  .bg-confirm .bt{height:36px; padding:0 16px; border-radius:9px; font-weight:600; font-size:13px; cursor:pointer;}
+  .bg-confirm .apply{background:var(--accent); color:var(--accent-contrast); border:none;}
+  .bg-confirm .cancel{background:transparent; border:1px solid var(--border); color:var(--text-muted);}
+  @media(max-width:560px){.bg-templates{grid-template-columns:repeat(3,1fr);}}
   .g-thumb-wrap{position:relative; aspect-ratio:4/5; overflow:hidden; background:var(--surface-2);}
   .g-thumb{position:absolute; inset:0; background-size:cover; transition:filter .15s ease;}
   .g-badge{position:absolute; top:10px; left:10px; font-size:10.5px; padding:4px 9px; border-radius:999px; background:rgba(255,255,255,.9); border:1px solid var(--border); display:flex; align-items:center; gap:5px; color:var(--text);}
@@ -451,6 +483,11 @@
             <input type="text" id="accentHex" value="#3E5C76" aria-label="Accent hex value">
             <button class="btn btn-ghost" id="applyHexBtn">Apply</button>
           </div>
+          <div style="margin-top:20px;">
+            <div class="panel-sub" style="margin-bottom:4px;">Background templates</div>
+            <div style="font-size:11px; color:var(--text-faint); margin-bottom:10px;">Click to select · double-click to preview, then confirm.</div>
+            <div class="bg-templates" id="bgTemplates"></div>
+          </div>
         </div>
       </div>
 
@@ -556,6 +593,7 @@
         <button class="btn btn-accent" id="topAddBtn">＋ Upload content</button>
       </div>
 
+      <div class="cl-folders" id="clFolders"></div>
       <div class="gallery-grid" id="galleryGrid"></div>
     </section>
 
@@ -710,6 +748,11 @@
 </div>
 
 <div id="toast"></div>
+<div class="bg-confirm" id="bgConfirm" style="display:none;">
+  <span id="bgConfirmLabel">Preview — keep this background?</span>
+  <button class="bt cancel" id="bgCancel">Cancel</button>
+  <button class="bt apply" id="bgApply">Install</button>
+</div>
 <input type="file" id="hiddenFileInput" accept="image/*" style="display:none;">
 
 <script>
@@ -737,6 +780,9 @@
     ppvDefault: '9.00',
     nameStyle: { color:null, size:'m' },
     sectionOrder: ['profile','appearance','stats','content','pricing','share','wallet','gifts'],
+    folders: [],
+    postFolders: {},
+    postOrder: [],
     giftsEnabled: true,
     giftAudience: { visitors:true, fans:true, members:true },
     goal: { type:'charity', text:"I support a good cause — every gift I receive goes toward a charity I'm currently saving for. Send a gift and help me reach the goal.", target:2000 },
@@ -854,7 +900,19 @@
     {key:'plex', label:'Corporate', desc:'IBM Plex Sans', display:"'IBM Plex Sans', sans-serif", body:"'IBM Plex Sans', sans-serif"},
   ];
   const colorPresets = ['#3e5c76','#3a6b52','#5b4a8a','#8a4a4a','#8a6a2f','#3a3a3f'];
-  const defaults = {font:'inter', accent:'#3e5c76', tone:96, warmth:30, tint:5, contrast:40, radius:10, typeColor:null, typeScale:1};
+  const defaults = {font:'inter', accent:'#3e5c76', tone:96, warmth:30, tint:5, contrast:40, radius:10, typeColor:null, typeScale:1, bgImage:null};
+  const BG_TEMPLATES = [
+    {key:'midnight', name:'Midnight', grad:'radial-gradient(120% 90% at 30% 15%, #2a1e4a, #0b0912)', tone:12, warmth:40, tint:6, contrast:45},
+    {key:'onyx',     name:'Onyx',     grad:'linear-gradient(160deg,#16181d,#0a0b0e)',                 tone:11, warmth:20, tint:2, contrast:40},
+    {key:'velvet',   name:'Velvet',   grad:'radial-gradient(120% 90% at 70% 15%, #3a1030, #0d0810)',  tone:10, warmth:85, tint:7, contrast:45},
+    {key:'abyss',    name:'Abyss',    grad:'linear-gradient(160deg,#0c1a2a,#070d16)',                 tone:12, warmth:5,  tint:6, contrast:45},
+    {key:'pine',     name:'Pine',     grad:'linear-gradient(160deg,#0f2018,#070f0b)',                 tone:13, warmth:55, tint:6, contrast:45},
+    {key:'ember',    name:'Ember',    grad:'radial-gradient(120% 90% at 30% 85%, #3a1a10, #100a08)',  tone:12, warmth:95, tint:7, contrast:45},
+    {key:'porcelain',name:'Porcelain',grad:'linear-gradient(160deg,#ffffff,#eceef1)',                 tone:96, warmth:25, tint:3, contrast:40},
+    {key:'blush',    name:'Blush',    grad:'linear-gradient(160deg,#fbeef3,#f2e5ec)',                 tone:95, warmth:80, tint:6, contrast:38},
+    {key:'mist',     name:'Mist',     grad:'linear-gradient(160deg,#eef3f6,#e3eaef)',                 tone:95, warmth:10, tint:5, contrast:38},
+    {key:'sand',     name:'Sand',     grad:'linear-gradient(160deg,#f7f1e6,#eee6d5)',                 tone:94, warmth:70, tint:6, contrast:40},
+  ];
   const TYPE_COLORS = [
     {key:'black', hex:'#111111'}, {key:'white', hex:'#ffffff'},
     {key:'cyan', hex:'#00AEEF'}, {key:'magenta', hex:'#EC008C'},
@@ -907,6 +965,8 @@
 
     root.setProperty('--radius', theme.radius+'px');
     root.setProperty('--radius-sm', Math.round(theme.radius*0.6)+'px');
+    root.setProperty('--bg-image', theme.bgImage || 'none');
+    document.querySelectorAll('#bgTemplates .bg-tpl').forEach(el=>el.classList.toggle('active', el.dataset.grad===theme.bgImage));
 
     const f = fontOptions.find(f=>f.key===theme.font) || fontOptions[0];
     root.setProperty('--font-display', f.display);
@@ -980,10 +1040,55 @@
       b.addEventListener('click', ()=>{ theme.typeScale = Number(b.dataset.scale); applyTheme(); themeChanged(); showToast('Text size updated'); });
     });
   }
+  // Background templates — click to select, double-click to live-preview + confirm.
+  let bgSnapshot = null;
+  function buildBgTemplates(){
+    const grid = document.getElementById('bgTemplates');
+    if(!grid) return;
+    grid.innerHTML = BG_TEMPLATES.map(t=>`
+      <button type="button" class="bg-tpl" data-key="${t.key}" data-grad="${t.grad.replace(/"/g,'&quot;')}" title="${t.name} — double-click to preview">
+        <span class="swatch" style="background:${t.grad};"></span>
+        <span class="chk">✓</span>
+        <span class="nm">${t.name}</span>
+      </button>`).join('');
+    grid.querySelectorAll('.bg-tpl').forEach(el=>{
+      el.addEventListener('click', ()=>{ grid.querySelectorAll('.bg-tpl').forEach(x=>x.classList.remove('active')); el.classList.add('active'); });
+      el.addEventListener('dblclick', ()=>{ previewTemplate(el.dataset.key); });
+    });
+  }
+  function previewTemplate(key){
+    const t = BG_TEMPLATES.find(x=>x.key===key); if(!t) return;
+    if(!bgSnapshot) bgSnapshot = Object.assign({}, theme);
+    theme.tone = t.tone; theme.warmth = t.warmth; theme.tint = t.tint; theme.contrast = t.contrast; theme.bgImage = t.grad;
+    document.getElementById('toneSlider').value = t.tone;
+    document.getElementById('warmthSlider').value = t.warmth;
+    document.getElementById('tintSlider').value = t.tint;
+    document.getElementById('contrastSlider').value = t.contrast;
+    applyTheme();
+    const bar = document.getElementById('bgConfirm');
+    document.getElementById('bgConfirmLabel').textContent = `Preview: ${t.name} — keep this background?`;
+    bar.style.display = 'flex';
+  }
+  document.getElementById('bgApply').addEventListener('click', ()=>{
+    bgSnapshot = null; document.getElementById('bgConfirm').style.display='none';
+    themeChanged(); showToast('Background installed');
+  });
+  document.getElementById('bgCancel').addEventListener('click', ()=>{
+    if(bgSnapshot){ theme = Object.assign({}, bgSnapshot); bgSnapshot=null;
+      document.getElementById('toneSlider').value = theme.tone;
+      document.getElementById('warmthSlider').value = theme.warmth;
+      document.getElementById('tintSlider').value = theme.tint;
+      document.getElementById('contrastSlider').value = theme.contrast;
+      applyTheme();
+    }
+    document.getElementById('bgConfirm').style.display='none';
+  });
+
   buildFontGrid();
   buildSwatches();
   buildTypeColors();
   buildTypeSizes();
+  buildBgTemplates();
 
   document.getElementById('accentPicker').addEventListener('input', e=>{ theme.accent = e.target.value; applyTheme(); });
   document.getElementById('accentPicker').addEventListener('change', themeChanged);
@@ -1039,7 +1144,7 @@
         const {url, type} = await uploadFile(file, 'content');
         if(target==='content-new'){
           const {post} = await api({action:'post_create', mediaUrl:url, mediaType:type, title:'New upload', visibility:'public', blur:0, price:0});
-          POSTS.unshift(post); renderGallery(); showToast('Content added');
+          POSTS.unshift(post); (CONFIG.postOrder||(CONFIG.postOrder=[])).unshift(post.id); persistConfig(); renderGallery(); renderFolders(); showToast('Content added');
         } else {
           const id = target.split(':')[1]; const it = POSTS.find(p=>p.id===id);
           if(it){ it.media_url=url; it.media_type=type; renderGallery(); showToast('Content updated'); }
@@ -1228,21 +1333,84 @@
     'linear-gradient(150deg,var(--surface),var(--border))'
   ];
   let activeFilter = 'all';
+  let activeFolder = null; // null = All
   function visLabel(v){ return v==='public'?'Public':v==='subscribers'?'Subscribers':'Pay-per-view'; }
   function titleOf(p){ return p.title || p.caption || 'Untitled'; }
+  function normalizeOrder(){
+    const ids = POSTS.map(p=>p.id);
+    CONFIG.postOrder = (CONFIG.postOrder||[]).filter(id=>ids.includes(id));
+    ids.forEach(id=>{ if(!CONFIG.postOrder.includes(id)) CONFIG.postOrder.push(id); });
+  }
+  function orderedPosts(){
+    normalizeOrder();
+    const byId = {}; POSTS.forEach(p=>byId[p.id]=p);
+    return CONFIG.postOrder.map(id=>byId[id]).filter(Boolean);
+  }
+  function reorderPost(dragId, targetId, after){
+    normalizeOrder();
+    const o = CONFIG.postOrder;
+    const di = o.indexOf(dragId); if(di>-1) o.splice(di,1);
+    let ti = o.indexOf(targetId); if(ti<0){ o.push(dragId); }
+    else o.splice(after?ti+1:ti, 0, dragId);
+    renderGallery(); persistConfig('Order saved');
+  }
+  function folderCount(fid){ return POSTS.filter(p=>(CONFIG.postFolders[p.id]||null)===fid).length; }
+  function renderFolders(){
+    const bar = document.getElementById('clFolders'); if(!bar) return;
+    const folders = CONFIG.folders || [];
+    bar.innerHTML =
+      `<div class="cl-folder ${activeFolder===null?'active':''}" data-folder="__all"><span class="fi">🗂️</span> All <span class="fc">${POSTS.length}</span></div>` +
+      folders.map(f=>`<div class="cl-folder ${activeFolder===f.id?'active':''}" data-folder="${f.id}" title="Click to filter · drop content here"><span class="fi">📁</span><span class="fname">${(f.name||'Folder').replace(/</g,'&lt;')}</span><span class="fc">${folderCount(f.id)}</span><button class="fx" data-ren="${f.id}" title="Rename folder">✎</button><button class="fx" data-del="${f.id}" title="Delete folder">✕</button></div>`).join('') +
+      (folders.length < 6 ? `<button class="cl-addfolder" id="clAddFolder">＋ New folder</button>` : '');
+
+    bar.querySelectorAll('.cl-folder').forEach(el=>{
+      el.addEventListener('click', e=>{ if(e.target.closest('button')) return; const f=el.dataset.folder; activeFolder = f==='__all'?null:f; renderFolders(); renderGallery(); });
+      el.addEventListener('dragover', e=>{ e.preventDefault(); el.classList.add('drop'); });
+      el.addEventListener('dragleave', ()=>el.classList.remove('drop'));
+      el.addEventListener('drop', e=>{
+        e.preventDefault(); el.classList.remove('drop');
+        let id=''; try{ id=e.dataTransfer.getData('text/plain'); }catch(_){}
+        if(!id) return;
+        const f = el.dataset.folder;
+        if(f==='__all') delete CONFIG.postFolders[id]; else CONFIG.postFolders[id]=f;
+        renderFolders(); renderGallery(); persistConfig('Moved to folder');
+      });
+    });
+    bar.querySelectorAll('[data-ren]').forEach(btn=>btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const f=(CONFIG.folders||[]).find(x=>x.id===e.currentTarget.dataset.ren); if(!f) return;
+      const nm = prompt('Rename folder', f.name); if(nm && nm.trim()){ f.name=nm.trim().slice(0,24); renderFolders(); persistConfig('Folder renamed'); }
+    }));
+    bar.querySelectorAll('[data-del]').forEach(btn=>btn.addEventListener('click', e=>{
+      e.stopPropagation(); const fid=e.currentTarget.dataset.del;
+      CONFIG.folders = (CONFIG.folders||[]).filter(x=>x.id!==fid);
+      Object.keys(CONFIG.postFolders).forEach(pid=>{ if(CONFIG.postFolders[pid]===fid) delete CONFIG.postFolders[pid]; });
+      if(activeFolder===fid) activeFolder=null;
+      renderFolders(); renderGallery(); persistConfig('Folder deleted');
+    }));
+    const add=document.getElementById('clAddFolder');
+    if(add) add.addEventListener('click', ()=>{
+      if((CONFIG.folders||[]).length>=6){ showToast('Maximum 6 folders'); return; }
+      CONFIG.folders.push({ id:'f'+Date.now().toString(36), name:'New folder' });
+      renderFolders(); persistConfig('Folder added');
+    });
+  }
 
   function renderGallery(){
     const grid = document.getElementById('galleryGrid');
-    const items = POSTS.filter(it => activeFilter==='all' || it.visibility===activeFilter);
+    const items = orderedPosts().filter(it =>
+      (activeFilter==='all' || it.visibility===activeFilter) &&
+      (activeFolder===null || (CONFIG.postFolders[it.id]||null)===activeFolder));
     grid.innerHTML = items.map((it,idx)=>{
       const showLock = it.visibility !== 'public';
       const price = Number(it.price)||0;
       const blur = Number(it.blur)||0;
       const bg = it.media_url ? `url(${it.media_url}) center/cover` : gradients[idx % gradients.length];
       return `
-      <div class="g-card" data-id="${it.id}">
+      <div class="g-card" data-id="${it.id}" draggable="true">
         <div class="g-thumb-wrap">
           <div class="g-thumb" style="background:${bg}; filter:blur(${blur}px);"></div>
+          <span class="g-drag" title="Drag to reorder, or onto a folder">⠿ drag</span>
           <div class="g-badge">${it.visibility==='ppv' ? '€'+price.toFixed(2) : visLabel(it.visibility)}</div>
           <div class="g-type">${it.media_type==='video'?'▶':'◧'}</div>
           <div class="g-lock ${showLock?'show':''}"><span class="price-tag">${it.visibility==='ppv' ? 'Unlock · €'+price.toFixed(2) : 'Subscribers only'}</span></div>
@@ -1305,8 +1473,10 @@
     });
     grid.querySelectorAll('[data-role="remove"]').forEach(btn=>btn.addEventListener('click', e=>{
       const id=e.currentTarget.dataset.id; const i=POSTS.findIndex(g=>g.id===id);
-      if(i>-1){ const removed=POSTS[i]; POSTS.splice(i,1); renderGallery();
-        api({action:'post_delete', id}).then(()=>showToast('Content removed')).catch(err=>{ POSTS.splice(i,0,removed); renderGallery(); showToast(err.message); });
+      if(i>-1){ const removed=POSTS[i]; POSTS.splice(i,1);
+        delete CONFIG.postFolders[id]; CONFIG.postOrder=(CONFIG.postOrder||[]).filter(x=>x!==id); persistConfig();
+        renderGallery(); renderFolders();
+        api({action:'post_delete', id}).then(()=>showToast('Content removed')).catch(err=>{ POSTS.splice(i,0,removed); renderGallery(); renderFolders(); showToast(err.message); });
       }
     }));
     grid.querySelectorAll('[data-role="replace"]').forEach(btn=>btn.addEventListener('click', e=>{
@@ -1319,6 +1489,16 @@
     }));
     const addTile = document.getElementById('addTileBtn');
     if(addTile) addTile.addEventListener('click', ()=>{ pendingTarget='content-new'; hiddenInput.accept='image/*,video/*'; hiddenInput.click(); });
+
+    // Drag to reorder open content (and drop onto a folder chip to file it).
+    let gDrag=null;
+    const clearGmarks=()=>grid.querySelectorAll('.g-card').forEach(c=>c.classList.remove('drop-before','drop-after'));
+    grid.querySelectorAll('.g-card').forEach(card=>{
+      card.addEventListener('dragstart', e=>{ gDrag=card; card.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain', card.dataset.id); }catch(_){} });
+      card.addEventListener('dragend', ()=>{ if(gDrag) gDrag.classList.remove('dragging'); gDrag=null; clearGmarks(); });
+      card.addEventListener('dragover', e=>{ e.preventDefault(); if(!gDrag||card===gDrag) return; const r=card.getBoundingClientRect(); const after=(e.clientX-r.left)/r.width>0.5; clearGmarks(); card.classList.add(after?'drop-after':'drop-before'); });
+      card.addEventListener('drop', e=>{ e.preventDefault(); if(!gDrag||card===gDrag){ clearGmarks(); return; } const r=card.getBoundingClientRect(); const after=(e.clientX-r.left)/r.width>0.5; const dragId=gDrag.dataset.id; clearGmarks(); reorderPost(dragId, card.dataset.id, after); });
+    });
   }
   document.getElementById('topAddBtn').addEventListener('click', ()=>{ pendingTarget='content-new'; hiddenInput.accept='image/*,video/*'; hiddenInput.click(); });
   document.querySelectorAll('.filter-chip').forEach(chip=>chip.addEventListener('click', ()=>{
@@ -1525,6 +1705,9 @@
       c.giftAudience = Object.assign({}, DEFAULTS.giftAudience, server.giftAudience||{});
       c.goal = Object.assign({}, DEFAULTS.goal, server.goal||{});
       c.nameStyle = Object.assign({}, DEFAULTS.nameStyle, server.nameStyle||{});
+      c.folders = Array.isArray(server.folders) ? server.folders.slice(0,6) : [];
+      c.postFolders = (server.postFolders && typeof server.postFolders==='object') ? server.postFolders : {};
+      c.postOrder = Array.isArray(server.postOrder) ? server.postOrder : [];
       if(!Array.isArray(c.categories)||!c.categories.length) c.categories = DEFAULTS.categories;
       if(!Array.isArray(c.tiers)||!c.tiers.length) c.tiers = DEFAULTS.tiers;
       if(!Array.isArray(c.giftCatalog)||!c.giftCatalog.length) c.giftCatalog = DEFAULTS.giftCatalog;
@@ -1586,6 +1769,7 @@
 
     // Renders
     renderStats();
+    renderFolders();
     renderGallery();
     renderTiers();
     renderWallet();

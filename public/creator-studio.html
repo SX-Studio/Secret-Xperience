@@ -346,6 +346,9 @@
         <button class="vis-toggle on" data-target="gifts" title="Visible on public profile" aria-label="Toggle Gifts visible on public profile"><span class="knob"></span></button>
       </div>
     </nav>
+    <button class="btn btn-accent" id="uploadProfileBtn" style="justify-content:center; margin-top:6px;">
+      <span style="font-size:15px; line-height:1;">⤴</span> Upload profile
+    </button>
     <div class="side-foot">
       <div class="status-pill"><span class="dot"></span> Profile live</div>
       <div class="side-note">The switch next to each section sets whether that module shows on your public profile. Everything stays editable here either way.</div>
@@ -1119,6 +1122,7 @@
   const hiddenInput = document.getElementById('hiddenFileInput');
   document.getElementById('editCoverBtn').addEventListener('click', ()=>{ pendingTarget='cover'; hiddenInput.accept='image/*'; hiddenInput.click(); });
   document.getElementById('editAvatarBtn').addEventListener('click', ()=>{ pendingTarget='avatar'; hiddenInput.accept='image/*'; hiddenInput.click(); });
+  document.getElementById('uploadProfileBtn').addEventListener('click', ()=>{ pendingTarget='avatar'; hiddenInput.accept='image/*'; hiddenInput.click(); });
 
   async function uploadFile(file, target){
     const fd = new FormData(); fd.append('file', file); fd.append('target', target);

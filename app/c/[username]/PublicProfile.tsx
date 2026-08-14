@@ -15,6 +15,43 @@ type Viewer = { loggedIn: boolean; isSelf: boolean; isFollowing: boolean; balanc
 const tokensForEuro = (euro: any) => Math.max(1, Math.round((Number(euro) || 0) * 10))
 const fmtDate = (iso: string) => { try { return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) } catch { return iso } }
 
+// Port of the Studio theme engine → the public page's CSS variables, so a creator's
+// Appearance choices (background, text colour, size) render on their public profile.
+// Returns null when no theme is set, keeping the default velvet look.
+function hexToRgb(hex: string) { hex = (hex || '#000000').replace('#', ''); if (hex.length === 3) hex = hex.split('').map(c => c + c).join(''); const n = parseInt(hex, 16); return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 } }
+function rgbToHex(r: number, g: number, b: number) { return '#' + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('') }
+function mixHex(a: string, b: string, t: number) { const x = hexToRgb(a), y = hexToRgb(b); return rgbToHex(x.r + (y.r - x.r) * t, x.g + (y.g - x.g) * t, x.b + (y.b - x.b) * t) }
+function computeThemeVars(theme: any, accent: string): React.CSSProperties | null {
+  if (!theme || typeof theme !== 'object') return null
+  const tone = Number(theme.tone ?? 96), warmth = Number(theme.warmth ?? 30), tint = Number(theme.tint ?? 5), contrast = Number(theme.contrast ?? 40)
+  const isDark = tone < 50
+  const hue = (210 - (warmth / 100) * (210 - 30)).toFixed(0)
+  const s = tint, sMin = Math.min(tint, 8)
+  const off = 2 + (contrast / 100) * 12
+  const L = (n: number) => `hsl(${hue}, ${s}%, ${n.toFixed(1)}%)`
+  const Lm = (n: number) => `hsl(${hue}, ${sMin}%, ${n.toFixed(1)}%)`
+  const vars: any = {
+    '--bg': `hsl(${hue}, ${s}%, ${tone}%)`,
+    '--bg1': L(isDark ? Math.min(96, tone + off) : Math.max(4, tone - off * 0.55)),
+    '--bg2': L(isDark ? Math.min(97, tone + off * 1.7) : Math.max(3, tone - off * 1.1)),
+    '--b': L(isDark ? Math.min(98, tone + off * 2.2) : Math.max(2, tone - off * 1.6)),
+    '--b2': L(isDark ? Math.min(98, tone + off * 2.6) : Math.max(2, tone - off * 2.0)),
+    '--t': Lm(isDark ? 95 : 12),
+    '--t2': Lm(isDark ? 72 : 40),
+    '--t3': Lm(isDark ? 52 : 60),
+    '--gold': accent,
+  }
+  const tc = theme.typeColor
+  if (typeof tc === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(tc)) {
+    // Chosen text colour, with muted/faint mixed toward the background tone for legibility.
+    const bgNeutral = rgbToHex(tone * 2.55, tone * 2.55, tone * 2.55)
+    vars['--t'] = tc
+    vars['--t2'] = mixHex(tc, bgNeutral, 0.35)
+    vars['--t3'] = mixHex(tc, bgNeutral, 0.6)
+  }
+  return vars
+}
+
 export default function PublicProfile({ creator, viewer }: { creator: PublicCreator; viewer: Viewer }) {
   const cfg = creator.config || {}
   const accent = (cfg.theme && typeof cfg.theme.accent === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(cfg.theme.accent)) ? cfg.theme.accent : '#c5a05a'
@@ -43,11 +80,92 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
   if (nameStyle.size === 's') nameCss.fontSize = 'clamp(22px,3.4vw,30px)'
   else if (nameStyle.size === 'l') nameCss.fontSize = 'clamp(30px,4.8vw,44px)'
 
+  // Full Appearance theme on the public profile (background + text + accent).
+  const themeVars = computeThemeVars(cfg.theme, accent)
+  const typeScale = Number(cfg.theme && cfg.theme.typeScale) || 1
+
   const publicPosts = creator.posts
   const goal = cfg.goal || null
   const goalTarget = goal && Number(goal.target) > 0 ? Number(goal.target) : 0
   const goalPct = goalTarget ? Math.min(100, Math.round((giftTokens / goalTarget) * 100)) : 0
-  const tiers: any[] = Array.isArray(cfg.tiers) ? cfg.tiers : []
+  const tiersList: any[] = Array.isArray(cfg.tiers) ? cfg.tiers : []
+
+  // Public blocks keyed by section, rendered in the creator's arranged order.
+  const blockMap: Record<string, React.ReactNode> = {
+    content: show('content') && (
+      <div className="cp-section" key="content">
+        <h2 className="cp-h">Content</h2>
+        <p className="cp-hsub">Public posts are free to view. Locked posts unlock for subscribers or with a one-off unlock.</p>
+        {publicPosts.length === 0 ? (
+          <div className="cp-empty">No posts yet — follow to be notified when {creator.full_name} shares something.</div>
+        ) : (
+          <div className="cp-grid">
+            {publicPosts.map((p) => <ContentCard key={p.id} p={p} isSubscriber={isSubscriber} onLocked={() => { const t = tiersList[0]; if (p.visibility === 'subscribers' && t) startSubscribe(t); else openGift() }} />)}
+          </div>
+        )}
+      </div>
+    ),
+    pricing: show('pricing') && tiersList.length > 0 && (
+      <div className="cp-section" key="pricing">
+        <h2 className="cp-h">Membership</h2>
+        <p className="cp-hsub">Subscribe with tokens to unlock members-only content. Renews monthly — cancel anytime.</p>
+        {subscription && (
+          <div className="cp-substatus">
+            <div>
+              <b>You're a {subscription.tierName} member.</b>{' '}
+              {subscription.cancelAtPeriodEnd
+                ? <span>Access ends {fmtDate(subscription.currentPeriodEnd)}.</span>
+                : <span>Renews {fmtDate(subscription.currentPeriodEnd)}.</span>}
+            </div>
+            {subscription.cancelAtPeriodEnd
+              ? <button className="cp-btn on" onClick={() => cancelResume(false)}>Resume membership</button>
+              : <button className="cp-btn" onClick={() => cancelResume(true)}>Cancel renewal</button>}
+          </div>
+        )}
+        <div className="cp-tiers">
+          {tiersList.map((t, i) => {
+            const current = subscription && subscription.tierName === t.name
+            const tok = tokensForEuro(t.price)
+            return (
+              <div className={`cp-tier ${t.highlight ? 'hi' : ''} ${current ? 'cur' : ''}`} key={i}>
+                {current ? <span className="tag">Your plan</span> : t.tag && <span className="tag">{t.tag}</span>}
+                <div className="tn">{t.name}</div>
+                <div className="tp">€{t.price}<small> / month · {tok} tokens</small></div>
+                <ul>{String(t.perks || '').split('\n').filter(Boolean).map((perk: string, j: number) => <li key={j}>{perk}</li>)}</ul>
+                {viewer.isSelf ? (
+                  <button className="cp-support" disabled style={{ opacity: .5, cursor: 'default' }}>Your tier</button>
+                ) : current ? (
+                  <button className="cp-support" disabled style={{ opacity: .6, cursor: 'default' }}>✓ Current plan</button>
+                ) : (
+                  <button className="cp-support" onClick={() => startSubscribe(t)}>{subscription ? 'Switch to this' : `Subscribe · ${tok} tokens`}</button>
+                )}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    ),
+    gifts: giftsOn && (
+      <div className="cp-section" key="gifts">
+        <h2 className="cp-h">Send a gift</h2>
+        <p className="cp-hsub">Show your support with tokens — it goes straight to {creator.full_name.split(' ')[0]}.</p>
+        <div className="cp-goal">
+          {goal?.text && <div style={{ fontSize: 14, color: 'var(--t2,#a9a49c)', lineHeight: 1.6 }}>{goal.text}</div>}
+          {goalTarget > 0 && (
+            <>
+              <div className="cp-track"><div className="cp-fill" style={{ width: `${goalPct}%` }} /></div>
+              <div className="cp-gnums"><span><b style={{ color: 'var(--t,#ece8e1)' }}>{giftTokens.toLocaleString()}</b> tokens raised</span><span>Goal: {goalTarget.toLocaleString()}</span></div>
+            </>
+          )}
+          {!viewer.isSelf && <button className="cp-btn acc" style={{ marginTop: 16 }} onClick={openGift}>🎁 Send a gift</button>}
+        </div>
+      </div>
+    ),
+  }
+  const PUBLIC_BLOCKS = ['content', 'pricing', 'gifts']
+  const savedOrder: string[] = Array.isArray(cfg.sectionOrder) ? cfg.sectionOrder.filter((t: string) => PUBLIC_BLOCKS.includes(t)) : []
+  PUBLIC_BLOCKS.forEach((t) => { if (!savedOrder.includes(t)) savedOrder.push(t) })
+  const orderedBlocks = savedOrder.map((t) => blockMap[t])
 
   async function toggleFollow() {
     if (!viewer.loggedIn) { window.location.href = `/login?next=/c/${creator.username}`; return }
@@ -90,7 +208,7 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
   }
 
   return (
-    <div className="cp" style={{ ['--acc' as any]: accent }}>
+    <div className="cp" style={{ ['--acc' as any]: accent, ...(themeVars || {}) }}>
       <style dangerouslySetInnerHTML={{ __html: `
         .cp{min-height:100vh;background:var(--bg,#080612);color:var(--t,#ece8e1);font-family:var(--sans,'Poppins',sans-serif)}
         .cp a{color:inherit}
@@ -177,7 +295,7 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
 
       <div className="cp-cover" style={creator.cover_url ? { backgroundImage: `url(${creator.cover_url})` } : undefined} />
 
-      <div className="cp-wrap">
+      <div className="cp-wrap" style={typeScale !== 1 ? ({ zoom: typeScale } as React.CSSProperties) : undefined}>
         <div className="cp-headrow">
           <div className="cp-av" style={creator.avatar_url ? { backgroundImage: `url(${creator.avatar_url})` } : undefined}>
             {!creator.avatar_url && initial}
@@ -225,82 +343,8 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
           </div>
         )}
 
-        {/* CONTENT */}
-        {show('content') && (
-          <div className="cp-section">
-            <h2 className="cp-h">Content</h2>
-            <p className="cp-hsub">Public posts are free to view. Locked posts unlock for subscribers or with a one-off unlock.</p>
-            {publicPosts.length === 0 ? (
-              <div className="cp-empty">No posts yet — follow to be notified when {creator.full_name} shares something.</div>
-            ) : (
-              <div className="cp-grid">
-                {publicPosts.map((p) => <ContentCard key={p.id} p={p} isSubscriber={isSubscriber} onLocked={() => { const t = tiers[0]; if (p.visibility === 'subscribers' && t) startSubscribe(t); else openGift() }} />)}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* PRICING / MEMBERSHIP */}
-        {show('pricing') && tiers.length > 0 && (
-          <div className="cp-section">
-            <h2 className="cp-h">Membership</h2>
-            <p className="cp-hsub">Subscribe with tokens to unlock members-only content. Renews monthly — cancel anytime.</p>
-
-            {subscription && (
-              <div className="cp-substatus">
-                <div>
-                  <b>You're a {subscription.tierName} member.</b>{' '}
-                  {subscription.cancelAtPeriodEnd
-                    ? <span>Access ends {fmtDate(subscription.currentPeriodEnd)}.</span>
-                    : <span>Renews {fmtDate(subscription.currentPeriodEnd)}.</span>}
-                </div>
-                {subscription.cancelAtPeriodEnd
-                  ? <button className="cp-btn on" onClick={() => cancelResume(false)}>Resume membership</button>
-                  : <button className="cp-btn" onClick={() => cancelResume(true)}>Cancel renewal</button>}
-              </div>
-            )}
-
-            <div className="cp-tiers">
-              {tiers.map((t, i) => {
-                const current = subscription && subscription.tierName === t.name
-                const tok = tokensForEuro(t.price)
-                return (
-                  <div className={`cp-tier ${t.highlight ? 'hi' : ''} ${current ? 'cur' : ''}`} key={i}>
-                    {current ? <span className="tag">Your plan</span> : t.tag && <span className="tag">{t.tag}</span>}
-                    <div className="tn">{t.name}</div>
-                    <div className="tp">€{t.price}<small> / month · {tok} tokens</small></div>
-                    <ul>{String(t.perks || '').split('\n').filter(Boolean).map((perk: string, j: number) => <li key={j}>{perk}</li>)}</ul>
-                    {viewer.isSelf ? (
-                      <button className="cp-support" disabled style={{ opacity: .5, cursor: 'default' }}>Your tier</button>
-                    ) : current ? (
-                      <button className="cp-support" disabled style={{ opacity: .6, cursor: 'default' }}>✓ Current plan</button>
-                    ) : (
-                      <button className="cp-support" onClick={() => startSubscribe(t)}>{subscription ? 'Switch to this' : `Subscribe · ${tok} tokens`}</button>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* GIFTS / GOAL */}
-        {giftsOn && (
-          <div className="cp-section">
-            <h2 className="cp-h">Send a gift</h2>
-            <p className="cp-hsub">Show your support with tokens — it goes straight to {creator.full_name.split(' ')[0]}.</p>
-            <div className="cp-goal">
-              {goal?.text && <div style={{ fontSize: 14, color: 'var(--t2,#a9a49c)', lineHeight: 1.6 }}>{goal.text}</div>}
-              {goalTarget > 0 && (
-                <>
-                  <div className="cp-track"><div className="cp-fill" style={{ width: `${goalPct}%` }} /></div>
-                  <div className="cp-gnums"><span><b style={{ color: 'var(--t,#ece8e1)' }}>{giftTokens.toLocaleString()}</b> tokens raised</span><span>Goal: {goalTarget.toLocaleString()}</span></div>
-                </>
-              )}
-              {!viewer.isSelf && <button className="cp-btn acc" style={{ marginTop: 16 }} onClick={openGift}>🎁 Send a gift</button>}
-            </div>
-          </div>
-        )}
+        {/* Blocks render in the creator's Studio-arranged order */}
+        {orderedBlocks}
       </div>
 
       {subTier && (

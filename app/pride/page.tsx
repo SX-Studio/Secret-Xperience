@@ -6,6 +6,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { createClient } from '../lib/supabase'
 import LockerRoom from '../components/LockerRoom'
 import { Aurora, Spotlight, Particles, PresenceOrbs, Magnetic, FlagWipe, PrideRain, Constellation, useBurst, useRipples, useTilt, SPRING } from '../components/pride/PrideFX'
+import PrideGsapLayer from '../components/pride/PrideGsap'
 
 type L = {
   id: string; title: string; age: number | null; city: string | null; country: string | null
@@ -94,7 +95,14 @@ export default function PridePage() {
   const chapter = CHAPTERS[chapIdx]
   const backroom = chapIdx >= 3
 
-  function rainNow() { setRaining(true); setToast('🌈 Pride!'); setTimeout(() => setRaining(false), 4500); setTimeout(() => setToast(t => (t === '🌈 Pride!' ? null : t)), 2500) }
+  function rainNow() {
+    setRaining(true); setToast('🌈 Pride!')
+    if (typeof window !== 'undefined') {
+      const g = (window as any).__prideGsap
+      if (g) { g.shockwave(window.innerWidth / 2, window.innerHeight * 0.4, '#e0507a'); g.confettiCannon(window.innerWidth / 2, window.innerHeight * 0.35, 28) }
+    }
+    setTimeout(() => setRaining(false), 4500); setTimeout(() => setToast(t => (t === '🌈 Pride!' ? null : t)), 2500)
+  }
 
   useEffect(() => {
     let savedFlag: string | null = null
@@ -131,10 +139,13 @@ export default function PridePage() {
       const msg = `✦ ${chapter.name} unlocked`
       setToast(msg)
       setTimeout(() => setToast(t => (t === msg ? null : t)), 3500)
-      if (chapIdx >= 3 && typeof window !== 'undefined') {
+      if (typeof window !== 'undefined') {
         const cx = window.innerWidth / 2, cy = window.innerHeight * 0.4
-        fire(cx, cy, 'confetti', 22)
-        setTimeout(() => fire(cx - 80, cy + 30, 'heart', 14), 160)
+        ;(window as any).__prideGsap?.shockwave(cx, cy, '#b96bd8')
+        if (chapIdx >= 3) {
+          fire(cx, cy, 'confetti', 22)
+          setTimeout(() => fire(cx - 80, cy + 30, 'heart', 14), 160)
+        }
       }
     }
     prevChap.current = chapIdx
@@ -194,6 +205,9 @@ export default function PridePage() {
         .pr-marq:hover .pr-marq-track { animation-play-state: paused; }
         @media (prefers-reduced-motion: reduce) { .pr-rule,[data-anim]{ animation:none!important } }
       `}</style>
+
+      {/* GSAP interactive layer — cursor comet, tap bursts, magnetic/tilt, scroll & ambient FX */}
+      <PrideGsapLayer accent={ACC} />
 
       {/* Ambient layers */}
       <Spotlight on />
@@ -275,7 +289,7 @@ export default function PridePage() {
               )
             })}
           </div>
-          <hr className="pr-rule" style={{ maxWidth: 220, margin: '0 auto' }} />
+          <hr className="pr-rule" data-gsap="glow" style={{ maxWidth: 220, margin: '0 auto' }} />
         </div>
       </section>
 
@@ -322,7 +336,7 @@ export default function PridePage() {
         )}
 
         {/* Find your tribe */}
-        <div style={{ font: '700 10px/1 Poppins, sans-serif', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(236,232,225,0.5)', marginBottom: 12 }}>Find your tribe</div>
+        <div data-gsap="reveal" style={{ font: '700 10px/1 Poppins, sans-serif', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(236,232,225,0.5)', marginBottom: 12 }}>Find your tribe</div>
         <motion.div layout style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, marginBottom: '2.25rem' }}>
           {TRIBES.map(trb => {
             const active = tribe === trb.key
@@ -359,8 +373,8 @@ export default function PridePage() {
         </div>
 
         {/* Hanky code rail */}
-        <div style={{ textAlign: 'center', marginBottom: 10 }}>
-          <span style={{ font: '700 10px/1 Poppins, sans-serif', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(236,232,225,0.45)' }}>Hanky code · tap a colour</span>
+        <div data-gsap="reveal" style={{ textAlign: 'center', marginBottom: 10 }}>
+          <span data-gsap="sweep" style={{ font: '700 10px/1 Poppins, sans-serif', letterSpacing: '0.22em', textTransform: 'uppercase', backgroundImage: ACC, WebkitBackgroundClip: 'text', backgroundClip: 'text', color: 'transparent' }}>Hanky code · tap a colour</span>
         </div>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
           {HANKY.map((h, i) => {

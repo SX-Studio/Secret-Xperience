@@ -4,6 +4,7 @@ import CookieBanner from './components/CookieBanner'
 import AttributionTracker from './components/AttributionTracker'
 import PageviewTracker from './components/PageviewTracker'
 import PrideMode from './components/PrideMode'
+import WelcomeChoice from './components/WelcomeChoice'
 import './globals.css'
 
 export const viewport: Viewport = {
@@ -367,6 +368,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <Script id="sx-translations" strategy="afterInteractive">{sxTranslationsScript}</Script>
         <Script id="lang-picker" strategy="afterInteractive">{langPickerScript}</Script>
+        <WelcomeChoice />
         <CookieBanner />
         <AttributionTracker />
         <PageviewTracker />

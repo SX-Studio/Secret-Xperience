@@ -36,6 +36,13 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
   const notify = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2800) }
   const initial = (creator.full_name || 'C').trim().charAt(0).toUpperCase()
 
+  // Creator-chosen name styling (from the Studio) — colour + size.
+  const nameStyle = cfg.nameStyle || {}
+  const nameCss: React.CSSProperties = {}
+  if (typeof nameStyle.color === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(nameStyle.color)) nameCss.color = nameStyle.color
+  if (nameStyle.size === 's') nameCss.fontSize = 'clamp(22px,3.4vw,30px)'
+  else if (nameStyle.size === 'l') nameCss.fontSize = 'clamp(30px,4.8vw,44px)'
+
   const publicPosts = creator.posts
   const goal = cfg.goal || null
   const goalTarget = goal && Number(goal.target) > 0 ? Number(goal.target) : 0
@@ -176,7 +183,7 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
             {!creator.avatar_url && initial}
           </div>
           <div className="cp-id">
-            <div className="cp-name">
+            <div className="cp-name" style={nameCss}>
               {creator.full_name}
               {creator.verified && <span className="cp-ver">✓ Verified</span>}
             </div>

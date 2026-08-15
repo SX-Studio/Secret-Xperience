@@ -101,8 +101,7 @@ export default async function CreatorsPage() {
             Secret<em style={{ fontStyle: 'italic', fontWeight: 400, background: 'linear-gradient(120deg,var(--gold),var(--goldd))', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Xperience</em>
           </Link>
           <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
-            <Link href="/events" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Events</Link>
-            <Link href="/advertise" className="cr-cta-btn" style={{ padding: '9px 16px', fontSize: '13px' }}>Become a creator</Link>
+            <Link href="/creators/studio" className="cr-cta-btn" style={{ padding: '9px 16px', fontSize: '13px' }}>Become a content creator</Link>
           </div>
         </nav>
 

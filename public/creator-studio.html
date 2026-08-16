@@ -350,7 +350,7 @@
       <span style="font-size:15px; line-height:1;">⤴</span> Upload profile
     </button>
     <div class="side-foot">
-      <div class="status-pill"><span class="dot"></span> Profile live</div>
+      <div class="status-pill" id="liveStatus"><span class="dot"></span> Not published yet</div>
       <div class="side-note">The switch next to each section sets whether that module shows on your public profile. Everything stays editable here either way.</div>
       <button class="btn btn-ghost" style="justify-content:center;">Preview as visitor</button>
     </div>
@@ -781,6 +781,8 @@
       {name:'VIP', price:'39', perks:'Everything in Subscriber\n1 custom request / month\nPriority replies', highlight:false},
     ],
     ppvDefault: '9.00',
+    published: false,
+    publishedAt: null,
     nameStyle: { color:null, size:'m' },
     sectionOrder: ['profile','appearance','stats','content','pricing','share','wallet','gifts'],
     folders: [],
@@ -1122,7 +1124,53 @@
   const hiddenInput = document.getElementById('hiddenFileInput');
   document.getElementById('editCoverBtn').addEventListener('click', ()=>{ pendingTarget='cover'; hiddenInput.accept='image/*'; hiddenInput.click(); });
   document.getElementById('editAvatarBtn').addEventListener('click', ()=>{ pendingTarget='avatar'; hiddenInput.accept='image/*'; hiddenInput.click(); });
-  document.getElementById('uploadProfileBtn').addEventListener('click', ()=>{ pendingTarget='avatar'; hiddenInput.accept='image/*'; hiddenInput.click(); });
+  function setLiveStatus(){
+    const pill = document.getElementById('liveStatus');
+    if(!pill) return;
+    if(CONFIG.published){
+      pill.classList.add('is-live');
+      pill.innerHTML = '<span class="dot"></span> Profile live';
+      pill.style.color = '#22e584';
+      pill.querySelector('.dot').style.background = '#22e584';
+    } else {
+      pill.classList.remove('is-live');
+      pill.innerHTML = '<span class="dot"></span> Not published yet';
+      pill.style.color = '';
+      pill.querySelector('.dot').style.background = '';
+    }
+  }
+  async function publishProfile(){
+    const btn = document.getElementById('uploadProfileBtn');
+    const first = !CONFIG.published;
+    clearTimeout(cfgTimer);
+    const prevHtml = btn.innerHTML;
+    btn.disabled = true; btn.style.opacity = '.7';
+    btn.innerHTML = '<span style="font-size:15px; line-height:1;">⤴</span> Publishing…';
+    try {
+      // Push the latest profile fields live alongside the config, so one click
+      // makes everything the creator sees here visible on the public page.
+      const patch = {
+        full_name: (document.getElementById('displayName').value||'').trim(),
+        username: (document.getElementById('handleName').value||'').trim(),
+        headline: (document.getElementById('headlineInput').value||'').trim(),
+        bio: (document.getElementById('bioInput').value||'').trim(),
+      };
+      await api(Object.assign({action:'profile'}, patch));
+      CONFIG.published = true;
+      CONFIG.publishedAt = new Date().toISOString();
+      await api({action:'config', config:CONFIG});
+      PROFILE.username = patch.username || PROFILE.username;
+      window.__pubUrl = PROFILE.username ? `secretxperience.eu/c/${PROFILE.username}` : 'secretxperience.eu/creators';
+      const su = document.getElementById('shareUrl'); if(su) su.value = window.__pubUrl;
+      setLiveStatus();
+      showToast(first ? 'Profile published — it is now live at '+window.__pubUrl : 'Changes published — your public profile is updated');
+    } catch(err){
+      showToast(err.message || 'Could not publish — please try again');
+    } finally {
+      btn.disabled = false; btn.style.opacity = ''; btn.innerHTML = prevHtml;
+    }
+  }
+  document.getElementById('uploadProfileBtn').addEventListener('click', publishProfile);
 
   async function uploadFile(file, target){
     const fd = new FormData(); fd.append('file', file); fd.append('target', target);
@@ -1750,6 +1798,7 @@
     if(PROFILE.bio){ document.getElementById('bioDisplay').textContent=PROFILE.bio; document.getElementById('bioInput').value=PROFILE.bio; }
     window.__pubUrl = PROFILE.username ? `secretxperience.eu/c/${PROFILE.username}` : 'secretxperience.eu/creators';
     document.getElementById('shareUrl').value = window.__pubUrl;
+    setLiveStatus();
 
     // Config-driven UI
     if(CONFIG.theme){ theme = Object.assign({}, defaults, CONFIG.theme);

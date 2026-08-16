@@ -53,7 +53,7 @@ function computeThemeVars(theme: any, accent: string): React.CSSProperties | nul
   return vars
 }
 
-export default function PublicProfile({ creator, viewer }: { creator: PublicCreator; viewer: Viewer }) {
+export default function PublicProfile({ creator, viewer, draft = false }: { creator: PublicCreator; viewer: Viewer; draft?: boolean }) {
   const cfg = creator.config || {}
   const accent = (cfg.theme && typeof cfg.theme.accent === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(cfg.theme.accent)) ? cfg.theme.accent : '#c5a05a'
   const sections = cfg.sections || {}
@@ -210,6 +210,11 @@ export default function PublicProfile({ creator, viewer }: { creator: PublicCrea
 
   return (
     <div className="cp" style={{ ['--acc' as any]: accent, ...(themeVars || {}) }}>
+      {draft && (
+        <div style={{ background: '#3a2a00', color: '#ffd98a', textAlign: 'center', padding: '10px 16px', fontSize: 13, fontFamily: "var(--sans,'Poppins',sans-serif)", borderBottom: '1px solid rgba(255,217,138,.25)' }}>
+          Draft preview — this profile isn’t public yet. Open your Studio and click <b>Upload profile</b> to make it live.
+        </div>
+      )}
       <style dangerouslySetInnerHTML={{ __html: `
         .cp{min-height:100vh;background-color:var(--bg,#080612);background-image:var(--bg-image,none);background-attachment:fixed;color:var(--t,#ece8e1);font-family:var(--sans,'Poppins',sans-serif)}
         .cp a{color:inherit}

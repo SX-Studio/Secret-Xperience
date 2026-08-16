@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic'
 export async function generateMetadata({ params }: { params: { username: string } }): Promise<Metadata> {
   const c = await getPublicCreator(params.username)
   if (!c) return { title: 'Creator not found · SecretXperience' }
+  if ((c.config as any)?.published !== true) return { title: 'Creator not found · SecretXperience', robots: { index: false, follow: false } }
   const desc = c.headline || c.bio || `Follow ${c.full_name} on SecretXperience.`
   const title = `${c.full_name} (@${c.username}) · SecretXperience`
   return {
@@ -35,6 +36,13 @@ export default async function CreatorPublicPage({ params }: { params: { username
   )
   const { data: { session } } = await supabase.auth.getSession()
 
+  // Publish gate: a profile is only visible to the public once the creator has
+  // clicked "Upload profile" in the studio (config.published === true). The creator
+  // themselves can always view their own page — as a draft preview when unpublished.
+  const published = (creator.config as any)?.published === true
+  const selfViewing = !!session && session.user.id === creator.id
+  if (!published && !selfViewing) notFound()
+
   let isSelf = false, isFollowing = false, viewerBalance = 0
   let subscription: { tierName: string; currentPeriodEnd: string; cancelAtPeriodEnd: boolean } | null = null
   if (session) {
@@ -54,6 +62,7 @@ export default async function CreatorPublicPage({ params }: { params: { username
     <PublicProfile
       creator={creator}
       viewer={{ loggedIn: !!session, isSelf, isFollowing, balance: viewerBalance, subscription }}
+      draft={!published}
     />
   )
 }

@@ -20,7 +20,15 @@ export interface Post {
 }
 
 type Creator = NonNullable<Post['creator']>
-type Entry = { c: Creator; created_at: string; media: string }
+export interface DirCreator {
+  id: string
+  full_name: string | null
+  username: string | null
+  avatar_url: string | null
+  verified: boolean
+  headline?: string | null
+}
+type Entry = { c: Creator; created_at: string | null; media: string; headline?: string | null }
 
 function timeAgo(iso: string) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
@@ -37,13 +45,14 @@ const BROWSE = [
   { key: 'video', label: 'Video', icon: '▷' },
 ] as const
 
-function Card({ e, i }: { e: Entry; i: number }) {
+function Card({ e, i, isNew }: { e: Entry; i: number; isNew: boolean }) {
   const c = e.c
   const name = c.full_name || c.username || 'Creator'
   const href = c.username ? `/c/${c.username}` : `/profile/${c.id}`
+  const sub = e.created_at ? `Posted ${timeAgo(e.created_at)}` : (e.headline ? String(e.headline).slice(0, 40) : 'View profile')
   return (
     <Link href={href} className="cf-card" style={{ animationDelay: `${Math.min(i, 16) * 45}ms` }}>
-      <span className="cf-tag">NEW</span>
+      {isNew && <span className="cf-tag">NEW</span>}
       <span className="cf-fav">♡</span>
       <div className="cf-ph" style={c.avatar_url ? { backgroundImage: `url(${c.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
         {!c.avatar_url && name.slice(0, 1).toUpperCase()}
@@ -51,13 +60,13 @@ function Card({ e, i }: { e: Entry; i: number }) {
       <div className="cf-ov" />
       <div className="cf-meta">
         <div className="cf-nm">{name} {c.verified && <i className="ti ti-rosette-discount-check-filled" style={{ fontSize: '13px', color: 'var(--goldd)' }} />}</div>
-        <div className="cf-sub">Posted {timeAgo(e.created_at)}</div>
+        <div className="cf-sub">{sub}</div>
       </div>
     </Link>
   )
 }
 
-export default function CreatorFeed({ posts }: { posts: Post[] }) {
+export default function CreatorFeed({ posts, directory = [] }: { posts: Post[]; directory?: DirCreator[] }) {
   const [allPosts, setAllPosts] = useState<Post[]>(posts)
   const [q, setQ] = useState('')
   const [browse, setBrowse] = useState<'all' | 'photo' | 'video'>('all')
@@ -81,25 +90,41 @@ export default function CreatorFeed({ posts }: { posts: Post[] }) {
     return () => { alive = false; clearInterval(iv) }
   }, [])
 
+  // Every published creator is a base entry; latest-post info (recency + media type)
+  // is overlaid on top so posting creators get a NEW badge and media filter.
   const creators = useMemo(() => {
     const map = new Map<string, Entry>()
+    for (const d of directory) {
+      const c: Creator = { id: d.id, full_name: d.full_name, username: d.username, avatar_url: d.avatar_url, verified: d.verified, external_links: null }
+      map.set(d.id, { c, created_at: null, media: 'image', headline: d.headline })
+    }
     for (const p of allPosts) {
       if (!p.creator) continue
-      if (!map.has(p.creator.id)) map.set(p.creator.id, { c: p.creator, created_at: p.created_at, media: p.media_type || 'image' })
+      const prev = map.get(p.creator.id)
+      if (prev) {
+        // Keep the richest info: newest post wins for recency/media, keep dir headline.
+        if (!prev.created_at || +new Date(p.created_at) > +new Date(prev.created_at)) {
+          prev.c = { ...prev.c, ...p.creator }
+          prev.created_at = p.created_at
+          prev.media = p.media_type || 'image'
+        }
+      } else {
+        map.set(p.creator.id, { c: p.creator, created_at: p.created_at, media: p.media_type || 'image' })
+      }
     }
     return Array.from(map.values())
-  }, [allPosts])
+  }, [allPosts, directory])
 
   const term = q.trim().toLowerCase()
-  let shown = creators.filter(({ c, created_at, media }) => {
+  let shown = creators.filter(({ c, media }) => {
     if (browse === 'photo' && media === 'video') return false
     if (browse === 'video' && media !== 'video') return false
     if (term) return (c.username || '').toLowerCase().includes(term) || (c.full_name || '').toLowerCase().includes(term)
-    return now - new Date(created_at).getTime() <= TWO_HOURS
+    return true
   })
   shown = sort === 'az'
     ? [...shown].sort((a, b) => (a.c.full_name || a.c.username || '').localeCompare(b.c.full_name || b.c.username || ''))
-    : [...shown].sort((a, b) => +new Date(b.created_at) - +new Date(a.created_at))
+    : [...shown].sort((a, b) => (b.created_at ? +new Date(b.created_at) : 0) - (a.created_at ? +new Date(a.created_at) : 0))
 
   return (
     <div className="cf">
@@ -159,14 +184,14 @@ export default function CreatorFeed({ posts }: { posts: Post[] }) {
           {shown.length === 0 ? (
             <div className="cf-empty">
               <div style={{ fontSize: '28px', marginBottom: '.5rem' }}>✦</div>
-              <div style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '.35rem' }}>{term ? 'No creator found' : 'No new creators right now'}</div>
+              <div style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '.35rem' }}>{term ? 'No creator found' : 'No creators yet'}</div>
               <p style={{ fontSize: '13.5px', color: 'var(--t3)', maxWidth: '340px', margin: '0 auto', lineHeight: 1.6 }}>
-                {term ? 'Try another username.' : 'Creators appear here for 2 hours after they post. Check back soon.'}
+                {term ? 'Try another username.' : 'Creators appear here once they publish their profile. Check back soon.'}
               </p>
             </div>
           ) : (
             <div className="cf-grid">
-              {shown.map((e, i) => <Card key={e.c.id} e={e} i={i} />)}
+              {shown.map((e, i) => <Card key={e.c.id} e={e} i={i} isNew={!!e.created_at && now - new Date(e.created_at).getTime() <= TWO_HOURS} />)}
             </div>
           )}
         </div>

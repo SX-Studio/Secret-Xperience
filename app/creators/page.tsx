@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import Link from 'next/link'
 import CreatorsGrid from './CreatorsGrid'
@@ -52,9 +53,37 @@ export default async function CreatorsPage() {
     .select('id, caption, media_url, media_type, created_at, creator:profiles!creator_id(id, full_name, username, avatar_url, verified, external_links)')
     .eq('active', true)
     .order('created_at', { ascending: false })
-    .limit(40)
+    .limit(200)
 
   const posts = (postRows || []) as any[]
+
+  // Full directory of published content-creator profiles (role = 'creator' and
+  // they have clicked "Upload profile" → studio_config.published). Read with the
+  // service role so every creator shows regardless of the viewer's RLS scope.
+  let directory: any[] = []
+  if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    const admin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    )
+    const { data: creatorRows } = await admin
+      .from('profiles')
+      .select('id, full_name, username, avatar_url, verified, headline, studio_config')
+      .eq('role', 'creator')
+      .not('username', 'is', null)
+      .limit(1000)
+    directory = (creatorRows || [])
+      .filter((c: any) => c.username && c.studio_config?.published === true)
+      .map((c: any) => ({
+        id: c.id,
+        full_name: c.full_name,
+        username: c.username,
+        avatar_url: c.avatar_url,
+        verified: !!c.verified,
+        headline: c.headline || '',
+      }))
+  }
 
   return (
     <>
@@ -129,8 +158,8 @@ export default async function CreatorsPage() {
                 <span style={{ fontSize: '11.5px', color: 'var(--t3)', letterSpacing: '0.05em', marginTop: '8px' }}>VERIFIED CREATORS</span>
               </div>
               <div className="cr-panel cr-mini" style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <b>2h</b>
-                <span style={{ fontSize: '11.5px', color: 'var(--t3)', letterSpacing: '0.05em', marginTop: '8px' }}>FRESH ROTATION · LIVE FEED</span>
+                <b>{directory.length || 0}</b>
+                <span style={{ fontSize: '11.5px', color: 'var(--t3)', letterSpacing: '0.05em', marginTop: '8px' }}>PUBLISHED CREATOR PROFILES</span>
               </div>
             </div>
           </div>
@@ -138,12 +167,12 @@ export default async function CreatorsPage() {
           {/* LATEST — marketplace grid with filter rail + search (in CreatorFeed) */}
           <div id="latest" style={{ marginBottom: '3rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.1rem', flexWrap: 'wrap', gap: '10px' }}>
-              <h2 style={{ fontFamily: 'var(--serif)', fontSize: '27px', fontWeight: 500, margin: 0 }}>Latest from creators</h2>
+              <h2 style={{ fontFamily: 'var(--serif)', fontSize: '27px', fontWeight: 500, margin: 0 }}>All creators</h2>
               <Link href="/creators/studio" className="cr-cta-btn" style={{ padding: '9px 16px', fontSize: '13px' }}>
                 <i className="ti ti-plus" /> Post content
               </Link>
             </div>
-            <CreatorFeed posts={posts} />
+            <CreatorFeed posts={posts} directory={directory} />
           </div>
 
           {/* OnlyFans directory — inherits the neon palette */}

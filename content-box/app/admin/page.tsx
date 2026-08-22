@@ -6,6 +6,7 @@ import { verifyStepUp, STEPUP_COOKIE } from '@/lib/stepup';
 import type { Role } from '@/lib/roles';
 import BoxesPanel, { type BoxRow } from './BoxesPanel';
 import { ModerationPanel, KycPanel, type QueueItem, type KycItem } from './ReviewPanels';
+import PayoutsPanel, { type PayoutItem } from './PayoutsPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -104,6 +105,19 @@ export default async function AdminDashboard() {
     };
   });
 
+  const { data: payoutData } = await admin
+    .from('payout_requests')
+    .select('id, amount_tokens, requested_at, creator:profiles!payout_requests_creator_id_fkey(public_code)')
+    .eq('status', 'requested')
+    .order('requested_at', { ascending: true })
+    .limit(50);
+
+  const payouts: PayoutItem[] = (payoutData ?? []).map((p) => {
+    const c = p.creator as { public_code: string } | { public_code: string }[] | null;
+    const code = Array.isArray(c) ? c[0]?.public_code ?? null : c?.public_code ?? null;
+    return { id: p.id, creator_code: code, amount_tokens: p.amount_tokens, requested_at: p.requested_at };
+  });
+
   const { data: recent } = await admin
     .from('audit_log')
     .select('id, actor_code, action, target_type, target_id, result, created_at')
@@ -141,6 +155,7 @@ export default async function AdminDashboard() {
 
       <ModerationPanel items={queue} />
       <KycPanel items={kycItems} />
+      <PayoutsPanel items={payouts} />
       <BoxesPanel boxes={boxes} />
 
       <h2 className="serif" style={{ fontSize: 20, fontWeight: 600, margin: '0 0 10px' }}>

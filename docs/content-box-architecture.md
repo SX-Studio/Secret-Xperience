@@ -196,11 +196,11 @@ Viewing ──▶ rental valid?  ──▶ server mints short-lived signed URL t
 - **Private buckets only.** No public URLs, ever. Originals reachable solely via short-lived signed URLs after an access check.
 - **Direct-to-storage upload** (client → Supabase Storage with a signed upload URL), bypassing the Vercel 4.5 MB body limit — the exact fix already learned in SX.
 - **Blur preview + thumbnail generated server-side** and stored as separate derived files; the feed only ever serves blur/thumb.
-- **Video:** route to **Cloudflare Stream / Mux** for transcode + signed playback (no permanent URL). MVP can ship **images-first** and add video in Phase 2.
-- Checksums for dedup + tamper detection; CSAM scan status stored per file.
+- **Video (in MVP, Phase 2):** route to **Cloudflare Stream / Mux** for transcode + signed playback (no permanent URL). Video files never hit Supabase Storage as originals — they go straight to the streaming provider, which mints short-lived signed playback tokens after a rental check.
+- Checksums for dedup + tamper detection; CSAM scan status stored per file. **Video is CSAM/AI-screened too** (Hive/Rekognition support video) before it's viewable.
 
 ### Why
-Private-by-default + signed-URL-on-demand is the only model that satisfies "user never gets a permanent public URL." Direct upload avoids the 413 that bit SX. Images-first keeps MVP small; video's signed-playback complexity is isolated to its own provider.
+Private-by-default + signed-URL-on-demand is the only model that satisfies "user never gets a permanent public URL." Direct upload avoids the 413 that bit SX. Video is in the MVP per your decision; its signed-playback complexity is isolated to the streaming provider so it doesn't leak into the rest of the stack.
 
 ---
 
@@ -249,16 +249,16 @@ Every item is either a concept requirement, a verified compliance mandate, or a 
 |---|---|---|
 | **0. Foundations** | New Supabase + Vercel project, schema + RLS, auth (phone/OTP), roles, audit log skeleton | A user can sign up via OTP; RLS blocks cross-role reads |
 | **1. Boxes & invitations** | Create box, box admin, single-use SMS invitations (creator + user), join flow | Admin invites a creator who joins via SMS link |
-| **2. Creator upload + T&S gate** | Direct upload, processing pipeline, **CSAM scan + AI screen + KYC-before-publish**, blur/thumb, moderation statuses | Unverified creator cannot publish; CSAM/HIGH content is blocked; approved content shows blurred |
-| **3. Wallet + token purchase** | Ledger, user wallet, **Verotel** token purchase + webhook, idempotency | User buys tokens; balance = ledger; duplicate webhook is a no-op |
+| **2. Creator upload + T&S gate (images + video)** | Direct upload for photos **and video** (Cloudflare Stream/Mux transcode + signed playback), processing pipeline, **CSAM scan + AI screen + KYC-before-publish**, blur/thumb, moderation statuses | Unverified creator cannot publish; CSAM/HIGH content is blocked; approved image+video shows blurred; video has no permanent URL |
+| **3. Wallet + token purchase** | Ledger, user wallet, **Verotel** token purchase + webhook, idempotency, **VAT-at-redemption accounting hooks** | User buys tokens; balance = ledger; duplicate webhook is a no-op; VAT captured on rental |
 | **4. Rental engine** | Single + cart rental, per-item 24h timer, My Rentals, lazy check + pg_cron sweep, signed-URL access | Rented content unlocks; access denied at expiry even if cron is late |
-| **5. Creator earnings + payouts** | Creator wallet (pending/available/lifetime), commission split, **€50 Paxum payout** request | Rental credits creator net of commission; payout blocked under €50 |
+| **5. Creator earnings + payouts** | Creator wallet (pending/available/lifetime), commission split (20% baseline), **€50 Paxum payout** request | Rental credits creator net of commission; payout blocked under €50 |
 | **6. Moderation console + reports** | Admin queue, decisions, reports triage, audit viewer, 7-day takedown | Operator reviews original (audited), approves/rejects; report → takedown works |
-| **7. Hardening + launch** | Rate limits, monitoring, backups/DR test, security review, load check | Security review passes; DR restore verified |
-| **Later (not MVP)** | Video (Stream/Mux), crypto rail, SX integration, chat/social/likes | — |
+| **7. Hardening + launch** | Rate limits, monitoring, backups/DR test, security review, load check, **OSS/VAT + DAC7 reporting export** | Security review passes; DR restore verified; VAT + creator-earnings reports exportable |
+| **Later (not MVP)** | Crypto rail (NOWPayments), SX integration, chat/social/likes | — |
 
 ### Why
-Ordered by dependency and risk: T&S/KYC lands **before** any content is buyable (Phase 2 before 3–4), so we never have unmoderated content or an unverified creator earning money. Money phases (3–5) come as a block so the ledger is proven before payouts.
+Ordered by dependency and risk: T&S/KYC lands **before** any content is buyable (Phase 2 before 3–4), so we never have unmoderated content or an unverified creator earning money. **Video is in the MVP (Phase 2)** per your decision — the signed-playback provider is isolated so it doesn't leak complexity into other phases. Money phases (3–5) come as a block so the ledger is proven before payouts.
 
 ---
 
@@ -273,8 +273,8 @@ Ordered by dependency and risk: T&S/KYC lands **before** any content is buyable 
 | KYC | **Veriff or Onfido** | Gov-ID + liveness (card-network mandate). |
 | CSAM | **Cloudflare CSAM tool (free)** + PhotoDNA/Thorn | Legal mandate. |
 | AI moderation | **Hive** (media) + **Anthropic API** (text) | Screening; humans decide. |
-| Video (Phase 2+) | **Cloudflare Stream** or **Mux** | Signed playback, no public URL. |
-| Payments in | **Verotel FlexPay** (+ NOWPayments crypto backup) | Verified to accept token/prepaid-credit adult-content model. |
+| Video (**in MVP, Phase 2**) | **Cloudflare Stream** or **Mux** | Signed playback, no public URL. In MVP per user decision. |
+| Payments in | **Verotel FlexPay** first; **CCBill + Segpay applications in parallel** (+ NOWPayments crypto backup later) | Verified to accept token/prepaid-credit adult-content model; parallel apps for redundancy/leverage per user decision. |
 | Payouts | **Paxum** (+ crypto) | Verified adult-creator payout rail; mainstream rails prohibit adult. |
 | Email | **Resend** | Existing. |
 | Monitoring | **Sentry** + Vercel analytics | Money/mod flows need alerting. |
@@ -284,12 +284,63 @@ Maximum reuse of the SX stack (lowest ops risk, fastest to ship) plus the specia
 
 ---
 
-## Open decisions for you (before Phase 1)
-1. **Confirm standalone Supabase/Vercel project** for Content Box (recommended) vs. sharing SX infra.
-2. **Next.js version** for the fresh project (recommend latest stable, not 13.5).
-3. **Images-first MVP** (defer video to Phase 2) — recommended to shrink MVP. OK?
-4. **Primary processor to apply to first** — Verotel (we have a relationship) vs. Segpay/CCBill in parallel.
-5. **Commission %** default (e.g. 20%)?
-6. **Legal review** for payouts/token model + creator agreement template — who owns this? (Gating, non-code.)
+## 13. Tax, VAT & fee economics
+> Researched/verified 2026-08-22. **Not tax advice** — the platform must engage a Belgian accountant experienced in digital/adult + cross-border VAT before launch. This is gating, non-code. "What the source said" vs "our interpretation" separated per the accuracy rule.
 
-**Next step:** on your approval (and answers to the above where they affect Phase 1), begin **Phase 0 — Foundations**, following the phased build rule (analyze → show plan → build → test → security → report → stop).
+### VAT — the platform is likely the "deemed supplier"
+*Source (CJEU C-695/20 Fenix/OnlyFans, 2023 + Art. 9a Reg. 282/2011):* where a platform authorises the supply, sets the T&Cs, and invoices the end user, the **platform is the deemed supplier of the electronically supplied service**, and **VAT liability extends to the total consideration paid by the user, not just the retained commission.**
+*Interpretation:* Content Box (we set terms, authorise publishing, invoice users) is almost certainly the deemed supplier → **Content Box charges and remits VAT on the full rental price.** Register for **VAT OSS in Belgium** to remit each EU country's rate via one return.
+
+### Tokens = multi-purpose vouchers → VAT at redemption
+*Source (EU Voucher Directive 2016/1065, in force 2019):* a **multi-purpose voucher** (VAT regime unknown at issue — usable across creators/prices/countries) is **not subject to VAT on transfer; VAT is due only on redemption** of the actual service.
+*Interpretation:* our tokens are MPVs → **selling tokens is not a VAT event; VAT accrues when content is rented.** Ledger must capture VAT at the rental, by the buyer's country rate. (Design hook added to Phase 3.)
+
+### VAT rate = buyer's country (destination)
+Belgian buyer 21%; other EU buyers their local rate (17–27%); non-EU different rules. OSS handles remittance.
+
+### Creator income tax + DAC7 reporting
+- Creators are independent contractors: **platform pays net share, does NOT withhold** their income tax. Each creator declares income in their own country.
+- *Source (DAC7 / Dir. (EU) 2021/514, enforced in Belgium 2026; FPS Finance DPI-DAC7):* platforms must run due diligence and **report reportable sellers'** identity + income to tax authorities (EU threshold €2,000 or 30 transactions/yr).
+- *Interpretation / open nuance:* DAC7's "relevant activities" are goods/immovable-property/transport/**personal services**. Whether selling one's **own pre-made content** is a "personal service" is genuinely debatable (custom-request content is more clearly in scope than passive sales) — **the accountant must confirm scope.** Regardless, **collect creator tax IDs + address at KYC** (near-zero cost, needed for DAC7 and/or the creator agreement).
+
+### Fee waterfall & the commission-base decision
+Illustrative only (Belgian user, 21% VAT, 250-token / €2.50 rental):
+
+| Step | Amount |
+|---|---|
+| User pays (VAT-inclusive) | €2.50 |
+| − VAT 21% (remitted via OSS) | −€0.43 → **€2.07 net** |
+| − Payment processing (Verotel ~13–14% + 10% rolling reserve) | ~−€0.35 |
+| **Pool to split** | **~€1.72** |
+| Creator / platform split (base = **decision below**) | — |
+
+**Unresolved design decision — what base does the 20% apply to?**
+- (a) 20% of **net-of-VAT**, processing fees **shared or passed to creator** → platform keeps a viable margin.
+- (b) Creator 80% of **gross**, platform absorbs VAT + fees from its 20% → platform nets **~6% or less** after Verotel — likely **too thin** to cover CSAM/KYC/AI-mod/hosting/support.
+- (c) Fees off the top **before** split (recommended to model first); or route volume to crypto (much lower fees) to protect margin.
+
+*Recommendation:* treat **20% as the platform floor**, take **processing fees off the top before the split**, and run a proper unit-economics model with the accountant before committing pricing. Commission is stored per-box in `boxes.commission_bps` so it's configurable.
+
+### Belgium corporate tax
+Platform profit subject to **Belgian corporate income tax (~25%)** — normal, budget for it.
+
+### Sources
+- Deemed supplier / OnlyFans: https://www.bdo.global/en-gb/insights/tax/indirect-tax/european-union-cjeu-holds-online-platform-operator-liable-for-vat-collected-from-customers · https://vatabout.com/cjeu-clarifies-vat-liability-of-digital-platforms-fenix-international-onlyfans-case-analysis
+- Voucher VAT (SPV vs MPV): https://cms.law/en/int/publication/vat-entry-in-force-of-the-directive-regarding-the-treatment-of-vouchers-for-vat-purposes · https://www.grantthornton.nl/en/insights-en/topics/tax/vat/ecj-clarifies-vat-rules-applicable-to-vouchers/
+- DAC7 (Belgium): https://finance.belgium.be/en/E-services/dac7 · https://www.ey.com/en_be/technical/financial-services/financial-services-alerts/belgian-tax-administration-publishes-dac7-guidelines
+
+---
+
+## Decisions locked (2026-08-22)
+1. **Infra:** standalone Supabase + Vercel project (not shared with SX). ✓
+2. **Video:** **in the MVP** (Phase 2), via Cloudflare Stream/Mux signed playback. ✓
+3. **Processors:** **Verotel first, CCBill + Segpay applications in parallel**; crypto (NOWPayments) later. ✓
+4. **Commission:** **20% baseline**, per-box configurable — *but* treat as platform floor and finalise the fee/VAT waterfall & commission base with the accountant. ✓ (with follow-up)
+
+## Still open (before/around Phase 1 — mostly non-code, gating)
+- **Next.js version** for the fresh project (recommend latest stable, not 13.5).
+- **Tax/VAT engagement:** appoint a Belgian accountant (digital/adult, cross-border VAT + OSS + DAC7). Confirm deemed-supplier stance, MPV treatment, DAC7 scope, and the commission/fee waterfall & base.
+- **Legal:** creator agreement template + consent-record model (card-network mandate), token/voucher terms, payout/money-transmission review.
+- **Commission base** final call (options a/b/c in §13) once unit economics are modelled.
+
+**Next step:** on your approval, begin **Phase 0 — Foundations**, following the phased build rule (analyze → show plan → build → test → security → report → stop). The tax/legal items are gating for launch but do **not** block Phase 0–2 engineering (schema, auth, boxes, upload, T&S) — we can build those in parallel with the accountant/lawyer conversations, and wire the exact VAT/commission math in Phase 3.

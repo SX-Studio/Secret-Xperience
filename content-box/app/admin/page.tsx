@@ -7,6 +7,7 @@ import type { Role } from '@/lib/roles';
 import BoxesPanel, { type BoxRow } from './BoxesPanel';
 import { ModerationPanel, KycPanel, type QueueItem, type KycItem } from './ReviewPanels';
 import PayoutsPanel, { type PayoutItem } from './PayoutsPanel';
+import ReportsPanel, { type ReportItem } from './ReportsPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -118,6 +119,15 @@ export default async function AdminDashboard() {
     return { id: p.id, creator_code: code, amount_tokens: p.amount_tokens, requested_at: p.requested_at };
   });
 
+  const { data: reportData } = await admin
+    .from('reports')
+    .select('id, target_type, target_id, reason, details, urgent, created_at, due_at')
+    .in('status', ['open', 'reviewing'])
+    .order('urgent', { ascending: false })
+    .order('due_at', { ascending: true })
+    .limit(50);
+  const reports: ReportItem[] = (reportData ?? []) as ReportItem[];
+
   const { data: recent } = await admin
     .from('audit_log')
     .select('id, actor_code, action, target_type, target_id, result, created_at')
@@ -153,6 +163,7 @@ export default async function AdminDashboard() {
         <Stat label="Audit events" value={auditCount ?? 0} />
       </section>
 
+      <ReportsPanel items={reports} />
       <ModerationPanel items={queue} />
       <KycPanel items={kycItems} />
       <PayoutsPanel items={payouts} />

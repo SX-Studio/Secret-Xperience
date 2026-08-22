@@ -145,4 +145,4 @@ Payments-in and moderation are solvable; those three are gating.
 - Visa/Mastercard UGC rules & age verification: https://www.austreme.com/en/mastercard-new-rules-adult-content/ · https://mobiuspay.com/blog/mastercard-adult-content-rules · https://adent.io/blog/age-verification-for-onlyfans-like-platforms/
 
 ## Next step when we resume
-Produce the section-33 architecture package (no code) — **fold this Providers analysis into it** (system architecture, media storage, T&S, security, and MVP roadmap sections). Then stop for approval before Phase 1.
+Architecture package produced → `content-box-architecture.md` (Providers analysis folded in; decisions locked: standalone project, video in MVP, Verotel+CCBill+Segpay parallel, 20% commission floor; tax/VAT/DAC7 section added). Frontend design/UI adopted from the interactive prototype → `content-box-frontend.md` (Artifact `1b69c5da-0515-40b6-b5d2-6b45739cf8ee`). **Awaiting approval to begin Phase 0 (Foundations).**

@@ -39,6 +39,7 @@ export default async function BoxPage({ params }: { params: Promise<{ code: stri
     .from('box_members')
     .select('id')
     .eq('box_id', box.id)
+    .eq('profile_id', profile.id)
     .eq('status', 'active')
     .maybeSingle();
   if (!membership && profile.role !== 'platform_admin') notFound();

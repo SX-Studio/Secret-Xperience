@@ -76,6 +76,39 @@ export default function Page() {
         ))}
       </ul>
 
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(130px,1fr))', gap: 10, margin: '4px 0 28px' }}>
+        {[
+          ['Boxes', '/boxes'],
+          ['Wallet', '/wallet'],
+          ['My Rentals', '/rentals'],
+          ['Drop', '/drop'],
+          ['Earnings', '/earnings'],
+          ['Admin', '/admin'],
+        ].map(([label, href]) => (
+          <a
+            key={href}
+            href={href}
+            style={{
+              background: 'var(--surf)',
+              border: '1px solid var(--line)',
+              borderRadius: 12,
+              padding: '14px 16px',
+              boxShadow: 'var(--shadow)',
+              textDecoration: 'none',
+              color: 'var(--ink)',
+              fontWeight: 600,
+              fontSize: 14,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            {label}
+            <span style={{ color: 'var(--ember)' }}>→</span>
+          </a>
+        ))}
+      </div>
+
       <div
         style={{
           background: 'var(--surf)',

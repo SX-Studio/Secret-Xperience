@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { getProfile } from '@/lib/session';
 import { purchaseCart } from '@/lib/rentals';
+import { checkRateLimit, HOUR } from '@/lib/ratelimit';
 import { writeAudit } from '@/lib/audit';
 
 // Rent one item or a cart. One atomic wallet transaction: if any item can't be
@@ -8,6 +9,10 @@ import { writeAudit } from '@/lib/audit';
 export async function POST(req: Request) {
   const profile = await getProfile();
   if (!profile) return new Response('Unauthorized', { status: 401 });
+
+  if (!(await checkRateLimit(`rent:${profile.id}`, 120, HOUR))) {
+    return new Response('Too many requests, slow down', { status: 429 });
+  }
 
   const body = (await req.json()) as {
     contentId?: string;

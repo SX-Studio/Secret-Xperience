@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { canAdminBox } from '@/lib/boxAuth';
 import { normalizePhone, looksLikePhone } from '@/lib/phone';
 import { generateInviteToken, hashInviteToken, inviteUrl, INVITE_TTL_MS } from '@/lib/invitations';
+import { checkRateLimit, HOUR } from '@/lib/ratelimit';
 import { writeAudit } from '@/lib/audit';
 
 const INVITE_ROLES = new Set(['box_admin', 'creator', 'user']);
@@ -12,6 +13,10 @@ const INVITE_ROLES = new Set(['box_admin', 'creator', 'user']);
 export async function POST(req: Request) {
   const profile = await getProfile();
   if (!profile) return new Response('Unauthorized', { status: 401 });
+
+  if (!(await checkRateLimit(`inv:${profile.id}`, 40, HOUR))) {
+    return new Response('Too many invitations, try later', { status: 429 });
+  }
 
   const body = (await req.json()) as { boxId?: string; phone?: string; role?: string };
   const boxId = body?.boxId ?? '';

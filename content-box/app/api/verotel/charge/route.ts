@@ -2,12 +2,17 @@ import { getProfile } from '@/lib/session';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { findPackage } from '@/lib/packages';
 import { verotelConfig, buildStartOrderUrl } from '@/lib/verotel';
+import { checkRateLimit, HOUR } from '@/lib/ratelimit';
 import { writeAudit } from '@/lib/audit';
 
 // Create a pending token order and return a signed Verotel FlexPay URL.
 export async function POST(req: Request) {
   const profile = await getProfile();
   if (!profile) return new Response('Unauthorized', { status: 401 });
+
+  if (!(await checkRateLimit(`charge:${profile.id}`, 20, HOUR))) {
+    return new Response('Too many requests, try later', { status: 429 });
+  }
 
   const { packageId } = (await req.json()) as { packageId?: string };
   const pkg = packageId ? findPackage(packageId) : undefined;

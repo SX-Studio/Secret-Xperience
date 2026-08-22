@@ -14,7 +14,8 @@ async function run(req: Request): Promise<Response> {
   if (!secret) return new Response('Disabled', { status: 503 });
 
   const url = new URL(req.url);
-  const provided = req.headers.get('x-cron-secret') || url.searchParams.get('secret');
+  const bearer = (req.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+  const provided = req.headers.get('x-cron-secret') || url.searchParams.get('secret') || bearer;
   if (provided !== secret) return new Response('Forbidden', { status: 403 });
 
   const expired = await expireRentals();

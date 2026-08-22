@@ -1,5 +1,6 @@
 import { getProfile } from '@/lib/session';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { checkRateLimit, HOUR } from '@/lib/ratelimit';
 import { writeAudit } from '@/lib/audit';
 
 // Creator submits KYC. Consent is mandatory (card-network requirement).
@@ -8,6 +9,10 @@ import { writeAudit } from '@/lib/audit';
 export async function POST(req: Request) {
   const profile = await getProfile();
   if (!profile) return new Response('Unauthorized', { status: 401 });
+
+  if (!(await checkRateLimit(`kyc:${profile.id}`, 10, HOUR))) {
+    return new Response('Too many attempts, try later', { status: 429 });
+  }
 
   const body = (await req.json()) as { provider?: string; providerRef?: string; consent?: boolean };
   if (body?.consent !== true) return new Response('Consent required', { status: 400 });

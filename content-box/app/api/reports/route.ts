@@ -1,5 +1,6 @@
 import { getProfile } from '@/lib/session';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { checkRateLimit, HOUR } from '@/lib/ratelimit';
 import { writeAudit } from '@/lib/audit';
 
 const TARGETS = new Set(['content', 'profile', 'box']);
@@ -10,6 +11,10 @@ const URGENT = new Set(['csam', 'nonconsensual', 'illegal']);
 export async function POST(req: Request) {
   const profile = await getProfile();
   if (!profile) return new Response('Unauthorized', { status: 401 });
+
+  if (!(await checkRateLimit(`report:${profile.id}`, 20, HOUR))) {
+    return new Response('Too many reports, try later', { status: 429 });
+  }
 
   const body = (await req.json()) as {
     targetType?: string;

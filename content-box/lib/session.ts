@@ -36,3 +36,13 @@ export async function requireRole(...allowed: Role[]): Promise<Profile> {
   if (!allowed.includes(profile.role)) throw new Error('forbidden');
   return profile;
 }
+
+// Returns the active platform_admin profile, or null. Used to gate /admin and
+// the admin API routes without throwing (callers decide 404 vs 401).
+export async function getAdminProfile(): Promise<Profile | null> {
+  const profile = await getProfile();
+  if (!profile) return null;
+  if (profile.status !== 'active') return null;
+  if (profile.role !== 'platform_admin') return null;
+  return profile;
+}

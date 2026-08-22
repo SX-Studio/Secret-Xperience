@@ -144,5 +144,10 @@ Payments-in and moderation are solvable; those three are gating.
 - NOWPayments crypto policy: https://makeanapplike.com/blogs/fintech/adult-content-businesses-and-nowpayments/ · https://nowpayments.io/all-solutions/adult
 - Visa/Mastercard UGC rules & age verification: https://www.austreme.com/en/mastercard-new-rules-adult-content/ · https://mobiuspay.com/blog/mastercard-adult-content-rules · https://adent.io/blog/age-verification-for-onlyfans-like-platforms/
 
-## Next step when we resume
-Architecture package produced → `content-box-architecture.md` (Providers analysis folded in; decisions locked: standalone project, video in MVP, Verotel+CCBill+Segpay parallel, 20% commission floor; tax/VAT/DAC7 section added). Frontend design/UI adopted from the interactive prototype → `content-box-frontend.md` (Artifact `1b69c5da-0515-40b6-b5d2-6b45739cf8ee`). **Awaiting approval to begin Phase 0 (Foundations).**
+## Build progress
+- **Phase 0 — Foundations ✅** (`content-box/`): Next.js 15 + TS scaffold, Supabase clients (browser/server/hardened admin), `0001_foundations.sql` (profiles, roles, append-only audit_log, RLS, privilege-escalation guard, auto-profile trigger), roles/audit/session helpers, design tokens ported from prototype. Validated vs real Postgres + typecheck + build.
+- **Phase 1 — Auth + Admin fingerprint gate ✅** (`0002_auth_admin.sql` + app): phone-OTP login (`/login`); **admin allowlist seeded with +32477704740 & +32467685669** → auto `platform_admin` on login; **WebAuthn passkey (fingerprint)** register/authenticate; step-up cookie; `/admin` gated (404 for non-admins, fingerprint step-up required) with dashboard (role counts + audit log). Validated vs Postgres + typecheck + build + step-up unit tests. **Live WebAuthn needs post-deploy verification on the HTTPS domain + a real device.**
+- **Deferred to next phase:** Boxes & invitations (was Phase 1 in roadmap), then upload + T&S (Phase 2), wallet/tokens (3), rentals (4), payouts (5), moderation console (6).
+
+### Owner provisioning still required before this runs live
+Standalone Supabase project + run `0001`/`0002`; standalone Vercel project on content24market.space; set env (see `content-box/.env.example`) incl. `NEXT_PUBLIC_RP_ID`, `ADMIN_STEPUP_SECRET`; enable Supabase **Phone** auth provider (+ an SMS provider). Then each admin: log in via OTP once, register a fingerprint on their device.

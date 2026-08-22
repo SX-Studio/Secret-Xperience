@@ -80,5 +80,69 @@ Do **not** build the whole app at once. Work **in phases**. For each phase: anal
 ## The pending first deliverable (section 33 of the master prompt) — NOT yet produced
 Before any code, the user asked for an architecture package: (1) system architecture, (2) DB ERD/description, (3) all user roles, (4) all screens, (5) API architecture, (6) wallet architecture, (7) rental engine architecture, (8) media storage architecture, (9) Trust & Safety architecture, (10) security architecture, (11) MVP roadmap, (12) tech stack proposal — each with rationale. **Then wait for approval before Phase 1.**
 
+## Providers (external services the platform needs)
+> Researched & verified via web search 2026-08-22. Accuracy rule applied: "what the source said" is separated from "our interpretation." Processor policies change — re-verify directly with each vendor before signing.
+
+### Core infrastructure (reuse SX stack)
+| Function | Pick | Why |
+|---|---|---|
+| Hosting / compute | **Vercel** | Existing stack; Next.js-native; content24market.space already points here. |
+| DB + Auth + Storage + cron | **Supabase** | Postgres (ledger), RLS (per-rental access), private buckets + signed URLs, pg_cron (24h expiry sweep) — four hard requirements in one vendor. |
+| Transactional email | **Resend** | Already wired in SX (invites, receipts, payout notices). |
+| Error/uptime monitoring | Sentry (or Vercel built-in) | Financial + moderation flows need alerting. |
+
+### Platform-specific
+| Function | Pick | Notes |
+|---|---|---|
+| SMS / OTP ⚠️ | **Twilio Verify** (alt: Bird/MessageBird, Vonage) | Phone activation + single-use invite tokens are core. Per-SMS cost + invite-spam is an attack surface — rate-limit hard. |
+| Video transcode + signed playback | **Cloudflare Stream** (cheaper) or **Mux** (stronger signed-token control) | Needed so video never has a permanent public URL. Images can stay on Supabase Storage + signed URLs. Not MVP-blocking if launching images-first. |
+| Object storage (later, at scale) | Cloudflare R2 / AWS S3 | Only if media volume outgrows Supabase; R2 has no egress fees. Not needed for MVP. |
+
+### ⚠️ Trust & Safety — non-negotiable for this content type
+| Function | Pick | Notes |
+|---|---|---|
+| CSAM detection | **Cloudflare CSAM Scanning Tool** (free), Thorn Safer, MS PhotoDNA | Legally mandatory. Hash-match every upload BEFORE it's viewable. |
+| AI content moderation | **Hive** or **AWS Rekognition** (image/video); **Anthropic API** (text) | Auto-screen → route UNCERTAIN/HIGH to human review. AI never the sole final decision (per spec). |
+| Creator age/ID verification (KYC) ⚠️ | **Veriff / Onfido / Persona / Yoti** | Gov-ID capture + liveness/selfie match for every uploader before first publish. This is a **card-network requirement**, not just best practice (see below). |
+
+### ⚠️ Money — payments IN and payouts OUT (the make-or-break)
+
+**Token purchase (money in) — VERIFIED:**
+- **Verotel / CardBilling (FlexPay)** — *Source:* Verotel/CardBilling accepts online adult entertainment, digital-goods sellers, and **"cam sites and other token-based systems to sell pre-paid credit."** *Interpretation:* Content Box IS a token/prepaid-credit adult-content model, so **Verotel fits here** — unlike the escorts-only constraint that blocks the multi-vertical SX site. We already have a live Verotel integration (SX website #136440) to build on. *Cost (source):* Premium FlexPay ≈ **13–14% fees**, **10% rolling reserve (6 mo)**, €1,000/wk processing req or €25/mo minimum.
+- **CCBill** — *Source:* "purpose-built for adult subscriptions, memberships, digital content, recurring billing." Prohibits extreme violence, incest, snuff, scat, mutilation, rape, and non-consensual/deepfake content. *Interpretation:* CCBill declined SX **escorts**, but a **content marketplace is squarely in its lane** — worth a parallel application. (Do NOT reuse the "CCBill = dead end" conclusion from SX; that was escort-specific.)
+- **Segpay** — *Source:* adult/cam/fan/dating processor; 24–72h approval post-KYC; weekly payouts. UGC merchants must submit a **detailed UGC procedure doc** (age/ID verification, pre-publish content review, real-time monitoring, anti-trafficking). *Interpretation:* viable alternative to Verotel/CCBill; the required UGC procedure doc aligns with what we're building anyway.
+- **Crypto (backup rail)** — **NOWPayments**. *Source:* legal adult content permitted (porn/cam/studios), 350+ coins, no mandatory verification; **BUT explicitly NO prostitution/escort services and no US residents.** *Interpretation:* good decline-proof backup for token purchase; the escort exclusion doesn't affect Content Box (it's content, not escort booking), but keep US users off crypto or geofence.
+
+**Creator payouts (money out) — VERIFIED, this is the harder half:**
+- **Paxum** — *Source:* specialized adult-content payout provider; 100+ countries, instant Paxum-to-Paxum, bulk payouts to performers, no signup/monthly/minimum-balance fees; faster + cheaper than international wire. *Interpretation:* **this solves the payout problem** — mainstream rails (Stripe Connect, PayPal, Wise) prohibit adult, so Paxum (or Cosmo Payment / crypto payout) is the realistic €50-threshold payout rail. Likely primary.
+- Alternatives: Verotel/CCBill/Segpay in-house pay-to-model programs, SEPA bank transfer, crypto payout.
+- **Still needs its own legal/compliance analysis before building** (money-transmission questions; tokens ≠ real currency without legal review).
+
+### ⚠️ Card-network compliance driver (Visa/Mastercard, 2026) — shapes the whole architecture
+This is a **requirement from Visa/Mastercard for UGC adult platforms**, not optional (any card processor we use enforces it):
+- **Every uploader** verified 18+ with **gov ID + liveness/selfie** BEFORE first publish (self-declaration not accepted in UK/FR/DE/IT).
+- **All content reviewed BEFORE publication** (matches our PENDING_REVIEW → APPROVED flow).
+- **Written consent** from everyone depicted in the content (uploaded, generated, or live).
+- **Written agreement** with every content provider (creator) prohibiting illegal activity + requiring consent records.
+- Process to **remove illegal/nonconsensual content within 7 business days**.
+*Architecture impact:* KYC provider + pre-publish moderation + a consent-record/creator-agreement store are **gating**, not nice-to-haves.
+
+### MVP minimum provider set
+**Have:** Vercel + Supabase + Resend. **Add:** Twilio (SMS/OTP) · Cloudflare CSAM (free) · Hive or Rekognition (AI mod) · Veriff/Onfido (creator KYC) · Verotel (token purchase) · Paxum (payouts). Crypto (NOWPayments) as backup rail.
+
+### De-risk FIRST, before any code (can kill the project)
+1. **Payout rail** (Paxum acceptance + legal/money-transmission review)
+2. **Creator age/ID verification** (card-network mandate)
+3. **CSAM scanning** (legal mandate)
+Payments-in and moderation are solvable; those three are gating.
+
+### Sources
+- Verotel/CardBilling: https://merchantmachine.co.uk/verotel/ · https://www.billing.creditcard/
+- CCBill / adult processors overview: https://medium.com/coinmonks/adult-content-payment-processing-in-2026-how-creators-and-platforms-accept-card-payments-after-03a57a86f595 · https://tripleminds.co/blogs/compliance/nsfw-adult-payment-processor/
+- Segpay UGC: https://segpay.com/verticals/high-risk/ · https://gethelp.segpay.com/docs/Content/ComplianceDocs/UserGeneratedContent.htm · https://automatehorizon.com/adult-creator-payment-processor-setup/
+- Paxum payouts: https://www.paxum.com/case-studies/webcam-studios/ · https://onlygemsmanagement.com/blog/payout-methods-every-platform-compared-2026/
+- NOWPayments crypto policy: https://makeanapplike.com/blogs/fintech/adult-content-businesses-and-nowpayments/ · https://nowpayments.io/all-solutions/adult
+- Visa/Mastercard UGC rules & age verification: https://www.austreme.com/en/mastercard-new-rules-adult-content/ · https://mobiuspay.com/blog/mastercard-adult-content-rules · https://adent.io/blog/age-verification-for-onlyfans-like-platforms/
+
 ## Next step when we resume
-Produce the section-33 architecture package (no code), then stop for approval.
+Produce the section-33 architecture package (no code) — **fold this Providers analysis into it** (system architecture, media storage, T&S, security, and MVP roadmap sections). Then stop for approval before Phase 1.

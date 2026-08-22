@@ -41,7 +41,8 @@ export default function LoginPage() {
         type: 'sms',
       });
       if (error) throw error;
-      window.location.href = '/admin';
+      const next = new URLSearchParams(window.location.search).get('next');
+      window.location.href = next && next.startsWith('/') ? next : '/';
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Invalid code');
     } finally {

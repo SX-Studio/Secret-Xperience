@@ -4,6 +4,7 @@ import { getAdminProfile } from '@/lib/session';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyStepUp, STEPUP_COOKIE } from '@/lib/stepup';
 import type { Role } from '@/lib/roles';
+import BoxesPanel, { type BoxRow } from './BoxesPanel';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,6 +45,22 @@ export default async function AdminDashboard() {
     .from('audit_log')
     .select('*', { count: 'exact', head: true });
 
+  const { data: boxData } = await admin
+    .from('boxes')
+    .select('id, public_code, name, commission_bps')
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  const boxes: BoxRow[] = await Promise.all(
+    (boxData ?? []).map(async (b) => {
+      const { count } = await admin
+        .from('box_members')
+        .select('*', { count: 'exact', head: true })
+        .eq('box_id', b.id);
+      return { ...b, member_count: count ?? 0 } as BoxRow;
+    }),
+  );
+
   const { data: recent } = await admin
     .from('audit_log')
     .select('id, actor_code, action, target_type, target_id, result, created_at')
@@ -78,6 +95,8 @@ export default async function AdminDashboard() {
         ))}
         <Stat label="Audit events" value={auditCount ?? 0} />
       </section>
+
+      <BoxesPanel boxes={boxes} />
 
       <h2 className="serif" style={{ fontSize: 20, fontWeight: 600, margin: '0 0 10px' }}>
         Recent audit log

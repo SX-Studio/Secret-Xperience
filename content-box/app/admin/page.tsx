@@ -5,6 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { verifyStepUp, STEPUP_COOKIE } from '@/lib/stepup';
 import type { Role } from '@/lib/roles';
 import BoxesPanel, { type BoxRow } from './BoxesPanel';
+import { ModerationPanel, KycPanel, type QueueItem, type KycItem } from './ReviewPanels';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,6 +62,48 @@ export default async function AdminDashboard() {
     }),
   );
 
+  const { data: queueData } = await admin
+    .from('content_items')
+    .select('id, public_code, title, moderation_status, box:boxes(name), creator:profiles(public_code)')
+    .in('moderation_status', ['pending_review', 'processing'])
+    .order('created_at', { ascending: true })
+    .limit(50);
+
+  const queue: QueueItem[] = (queueData ?? []).map((c) => {
+    const box = c.box as { name: string } | { name: string }[] | null;
+    const creator = c.creator as { public_code: string } | { public_code: string }[] | null;
+    const boxName = Array.isArray(box) ? box[0]?.name ?? null : box?.name ?? null;
+    const creatorCode = Array.isArray(creator)
+      ? creator[0]?.public_code ?? null
+      : creator?.public_code ?? null;
+    return {
+      id: c.id,
+      public_code: c.public_code,
+      title: c.title,
+      moderation_status: c.moderation_status,
+      box_name: boxName,
+      creator_code: creatorCode,
+    };
+  });
+
+  const { data: kycData } = await admin
+    .from('kyc_verifications')
+    .select('profile_id, consent_given, created_at, profile:profiles(public_code)')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true })
+    .limit(50);
+
+  const kycItems: KycItem[] = (kycData ?? []).map((k) => {
+    const p = k.profile as { public_code: string } | { public_code: string }[] | null;
+    const code = Array.isArray(p) ? p[0]?.public_code ?? null : p?.public_code ?? null;
+    return {
+      profile_id: k.profile_id,
+      profile_code: code,
+      consent_given: k.consent_given,
+      created_at: k.created_at,
+    };
+  });
+
   const { data: recent } = await admin
     .from('audit_log')
     .select('id, actor_code, action, target_type, target_id, result, created_at')
@@ -96,6 +139,8 @@ export default async function AdminDashboard() {
         <Stat label="Audit events" value={auditCount ?? 0} />
       </section>
 
+      <ModerationPanel items={queue} />
+      <KycPanel items={kycItems} />
       <BoxesPanel boxes={boxes} />
 
       <h2 className="serif" style={{ fontSize: 20, fontWeight: 600, margin: '0 0 10px' }}>

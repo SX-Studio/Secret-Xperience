@@ -5,6 +5,7 @@ import CreatorsGrid from './CreatorsGrid'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
 import CreatorFeed from './CreatorFeed'
 import CreatorHub from './CreatorHub'
+import AIGirlfriendBanner from './AIGirlfriendBanner'
 import OnlyFansShowcase from '../components/OnlyFansShowcase/OnlyFansShowcase'
 
 export async function generateMetadata() {
@@ -143,6 +144,11 @@ export default async function CreatorsPage() {
           {/* OnlyFans creator directory — shared with homepage, data in app/data/onlyfans.ts */}
           <div style={{ margin: '0 -1.5rem 3rem' }}>
             <OnlyFansShowcase />
+          </div>
+
+          {/* AI girlfriend affiliate banner — gptgirlfriend.online */}
+          <div style={{ marginBottom: '3rem' }}>
+            <AIGirlfriendBanner />
           </div>
 
           {allListings.length > 0 && (

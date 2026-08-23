@@ -4,6 +4,7 @@ import Link from 'next/link'
 import CreatorsGrid from './CreatorsGrid'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
 import CreatorFeed from './CreatorFeed'
+import CreatorHub from './CreatorHub'
 import OnlyFansShowcase from '../components/OnlyFansShowcase/OnlyFansShowcase'
 
 export async function generateMetadata() {
@@ -124,6 +125,9 @@ export default async function CreatorsPage() {
         </div>
 
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2.5rem 1.5rem 6rem' }}>
+
+          {/* CREATOR HUB — slide banners, stats, meet & greets, expos, journal, earnings, brands */}
+          <CreatorHub creatorCount={allListings.length} />
 
           {/* LATEST CONTENT FEED */}
           <div style={{ marginBottom: '3rem' }}>

@@ -5,6 +5,7 @@ import CreatorsGrid from './CreatorsGrid'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
 import CreatorFeed from './CreatorFeed'
 import CreatorHub from './CreatorHub'
+import CollabsBanner from './CollabsBanner'
 import AIGirlfriendBanner from './AIGirlfriendBanner'
 import OnlyFansShowcase from '../components/OnlyFansShowcase/OnlyFansShowcase'
 
@@ -126,6 +127,11 @@ export default async function CreatorsPage() {
         </div>
 
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2.5rem 1.5rem 6rem' }}>
+
+          {/* COLLABS partner banner — collabs-photography.com */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <CollabsBanner />
+          </div>
 
           {/* CREATOR HUB — slide banners, stats, meet & greets, expos, journal, earnings, brands */}
           <CreatorHub creatorCount={allListings.length} />

@@ -5,6 +5,9 @@ import Link from 'next/link'
 import CreatorsGrid from './CreatorsGrid'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
 import CreatorFeed from './CreatorFeed'
+import CreatorHub from './CreatorHub'
+import CollabsPromo from './CollabsPromo'
+import AIGirlfriendBanner from './AIGirlfriendBanner'
 import OnlyFansShowcase from '../components/OnlyFansShowcase/OnlyFansShowcase'
 
 export async function generateMetadata() {
@@ -164,7 +167,7 @@ export default async function CreatorsPage() {
             </div>
           </div>
 
-          {/* LATEST — marketplace grid with filter rail + search (in CreatorFeed) */}
+          {/* ALL CREATORS — marketplace grid with filter rail + search (in CreatorFeed) — pinned to top */}
           <div id="latest" style={{ marginBottom: '3rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.1rem', flexWrap: 'wrap', gap: '10px' }}>
               <h2 style={{ fontFamily: 'var(--serif)', fontSize: '27px', fontWeight: 500, margin: 0 }}>All creators</h2>
@@ -175,9 +178,22 @@ export default async function CreatorsPage() {
             <CreatorFeed posts={posts} directory={directory} />
           </div>
 
+          {/* COLLABS partner block — banner + looping promo video (right) → collabs-photography.com */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <CollabsPromo />
+          </div>
+
+          {/* CREATOR HUB — slide banners, stats, meet & greets, expos, journal, earnings, brands */}
+          <CreatorHub creatorCount={allListings.length} />
+
           {/* OnlyFans directory — inherits the neon palette */}
           <div style={{ margin: '0 -1.5rem 3rem' }}>
             <OnlyFansShowcase />
+          </div>
+
+          {/* AI girlfriend affiliate banner — gptgirlfriend.online */}
+          <div style={{ marginBottom: '3rem' }}>
+            <AIGirlfriendBanner />
           </div>
 
           {allListings.length > 0 && (

@@ -42,7 +42,7 @@ const TWO_HOURS = 2 * 60 * 60 * 1000
 const BROWSE = [
   { key: 'all', label: 'All creators', icon: '✦' },
   { key: 'photo', label: 'Photos', icon: '▤' },
-  { key: 'video', label: 'Video', icon: '▷' },
+  { key: 'video', label: 'Videos', icon: '▷' },
 ] as const
 
 function Card({ e, i, isNew }: { e: Entry; i: number; isNew: boolean }) {
@@ -115,6 +115,12 @@ export default function CreatorFeed({ posts, directory = [] }: { posts: Post[]; 
     return Array.from(map.values())
   }, [allPosts, directory])
 
+  const mediaCounts: Record<'all' | 'photo' | 'video', number> = {
+    all: creators.length,
+    photo: creators.filter((e) => e.media !== 'video').length,
+    video: creators.filter((e) => e.media === 'video').length,
+  }
+
   const term = q.trim().toLowerCase()
   let shown = creators.filter(({ c, media }) => {
     if (browse === 'photo' && media === 'video') return false
@@ -136,6 +142,8 @@ export default function CreatorFeed({ posts, directory = [] }: { posts: Post[]; 
         .cf-rail button:hover{color:var(--t)}
         .cf-rail button.on{background:linear-gradient(135deg,rgba(139,108,240,.2),rgba(75,224,208,.14));color:var(--t);border-color:var(--gbrd)}
         .cf-rail .ic{width:16px;text-align:center}
+        .cf-rail .ct{margin-left:auto;font-size:11px;color:var(--t3);font-weight:500}
+        .cf-rail button.on .ct{color:var(--goldd)}
         .cf-search{display:flex;align-items:center;gap:12px;height:52px;padding:0 18px;border-radius:16px;background:var(--bg2);border:.5px solid var(--b);backdrop-filter:blur(16px);margin-bottom:18px}
         .cf-search input{flex:1;background:none;border:none;outline:none;color:var(--t);font-size:15px;font-family:var(--sans)}
         .cf-search input::placeholder{color:var(--t3)}
@@ -167,6 +175,7 @@ export default function CreatorFeed({ posts, directory = [] }: { posts: Post[]; 
           {BROWSE.map(b => (
             <button key={b.key} className={browse === b.key ? 'on' : ''} onClick={() => setBrowse(b.key)}>
               <span className="ic">{b.icon}</span> {b.label}
+              <span className="ct">{mediaCounts[b.key]}</span>
             </button>
           ))}
           <h4 style={{ marginTop: '14px' }}>Sort</h4>

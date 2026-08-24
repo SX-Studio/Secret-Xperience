@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
 const ALLOWED = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo', 'video/mpeg', 'video/3gpp', 'video/3gpp2']
-const MAX_BYTES = 500 * 1024 * 1024  // 500 MB
+const MAX_BYTES = 30 * 1024 * 1024  // 30 MB
 
 export async function POST(req: Request) {
   const cookieStore = cookies()
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   if (!contentType || !ALLOWED.includes(contentType))
     return NextResponse.json({ error: 'Unsupported video format (MP4, WebM, MOV).' }, { status: 400 })
   if (size && size > MAX_BYTES)
-    return NextResponse.json({ error: 'File exceeds 500 MB limit.' }, { status: 400 })
+    return NextResponse.json({ error: 'File exceeds 30 MB limit.' }, { status: 400 })
 
   const ext = (filename as string | undefined)?.split('.').pop()?.toLowerCase() ?? 'mp4'
   // Use a dedicated 'videos' bucket (no MIME restrictions, 500 MB limit).

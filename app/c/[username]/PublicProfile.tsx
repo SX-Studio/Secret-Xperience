@@ -69,6 +69,7 @@ export default function PublicProfile({ creator, viewer, draft = false }: { crea
   const [subscription, setSubscription] = useState<Subscription | null>(viewer.subscription)
   const [subTier, setSubTier] = useState<any | null>(null) // tier being confirmed in the modal
   const [toast, setToast] = useState<string | null>(null)
+  const [mediaFilter, setMediaFilter] = useState<'all' | 'photo' | 'video'>('all')
   const isSubscriber = !!subscription
 
   const notify = (m: string) => { setToast(m); setTimeout(() => setToast(null), 2800) }
@@ -86,6 +87,11 @@ export default function PublicProfile({ creator, viewer, draft = false }: { crea
   const typeScale = Number(cfg.theme && cfg.theme.typeScale) || 1
 
   const publicPosts = creator.posts
+  const videoCount = publicPosts.filter((p) => p.media_type === 'video').length
+  const photoCount = publicPosts.length - videoCount
+  const shownPosts = mediaFilter === 'all' ? publicPosts
+    : mediaFilter === 'video' ? publicPosts.filter((p) => p.media_type === 'video')
+    : publicPosts.filter((p) => p.media_type !== 'video')
   const goal = cfg.goal || null
   const goalTarget = goal && Number(goal.target) > 0 ? Number(goal.target) : 0
   const goalPct = goalTarget ? Math.min(100, Math.round((giftTokens / goalTarget) * 100)) : 0
@@ -100,9 +106,22 @@ export default function PublicProfile({ creator, viewer, draft = false }: { crea
         {publicPosts.length === 0 ? (
           <div className="cp-empty">No posts yet — follow to be notified when {creator.full_name} shares something.</div>
         ) : (
-          <div className="cp-grid">
-            {publicPosts.map((p) => <ContentCard key={p.id} p={p} isSubscriber={isSubscriber} onLocked={() => { const t = tiersList[0]; if (p.visibility === 'subscribers' && t) startSubscribe(t); else openGift() }} />)}
-          </div>
+          <>
+            {videoCount > 0 && (
+              <div className="cp-filter" role="tablist" aria-label="Filter content by media type">
+                <button role="tab" aria-selected={mediaFilter === 'all'} className={`cp-fchip${mediaFilter === 'all' ? ' active' : ''}`} onClick={() => setMediaFilter('all')}>All <span>{publicPosts.length}</span></button>
+                <button role="tab" aria-selected={mediaFilter === 'photo'} className={`cp-fchip${mediaFilter === 'photo' ? ' active' : ''}`} onClick={() => setMediaFilter('photo')}><i className="ti ti-photo" /> Photos <span>{photoCount}</span></button>
+                <button role="tab" aria-selected={mediaFilter === 'video'} className={`cp-fchip${mediaFilter === 'video' ? ' active' : ''}`} onClick={() => setMediaFilter('video')}><i className="ti ti-player-play" /> Videos <span>{videoCount}</span></button>
+              </div>
+            )}
+            {shownPosts.length === 0 ? (
+              <div className="cp-empty">No {mediaFilter === 'video' ? 'videos' : 'photos'} yet.</div>
+            ) : (
+              <div className="cp-grid">
+                {shownPosts.map((p) => <ContentCard key={p.id} p={p} isSubscriber={isSubscriber} onLocked={() => { const t = tiersList[0]; if (p.visibility === 'subscribers' && t) startSubscribe(t); else openGift() }} />)}
+              </div>
+            )}
+          </>
         )}
       </div>
     ),
@@ -247,6 +266,11 @@ export default function PublicProfile({ creator, viewer, draft = false }: { crea
         .cp-links{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
         .cp-link{font-size:13px;padding:9px 15px;border-radius:12px;border:.5px solid var(--b2,rgba(255,255,255,.12));text-decoration:none;color:var(--t,#ece8e1);display:inline-flex;gap:7px;align-items:center;transition:.15s}
         .cp-link:hover{border-color:var(--acc);color:var(--acc)}
+        .cp-filter{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
+        .cp-fchip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:20px;border:.5px solid var(--b,rgba(255,255,255,.14));background:transparent;color:var(--t2,#b6bce0);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s,color .15s,border-color .15s;font-family:inherit}
+        .cp-fchip:hover{border-color:var(--acc);color:var(--t,#eef0ff)}
+        .cp-fchip span{font-size:11px;opacity:.7;font-weight:500}
+        .cp-fchip.active{background:color-mix(in srgb,var(--acc) 16%,transparent);color:var(--acc);border-color:color-mix(in srgb,var(--acc) 45%,transparent)}
         .cp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
         .cp-card{position:relative;border-radius:14px;overflow:hidden;aspect-ratio:4/5;background:#14101c;border:.5px solid var(--b,rgba(255,255,255,.07))}
         .cp-card img{width:100%;height:100%;object-fit:cover;display:block}
@@ -390,8 +414,12 @@ function ContentCard({ p, isSubscriber, onLocked }: { p: PublicPost; isSubscribe
   return (
     <div className="cp-card">
       {p.media_url
-        ? /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={p.media_url} alt={p.title || 'post'} loading="lazy" style={blur ? { filter: `blur(${blur}px)`, transform: 'scale(1.06)' } : undefined} />
+        ? (isVideo
+            ? (locked
+                ? <div className="ph" style={{ filter: `blur(${blur}px)`, transform: 'scale(1.06)' }}>▶</div>
+                : <video src={p.media_url} controls playsInline preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', background: '#000' }} />)
+            : /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={p.media_url} alt={p.title || 'post'} loading="lazy" style={blur ? { filter: `blur(${blur}px)`, transform: 'scale(1.06)' } : undefined} />)
         : <div className="ph">{isVideo ? '▶' : '◧'}</div>}
       <div className="cp-ov" />
       {label && <span className="cp-badge">{label}</span>}

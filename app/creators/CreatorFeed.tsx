@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '../lib/supabase'
 
@@ -19,6 +19,17 @@ export interface Post {
   } | null
 }
 
+type Creator = NonNullable<Post['creator']>
+export interface DirCreator {
+  id: string
+  full_name: string | null
+  username: string | null
+  avatar_url: string | null
+  verified: boolean
+  headline?: string | null
+}
+type Entry = { c: Creator; created_at: string | null; media: string; headline?: string | null }
+
 function timeAgo(iso: string) {
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000)
   if (s < 60) return 'just now'
@@ -27,246 +38,164 @@ function timeAgo(iso: string) {
   return `${Math.floor(s / 86400)}d ago`
 }
 
-const GIFT_AMOUNTS = [25, 50, 100, 200]
+const TWO_HOURS = 2 * 60 * 60 * 1000
+const BROWSE = [
+  { key: 'all', label: 'All creators', icon: '✦' },
+  { key: 'photo', label: 'Photos', icon: '▤' },
+  { key: 'video', label: 'Video', icon: '▷' },
+] as const
 
-function GiftModal({ creator, senderBalance, onClose, onSent }: {
-  creator: { id: string; full_name: string | null; username: string | null }
-  senderBalance: number | null
-  onClose: () => void
-  onSent: (newBalance: number) => void
-}) {
-  const [amount, setAmount] = useState(50)
-  const [message, setMessage] = useState('')
-  const [sending, setSending] = useState(false)
-  const [err, setErr] = useState('')
-  const name = creator.full_name || creator.username || 'Creator'
-
-  async function send() {
-    setSending(true); setErr('')
-    try {
-      const res = await fetch('/api/creators/gift', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ creatorId: creator.id, amountTokens: amount, message: message.trim() }),
-      })
-      const json = await res.json()
-      if (!res.ok) { setErr(json.error || 'Failed to send gift'); setSending(false); return }
-      onSent(json.newBalance)
-    } catch { setErr('Failed to send gift'); setSending(false) }
-  }
-
-  return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'rgba(4,3,10,0.85)', backdropFilter: 'blur(8px)' }} onClick={onClose} />
-      <div style={{ position: 'relative', background: 'var(--bg1)', border: '0.5px solid var(--gbrd)', borderRadius: '18px', padding: '2rem', width: '100%', maxWidth: '380px', boxShadow: '0 0 60px rgba(197,160,90,0.15)' }}>
-        <button onClick={onClose} style={{ position: 'absolute', top: '14px', right: '14px', background: 'none', border: 'none', color: 'var(--t3)', cursor: 'pointer', fontSize: '20px' }}>×</button>
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '28px', marginBottom: '8px' }}>✦</div>
-          <h2 style={{ fontFamily: 'var(--serif)', fontSize: '22px', fontWeight: 400, margin: '0 0 6px' }}>Send a gift</h2>
-          <p style={{ fontSize: '13px', color: 'var(--t3)', margin: 0 }}>Show {name} some appreciation</p>
-        </div>
-
-        <div style={{ marginBottom: '1.25rem' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--t3)', marginBottom: '10px' }}>Choose amount</div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '8px' }}>
-            {GIFT_AMOUNTS.map(a => (
-              <button key={a} onClick={() => setAmount(a)} style={{ padding: '10px 4px', borderRadius: '10px', border: amount === a ? '1.5px solid var(--gold)' : '0.5px solid var(--b2)', background: amount === a ? 'var(--gbg)' : 'var(--bg2)', cursor: 'pointer', color: amount === a ? 'var(--gold)' : 'var(--t2)', fontWeight: 700, fontSize: '14px', transition: 'all .15s' }}>
-                {a}
-                <div style={{ fontSize: '10px', fontWeight: 400, color: 'var(--t3)', marginTop: '2px' }}>tokens</div>
-              </button>
-            ))}
-          </div>
-          {senderBalance !== null && (
-            <div style={{ fontSize: '11px', color: 'var(--t3)', marginTop: '8px', textAlign: 'right' }}>
-              Your balance: <strong style={{ color: amount > senderBalance ? '#e0607a' : 'var(--gold)' }}>{senderBalance} tokens</strong>
-            </div>
-          )}
-        </div>
-
-        <div style={{ marginBottom: '1.25rem' }}>
-          <div style={{ fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--t3)', marginBottom: '10px' }}>Message (optional)</div>
-          <textarea
-            value={message}
-            onChange={e => setMessage(e.target.value.slice(0, 200))}
-            placeholder="Leave a kind word…"
-            rows={2}
-            style={{ width: '100%', padding: '10px 12px', background: 'var(--bg2)', border: '0.5px solid var(--b2)', borderRadius: 'var(--r)', color: 'var(--t)', fontSize: '13px', fontFamily: 'var(--sans)', resize: 'none', boxSizing: 'border-box' }}
-          />
-          <div style={{ fontSize: '11px', color: 'var(--t3)', textAlign: 'right' }}>{message.length}/200</div>
-        </div>
-
-        {err && <div style={{ fontSize: '13px', color: '#e0607a', marginBottom: '12px', textAlign: 'center' }}>{err}</div>}
-
-        <button onClick={send} disabled={sending || (senderBalance !== null && amount > senderBalance)} style={{ width: '100%', padding: '13px', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', border: 'none', borderRadius: 'var(--r)', color: '#0a0a0a', fontWeight: 700, fontSize: '15px', cursor: sending ? 'default' : 'pointer', opacity: (senderBalance !== null && amount > senderBalance) ? 0.5 : 1 }}>
-          {sending ? 'Sending…' : `Send ${amount} tokens ✦`}
-        </button>
-        {senderBalance !== null && amount > senderBalance && (
-          <p style={{ fontSize: '12px', color: 'var(--t3)', textAlign: 'center', marginTop: '10px' }}>
-            <Link href="/tokens" style={{ color: 'var(--gold)' }}>Get more tokens →</Link>
-          </p>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function GiftSuccess({ amount, onClose }: { amount: number; onClose: () => void }) {
-  useEffect(() => { const t = setTimeout(onClose, 3000); return () => clearTimeout(t) }, [onClose])
-  return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', pointerEvents: 'none' }}>
-      <div style={{ background: 'var(--bg1)', border: '1px solid var(--gbrd)', borderRadius: '16px', padding: '2rem 2.5rem', textAlign: 'center', boxShadow: '0 0 60px rgba(197,160,90,0.25)', pointerEvents: 'auto' }}>
-        <div style={{ fontSize: '36px', marginBottom: '8px' }}>✦</div>
-        <div style={{ fontFamily: 'var(--serif)', fontSize: '20px', fontWeight: 400, marginBottom: '6px' }}>Gift sent!</div>
-        <div style={{ fontSize: '13px', color: 'var(--t3)' }}>{amount} tokens delivered with love</div>
-      </div>
-    </div>
-  )
-}
-
-function PostCard({ post, me, follows, balance, onFollow, onBalanceChange }: {
-  post: Post; me: string | null; follows: Set<string>; balance: number | null
-  onFollow: (id: string) => void
-  onBalanceChange: (b: number) => void
-}) {
-  const c = post.creator
-  if (!c) return null
+function Card({ e, i, isNew }: { e: Entry; i: number; isNew: boolean }) {
+  const c = e.c
   const name = c.full_name || c.username || 'Creator'
-  const following = follows.has(c.id)
-  const isSelf = me === c.id
-  const links = Array.isArray(c.external_links) ? c.external_links : []
-  const [giftOpen, setGiftOpen] = useState(false)
-  const [gifted, setGifted] = useState<number | null>(null)
-
+  const href = c.username ? `/c/${c.username}` : `/profile/${c.id}`
+  const sub = e.created_at ? `Posted ${timeAgo(e.created_at)}` : (e.headline ? String(e.headline).slice(0, 40) : 'View profile')
   return (
-    <article style={{ background: 'var(--bg1)', border: '0.5px solid var(--b)', borderRadius: '14px', overflow: 'hidden' }}>
-      {/* header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px 14px' }}>
-        <Link href={`/profile/${c.id}`} style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', flex: 1, minWidth: 0 }}>
-          <div style={{ width: '38px', height: '38px', borderRadius: '50%', flexShrink: 0, background: c.avatar_url ? `url(${c.avatar_url}) center/cover` : 'linear-gradient(135deg,var(--gold),var(--goldd))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#0a0a0a', fontWeight: 700, fontSize: '14px' }}>
-            {!c.avatar_url && name.slice(0, 1).toUpperCase()}
-          </div>
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--t)', display: 'flex', alignItems: 'center', gap: '5px' }}>
-              {name} {c.verified && <i className="ti ti-rosette-discount-check-filled" style={{ color: 'var(--gold)', fontSize: '14px' }} />}
-            </div>
-            <div style={{ fontSize: '11px', color: 'var(--t3)' }}>{timeAgo(post.created_at)}</div>
-          </div>
-        </Link>
-        {!isSelf && me && (
-          <button onClick={() => onFollow(c.id)} style={{ padding: '6px 14px', borderRadius: '20px', fontSize: '12px', fontWeight: 600, cursor: 'pointer', border: following ? '0.5px solid var(--b2)' : 'none', background: following ? 'transparent' : 'linear-gradient(135deg,var(--gold),var(--goldd))', color: following ? 'var(--t2)' : '#0a0a0a' }}>
-            {following ? 'Following' : 'Follow'}
-          </button>
-        )}
+    <Link href={href} className="cf-card" style={{ animationDelay: `${Math.min(i, 16) * 45}ms` }}>
+      {isNew && <span className="cf-tag">NEW</span>}
+      <span className="cf-fav">♡</span>
+      <div className="cf-ph" style={c.avatar_url ? { backgroundImage: `url(${c.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : undefined}>
+        {!c.avatar_url && name.slice(0, 1).toUpperCase()}
       </div>
-
-      {/* media */}
-      {post.media_url && (
-        post.media_type === 'video' ? (
-          <video src={post.media_url} controls style={{ width: '100%', maxHeight: '520px', background: '#000', display: 'block' }} />
-        ) : (
-          <img src={post.media_url} alt="" style={{ width: '100%', maxHeight: '560px', objectFit: 'cover', display: 'block' }} onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none' }} />
-        )
-      )}
-
-      {/* body */}
-      <div style={{ padding: '12px 14px 14px' }}>
-        {post.caption && <p style={{ fontSize: '14px', color: 'var(--t)', lineHeight: 1.6, margin: '0 0 10px' }}>{post.caption}</p>}
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-          {me && !isSelf && (
-            <Link href={`/messages?provider_id=${c.id}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '20px', border: '0.5px solid var(--b2)', color: 'var(--t2)', fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}>
-              <i className="ti ti-message-circle" /> Live chat
-            </Link>
-          )}
-          {!isSelf && (
-            <button
-              onClick={() => { if (!me) { window.location.href = '/login?next=/creators'; return } setGiftOpen(true) }}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '7px 14px', borderRadius: '20px', border: '0.5px solid rgba(197,160,90,0.35)', background: 'var(--gbg)', color: 'var(--gold)', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}>
-              ✦ Send a gift
-            </button>
-          )}
-          {links.slice(0, 3).map((l, i) => (
-            <a key={i} href={l.url} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '7px 12px', borderRadius: '20px', border: '0.5px solid rgba(197,160,90,0.3)', color: 'var(--gold)', fontSize: '12px', fontWeight: 600, textDecoration: 'none' }}>
-              <i className="ti ti-external-link" /> {l.label}
-            </a>
-          ))}
-        </div>
+      <div className="cf-ov" />
+      <div className="cf-meta">
+        <div className="cf-nm">{name} {c.verified && <i className="ti ti-rosette-discount-check-filled" style={{ fontSize: '13px', color: 'var(--goldd)' }} />}</div>
+        <div className="cf-sub">{sub}</div>
       </div>
-
-      {giftOpen && (
-        <GiftModal
-          creator={c}
-          senderBalance={balance}
-          onClose={() => setGiftOpen(false)}
-          onSent={(newBal) => { onBalanceChange(newBal); setGifted(amount => { setGiftOpen(false); return null }); setGifted(50) }}
-        />
-      )}
-      {gifted !== null && <GiftSuccess amount={gifted} onClose={() => setGifted(null)} />}
-    </article>
+    </Link>
   )
 }
 
-export default function CreatorFeed({ posts }: { posts: Post[] }) {
-  const [me, setMe] = useState<string | null>(null)
-  const [follows, setFollows] = useState<Set<string>>(new Set())
-  const [balance, setBalance] = useState<number | null>(null)
+export default function CreatorFeed({ posts, directory = [] }: { posts: Post[]; directory?: DirCreator[] }) {
+  const [allPosts, setAllPosts] = useState<Post[]>(posts)
+  const [q, setQ] = useState('')
+  const [browse, setBrowse] = useState<'all' | 'photo' | 'video'>('all')
+  const [sort, setSort] = useState<'new' | 'az'>('new')
+  const [now, setNow] = useState<number>(() => Date.now())
 
   useEffect(() => {
-    (async () => {
+    let alive = true
+    const supabase = createClient()
+    const load = async () => {
       try {
-        const supabase = createClient()
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session) return
-        setMe(session.user.id)
-        const [{ data: followData }, { data: wallet }] = await Promise.all([
-          supabase.from('creator_follows').select('creator_id').eq('follower_id', session.user.id),
-          supabase.from('user_wallets').select('balance').eq('user_id', session.user.id).maybeSingle(),
-        ])
-        setFollows(new Set((followData || []).map((r: any) => r.creator_id)))
-        if (wallet) setBalance(wallet.balance)
-      } catch { /* ignore */ }
-    })()
+        const { data } = await supabase
+          .from('creator_posts')
+          .select('id, caption, media_url, media_type, created_at, creator:profiles!creator_id(id, full_name, username, avatar_url, verified, external_links)')
+          .eq('active', true).order('created_at', { ascending: false }).limit(200)
+        if (alive && Array.isArray(data) && data.length) setAllPosts(data as unknown as Post[])
+      } catch { /* keep current */ }
+    }
+    load()
+    const iv = setInterval(() => { setNow(Date.now()); load() }, 60000)
+    return () => { alive = false; clearInterval(iv) }
   }, [])
 
-  async function onFollow(creatorId: string) {
-    if (!me) { window.location.href = '/login?next=/creators'; return }
-    setFollows(prev => { const n = new Set(prev); n.has(creatorId) ? n.delete(creatorId) : n.add(creatorId); return n })
-    try {
-      const res = await fetch('/api/creators/follow', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ creatorId }) })
-      if (!res.ok) throw new Error()
-    } catch {
-      setFollows(prev => { const n = new Set(prev); n.has(creatorId) ? n.delete(creatorId) : n.add(creatorId); return n })
+  // Every published creator is a base entry; latest-post info (recency + media type)
+  // is overlaid on top so posting creators get a NEW badge and media filter.
+  const creators = useMemo(() => {
+    const map = new Map<string, Entry>()
+    for (const d of directory) {
+      const c: Creator = { id: d.id, full_name: d.full_name, username: d.username, avatar_url: d.avatar_url, verified: d.verified, external_links: null }
+      map.set(d.id, { c, created_at: null, media: 'image', headline: d.headline })
     }
-  }
+    for (const p of allPosts) {
+      if (!p.creator) continue
+      const prev = map.get(p.creator.id)
+      if (prev) {
+        // Keep the richest info: newest post wins for recency/media, keep dir headline.
+        if (!prev.created_at || +new Date(p.created_at) > +new Date(prev.created_at)) {
+          prev.c = { ...prev.c, ...p.creator }
+          prev.created_at = p.created_at
+          prev.media = p.media_type || 'image'
+        }
+      } else {
+        map.set(p.creator.id, { c: p.creator, created_at: p.created_at, media: p.media_type || 'image' })
+      }
+    }
+    return Array.from(map.values())
+  }, [allPosts, directory])
 
-  if (posts.length === 0) {
-    return (
-      <div style={{ textAlign: 'center', padding: '3.5rem 2rem', background: 'var(--bg1)', border: '0.5px solid var(--b)', borderRadius: '14px' }}>
-        <div style={{ fontSize: '34px', marginBottom: '0.75rem' }}>✦</div>
-        <div style={{ fontFamily: 'var(--serif)', fontSize: '22px', marginBottom: '0.5rem' }}>No content yet</div>
-        <p style={{ fontSize: '14px', color: 'var(--t3)', maxWidth: '360px', margin: '0 auto 1.5rem', lineHeight: 1.7 }}>
-          Be the first creator to publish. Share photos and videos, build followers, and link your other platforms.
-        </p>
-        <Link href="/creators/studio" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '12px 26px', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', borderRadius: 'var(--r)', color: '#0a0a0a', fontWeight: 700, fontSize: '14px', textDecoration: 'none' }}>
-          Open Creator Studio →
-        </Link>
-      </div>
-    )
-  }
+  const term = q.trim().toLowerCase()
+  let shown = creators.filter(({ c, media }) => {
+    if (browse === 'photo' && media === 'video') return false
+    if (browse === 'video' && media !== 'video') return false
+    if (term) return (c.username || '').toLowerCase().includes(term) || (c.full_name || '').toLowerCase().includes(term)
+    return true
+  })
+  shown = sort === 'az'
+    ? [...shown].sort((a, b) => (a.c.full_name || a.c.username || '').localeCompare(b.c.full_name || b.c.username || ''))
+    : [...shown].sort((a, b) => (b.created_at ? +new Date(b.created_at) : 0) - (a.created_at ? +new Date(a.created_at) : 0))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', maxWidth: '620px', margin: '0 auto' }}>
-      {posts.map(p => (
-        <PostCard
-          key={p.id}
-          post={p}
-          me={me}
-          follows={follows}
-          balance={balance}
-          onFollow={onFollow}
-          onBalanceChange={setBalance}
-        />
-      ))}
+    <div className="cf">
+      <style dangerouslySetInnerHTML={{ __html: `
+        .cf-main{display:grid;grid-template-columns:210px 1fr;gap:22px}
+        .cf-rail{position:sticky;top:78px;align-self:start;padding:16px;background:var(--bg2);border:.5px solid var(--b);border-radius:20px;backdrop-filter:blur(16px)}
+        .cf-rail h4{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin:0 0 10px}
+        .cf-rail button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 12px;border-radius:12px;color:var(--t2);font:500 13.5px var(--sans);background:none;border:.5px solid transparent;cursor:pointer;margin-bottom:3px;transition:.15s}
+        .cf-rail button:hover{color:var(--t)}
+        .cf-rail button.on{background:linear-gradient(135deg,rgba(139,108,240,.2),rgba(75,224,208,.14));color:var(--t);border-color:var(--gbrd)}
+        .cf-rail .ic{width:16px;text-align:center}
+        .cf-search{display:flex;align-items:center;gap:12px;height:52px;padding:0 18px;border-radius:16px;background:var(--bg2);border:.5px solid var(--b);backdrop-filter:blur(16px);margin-bottom:18px}
+        .cf-search input{flex:1;background:none;border:none;outline:none;color:var(--t);font-size:15px;font-family:var(--sans)}
+        .cf-search input::placeholder{color:var(--t3)}
+        .cf-search .x{background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px}
+        .cf-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px}
+        .cf-card{position:relative;display:block;aspect-ratio:4/5;border-radius:18px;overflow:hidden;border:.5px solid var(--b);
+          background:linear-gradient(160deg,#211a3a,#0c0a1a);text-decoration:none;color:inherit;
+          transition:transform .28s cubic-bezier(.2,.7,.2,1),box-shadow .28s;opacity:0;transform:translateX(-20px);animation:cfIn .5s cubic-bezier(.2,.7,.2,1) forwards}
+        @keyframes cfIn{to{opacity:1;transform:none}}
+        .cf-card:hover{transform:translateY(-8px);box-shadow:0 22px 54px -22px var(--gold),0 0 0 1px var(--goldd)}
+        .cf-card::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 50%,transparent 70%);transform:translateX(-120%);transition:transform .6s ease;pointer-events:none}
+        .cf-card:hover::after{transform:translateX(120%)}
+        .cf-ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:50px;color:rgba(139,108,240,.6)}
+        .cf-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,6,16,.86),transparent 55%)}
+        .cf-meta{position:absolute;left:0;right:0;bottom:0;padding:13px;z-index:2}
+        .cf-nm{font-size:13.5px;font-weight:600;display:flex;align-items:center;gap:5px;color:#fff}
+        .cf-sub{font-size:11px;color:var(--t2);margin-top:2px}
+        .cf-tag{position:absolute;top:10px;left:10px;z-index:2;font-size:9px;font-weight:700;letter-spacing:.05em;padding:4px 9px;border-radius:999px;background:linear-gradient(120deg,var(--gold),var(--goldd));color:#0a0714;animation:cfPulse 1.8s ease-in-out infinite}
+        @keyframes cfPulse{0%,100%{box-shadow:0 0 0 0 rgba(75,224,208,.5)}50%{box-shadow:0 0 12px 1px rgba(75,224,208,.5)}}
+        .cf-fav{position:absolute;top:9px;right:9px;z-index:2;width:30px;height:30px;border-radius:50%;background:rgba(8,6,16,.5);backdrop-filter:blur(8px);border:.5px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--t)}
+        .cf-empty{text-align:center;padding:2.6rem 1.5rem;background:var(--bg2);border:.5px solid var(--b);border-radius:18px;backdrop-filter:blur(16px)}
+        @media(max-width:860px){.cf-main{grid-template-columns:1fr}.cf-rail{position:static;display:flex;flex-wrap:wrap;gap:8px}.cf-rail h4{display:none}.cf-rail button{width:auto}}
+        @media(prefers-reduced-motion:reduce){.cf-card{animation:none;opacity:1;transform:none}.cf-tag{animation:none}.cf-card::after{display:none}}
+      ` }} />
+
+      <div className="cf-main">
+        <aside className="cf-rail">
+          <h4>Browse</h4>
+          {BROWSE.map(b => (
+            <button key={b.key} className={browse === b.key ? 'on' : ''} onClick={() => setBrowse(b.key)}>
+              <span className="ic">{b.icon}</span> {b.label}
+            </button>
+          ))}
+          <h4 style={{ marginTop: '14px' }}>Sort</h4>
+          <button className={sort === 'new' ? 'on' : ''} onClick={() => setSort('new')}><span className="ic">↳</span> Newest</button>
+          <button className={sort === 'az' ? 'on' : ''} onClick={() => setSort('az')}><span className="ic">A</span> A–Z</button>
+        </aside>
+
+        <div>
+          <div className="cf-search">
+            <i className="ti ti-search" style={{ color: 'var(--t3)', fontSize: '16px' }} />
+            <input value={q} onChange={e => setQ(e.target.value)} placeholder="Search creators by username…" aria-label="Search creators by username" />
+            {q && <button className="x" onClick={() => setQ('')} aria-label="Clear">✕</button>}
+          </div>
+
+          {shown.length === 0 ? (
+            <div className="cf-empty">
+              <div style={{ fontSize: '28px', marginBottom: '.5rem' }}>✦</div>
+              <div style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '.35rem' }}>{term ? 'No creator found' : 'No creators yet'}</div>
+              <p style={{ fontSize: '13.5px', color: 'var(--t3)', maxWidth: '340px', margin: '0 auto', lineHeight: 1.6 }}>
+                {term ? 'Try another username.' : 'Creators appear here once they publish their profile. Check back soon.'}
+              </p>
+            </div>
+          ) : (
+            <div className="cf-grid">
+              {shown.map((e, i) => <Card key={e.c.id} e={e} i={i} isNew={!!e.created_at && now - new Date(e.created_at).getTime() <= TWO_HOURS} />)}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

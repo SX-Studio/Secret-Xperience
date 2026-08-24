@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { focusPosition } from '../lib/imageFocus'
 
@@ -210,10 +210,9 @@ function CreatorCard({ l, isFeatured, idx, discreet }: { l: Listing; isFeatured:
 }
 
 export default function CreatorsGrid({ listings }: { listings: Listing[] }) {
-  const [discreet, setDiscreet] = useState<boolean>(() => {
-    if (typeof window === 'undefined') return false
-    return localStorage.getItem('discreetMode') === '1'
-  })
+  // Read discreet mode after mount so SSR and first client render match (no hydration mismatch).
+  const [discreet, setDiscreet] = useState<boolean>(false)
+  useEffect(() => { try { setDiscreet(localStorage.getItem('discreetMode') === '1') } catch { /* ignore */ } }, [])
   const [typeFilter, setTypeFilter] = useState('all')
 
   const filteredAll = listings.filter(l =>

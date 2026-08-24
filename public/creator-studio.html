@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecretXperience — Creator Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&family=PT+Sans:wght@400;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f6f7; --surface:#ffffff; --surface-2:#f0f0f2; --border:#e0e0e3;
+    --text:#1c1c1f; --text-muted:#63636b; --text-faint:#93939c;
+    --accent:#3e5c76; --accent-soft:#dbe4ea; --accent-strong:#2c4258; --accent-contrast:#ffffff;
+    --ok:#2f7d5b; --warn:#b0822f;
+    --radius:10px; --radius-sm:6px;
+    --font-display:'Inter', sans-serif; --font-body:'Inter', sans-serif;
+    --shadow:0 16px 40px -22px rgba(20,20,25,.22);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background-color:var(--bg); background-image:var(--bg-image,none); background-attachment:fixed; color:var(--text); font-family:var(--font-body); font-weight:400; -webkit-font-smoothing:antialiased; transition:background .2s ease, color .2s ease;}
+  h1,h2,h3,.serif{font-family:var(--font-display);}
+  a{color:inherit;}
+  ::selection{background:var(--accent-soft); color:var(--accent-strong);}
+  ::-webkit-scrollbar{width:10px; height:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--border); border-radius:10px;}
+  button, input, select, textarea{font-family:var(--font-body); color:var(--text);}
+  input, select, textarea{
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm);
+    padding:9px 12px; font-size:14px; outline:none; transition:border-color .15s ease;
+  }
+  input:focus, select:focus, textarea:focus{border-color:var(--accent);}
+  input:focus-visible, select:focus-visible, textarea:focus-visible, button:focus-visible, a:focus-visible{
+    outline:2px solid var(--accent); outline-offset:2px;
+  }
+  button{cursor:pointer; border:none; font-family:var(--font-body);}
+  .btn{background:var(--surface); border:1px solid var(--border); color:var(--text); padding:9px 16px; border-radius:999px; font-size:13px; display:inline-flex; align-items:center; gap:6px; transition:border-color .15s ease, transform .1s ease;}
+  .btn:hover{border-color:var(--accent);}
+  .btn:active{transform:scale(.97);}
+  .btn-accent{background:var(--accent); color:var(--accent-contrast); border:none; font-weight:500;}
+  .btn-accent:hover{background:var(--accent-strong);}
+  .btn-ghost{background:transparent; border:1px solid var(--border);}
+  .btn-icon{width:34px; height:34px; padding:0; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; background:var(--surface); border:1px solid var(--border);}
+  .btn-icon:hover{border-color:var(--accent);}
+  svg{display:block;}
+
+  .shell{display:grid; grid-template-columns:260px 1fr; min-height:100vh;}
+  .sidebar{position:sticky; top:0; height:100vh; overflow-y:auto; background:var(--surface); border-right:1px solid var(--border); padding:26px 18px; display:flex; flex-direction:column; gap:28px;}
+  .brand{display:flex; flex-direction:column; gap:2px; padding:0 8px;}
+  .brand .mark{font-size:20px; letter-spacing:-.01em; font-weight:600;}
+  .brand .mark em{color:var(--accent); font-style:normal;}
+  .brand .sub{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--text-faint);}
+  .nav{display:flex; flex-direction:column; gap:2px;}
+  .nav-item{display:flex; align-items:center; gap:6px; border-radius:var(--radius-sm);}
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.dragging{opacity:.5;}
+  .nav-item.drop-before{box-shadow:inset 0 2px 0 var(--accent);}
+  .nav-item.drop-after{box-shadow:inset 0 -2px 0 var(--accent);}
+  .nav-item.off a{opacity:.45;}
+  .nav-grip{flex:none; cursor:grab; color:var(--text-faint); font-size:13px; padding:0 2px 0 4px; user-select:none; line-height:1;}
+  .nav-grip:active{cursor:grabbing;}
+  .section-hidden{display:none !important;}
+  .nav a{flex:1; display:flex; align-items:center; gap:12px; padding:10px 10px; border-radius:var(--radius-sm); font-size:13.5px; color:var(--text-muted); text-decoration:none; border:1px solid transparent; min-width:0;}
+  .nav a .n{font-family:var(--font-display); color:var(--accent); font-size:12px; width:18px; font-weight:600; flex:none;}
+  .nav-item.active a{color:var(--text); background:var(--surface-2); border-color:var(--border);}
+  .vis-toggle{flex:none; width:30px; height:18px; border-radius:999px; background:var(--border); border:none; position:relative; margin-right:8px; padding:0; cursor:pointer;}
+  .vis-toggle .knob{position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:var(--surface); box-shadow:0 1px 2px rgba(0,0,0,.25); transition:left .15s ease;}
+  .vis-toggle.on{background:var(--accent);}
+  .vis-toggle.on .knob{left:14px;}
+  .vis-locked{flex:none;margin-right:8px;color:var(--text-faint);font-size:12px;display:inline-flex;align-items:center;justify-content:center;width:30px;height:18px;opacity:.7;cursor:not-allowed;}
+  .side-foot{margin-top:auto; display:flex; flex-direction:column; gap:10px;}
+  .status-pill{display:flex; align-items:center; gap:8px; font-size:11.5px; color:var(--text-muted); background:var(--surface-2); border:1px solid var(--border); padding:8px 10px; border-radius:999px;}
+  .dot{width:7px; height:7px; border-radius:50%; background:var(--ok);}
+  .side-note{font-size:11px; color:var(--text-faint); padding:0 8px; line-height:1.5;}
+
+  main{padding:0 0 80px;}
+  section{padding:44px clamp(20px,4vw,56px); border-bottom:1px solid var(--border);}
+  .eyebrow{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); margin:0 0 8px; font-weight:600;}
+  .sec-title{font-size:clamp(22px,2.4vw,28px); margin:0 0 6px; font-weight:600;}
+  .sec-desc{color:var(--text-muted); font-size:14px; max-width:580px; margin:0 0 28px; line-height:1.55;}
+  .sec-title-row{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+  .visibility-flag{font-size:11px; padding:4px 11px; border-radius:999px; border:1px solid var(--border); color:var(--text-faint); display:inline-flex; align-items:center; gap:6px; margin-bottom:14px;}
+  .visibility-flag.on{border-color:var(--accent); color:var(--accent-strong); background:var(--accent-soft);}
+  .visibility-flag .fdot{width:6px; height:6px; border-radius:50%; background:currentColor;}
+
+  .appearance-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:20px;}
+  .panel{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px;}
+  .panel-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;}
+  .panel-title{font-size:14px; font-weight:600;}
+  .panel-sub{font-size:11.5px; color:var(--text-faint);}
+  .font-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;}
+  .font-card{border:1.5px solid var(--border); border-radius:var(--radius-sm); padding:14px 12px; cursor:pointer; background:var(--surface-2); text-align:left; display:flex; flex-direction:column; gap:6px;}
+  .font-card:hover{border-color:var(--accent);}
+  .font-card.active{border-color:var(--accent); background:var(--accent-soft);}
+  .font-card .aa{font-size:26px; line-height:1;}
+  .font-card .fname{font-size:11.5px; color:var(--text-muted); font-family:'Inter',sans-serif;}
+  .swatch-row{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;}
+  .size-btn{border:1.5px solid var(--border); background:var(--surface-2); color:var(--text-muted); border-radius:var(--radius-sm); padding:8px 14px; cursor:pointer; font-family:var(--font-body); display:flex; align-items:baseline; gap:4px;}
+  .size-btn:hover{border-color:var(--accent);}
+  .size-btn.active{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-strong);}
+  .size-btn .g{font-weight:600;}
+  .color-swatch{width:32px; height:32px; border-radius:50%; border:2px solid var(--surface); box-shadow:0 0 0 1px var(--border); cursor:pointer;}
+  .color-swatch.active{box-shadow:0 0 0 2px var(--accent);}
+  .color-custom-row{display:flex; align-items:center; gap:10px;}
+  .color-custom-row input[type=color]{width:44px; height:36px; padding:2px; cursor:pointer;}
+  .color-custom-row input[type=text]{width:110px; font-family:'IBM Plex Mono', monospace; font-size:12.5px;}
+  .slider-block{display:flex; flex-direction:column; gap:6px; margin-bottom:16px;}
+  .slider-label-row{display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-muted);}
+  .slider-label-row b{color:var(--text); font-weight:500;}
+  input[type=range]{-webkit-appearance:none; width:100%; height:4px; background:var(--border); border-radius:4px; padding:0; border:none;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer; margin-top:-6px; box-shadow:0 1px 4px rgba(0,0,0,.25);}
+  input[type=range]::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer; border:none;}
+  .slider-ends{display:flex; justify-content:space-between; font-size:10.5px; color:var(--text-faint);}
+  .reset-row{display:flex; justify-content:flex-end; margin-top:6px;}
+  .radius-preview{display:flex; gap:10px; align-items:center; margin-top:4px;}
+  .radius-box{width:44px; height:44px; background:var(--accent-soft); border:1px solid var(--accent); border-radius:var(--radius);}
+
+  .cover-wrap{position:relative; height:200px; border-radius:var(--radius); overflow:hidden; border:1px solid var(--border);}
+  .cover{position:absolute; inset:0; background:linear-gradient(135deg, var(--accent-soft), var(--surface-2)); background-size:cover; background-position:center;}
+  .cover-edit{position:absolute; top:14px; right:14px; display:flex; gap:8px;}
+  .profile-row{display:flex; align-items:flex-end; gap:22px; margin-top:-46px; padding:0 26px; position:relative; z-index:2;}
+  .avatar-wrap{position:relative; flex:none;}
+  .avatar{width:96px; height:96px; border-radius:50%; border:4px solid var(--bg); background:var(--accent); display:flex; align-items:center; justify-content:center; font-family:var(--font-display); font-size:30px; color:var(--accent-contrast); box-shadow:var(--shadow); background-size:cover; background-position:center;}
+  .avatar-edit{position:absolute; bottom:2px; right:2px;}
+  .profile-meta{flex:1; padding-bottom:6px; display:flex; flex-direction:column; gap:8px; min-width:280px;}
+  .name-line{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .name-line input{font-family:var(--font-display); font-size:21px; font-weight:600; background:transparent; border:1px solid transparent; padding:2px 6px;}
+  .name-line input:hover, .name-line input:focus{border-color:var(--border);}
+  .verified{color:var(--ok); font-size:13px; display:flex; align-items:center; gap:4px;}
+  .handle{display:flex; align-items:center; gap:4px; color:var(--text-muted); font-size:13.5px;}
+  .handle input{background:transparent; border:none; padding:2px; width:150px; color:var(--text-muted);}
+  .profile-actions{display:flex; gap:10px; padding-bottom:6px;}
+  .categories{display:flex; gap:8px; flex-wrap:wrap; padding:20px 26px 0;}
+  .chip{font-size:11.5px; padding:5px 12px; border-radius:999px; border:1px solid var(--border); color:var(--text-muted); background:var(--surface-2);}
+  .chip.accent{border-color:var(--accent); color:var(--accent-strong); background:var(--accent-soft);}
+
+  .field-block{padding:24px 26px 0;}
+  .field-label-row{display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;}
+  .field-label{font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint);}
+  .pencil-btn{background:none; border:none; color:var(--accent); font-size:12px; display:flex; align-items:center; gap:5px; padding:2px 4px;}
+  .pencil-btn:hover{color:var(--accent-strong);}
+  .static-text{font-size:14.5px; line-height:1.6; color:var(--text-muted); max-width:640px;}
+  .editable-title{outline:none; border-bottom:1px dashed transparent; cursor:text;}
+  .editable-title:hover, .editable-title:focus{border-bottom-color:var(--accent);}
+
+  .popover-anchor{position:relative; display:inline-block;}
+  .popover{position:absolute; z-index:30; top:calc(100% + 10px); right:0; left:auto; width:min(420px,86vw); background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px; display:none; flex-direction:column; gap:10px;}
+  .popover.open{display:flex;}
+  .popover textarea{width:100%; min-height:90px; resize:vertical;}
+  .popover-foot{display:flex; justify-content:space-between; align-items:center; gap:10px;}
+  .char-count{font-size:11px; color:var(--text-faint);}
+  .popover-btns{display:flex; gap:8px;}
+
+  .stat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px;}
+  .stat-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px;}
+  .stat-label{font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--text-faint);}
+  .stat-value{font-family:var(--font-display); font-size:27px; margin-top:6px; font-weight:600;}
+  .stat-delta{font-size:12px; margin-top:4px;}
+  .stat-delta.up{color:var(--ok);}
+  .stat-delta.down{color:var(--warn);}
+
+  .chart-grid{display:grid; grid-template-columns:1.4fr 1fr; gap:16px;}
+  .legend{display:flex; gap:14px; flex-wrap:wrap; margin-top:12px; font-size:11.5px; color:var(--text-muted);}
+  .legend span{display:inline-flex; align-items:center; gap:6px;}
+  .legend-swatch{width:9px; height:9px; border-radius:2px;}
+  .donut-wrap{display:flex; align-items:center; gap:18px;}
+
+  .gallery-toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; gap:12px; flex-wrap:wrap;}
+  .filter-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .filter-chip{font-size:12px; padding:7px 14px; border-radius:999px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted);}
+  .filter-chip.active{border-color:var(--accent); color:var(--accent-strong); background:var(--accent-soft);}
+  /* content folders */
+  .cl-folders{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:16px; align-items:center;}
+  .cl-folder{display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:12px; border:1px solid var(--border); background:var(--surface); color:var(--text-muted); font-size:13px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+  .cl-folder:hover{border-color:var(--accent);}
+  .cl-folder.active{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-strong);}
+  .cl-folder.drop{border-color:var(--accent); background:var(--accent-soft); box-shadow:0 0 0 2px var(--accent) inset;}
+  .cl-folder .fi{font-size:15px;}
+  .cl-folder .fc{font-size:11px; opacity:.7;}
+  .cl-folder .fname{cursor:pointer; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .cl-folder .fx{background:none; border:none; color:var(--text-faint); cursor:pointer; font-size:13px; padding:0 2px;}
+  .cl-folder .fx:hover{color:var(--warn);}
+  .cl-addfolder{border:1.5px dashed var(--border); background:transparent; color:var(--text-faint); border-radius:12px; padding:9px 14px; font-size:13px; cursor:pointer;}
+  .cl-addfolder:hover{border-color:var(--accent); color:var(--accent);}
+  .gallery-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:16px;}
+  .g-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; display:flex; flex-direction:column;}
+  .g-card.dragging{opacity:.45;}
+  .g-card.drop-before{box-shadow:-3px 0 0 0 var(--accent);}
+  .g-card.drop-after{box-shadow:3px 0 0 0 var(--accent);}
+  .g-drag{position:absolute; top:10px; left:50%; transform:translateX(-50%); z-index:3; background:rgba(20,20,25,.55); color:#fff; border-radius:6px; font-size:12px; padding:1px 8px; cursor:grab; opacity:0; transition:opacity .15s ease;}
+  .g-card:hover .g-drag{opacity:1;}
+  /* background templates */
+  .bg-templates{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+  .bg-tpl{position:relative; border-radius:10px; overflow:hidden; cursor:pointer; border:2px solid transparent; aspect-ratio:16/10;}
+  .bg-tpl:hover{border-color:var(--border);}
+  .bg-tpl.active{border-color:var(--accent);}
+  .bg-tpl .swatch{position:absolute; inset:0;}
+  .bg-tpl .nm{position:absolute; left:0; right:0; bottom:0; font-size:10px; padding:3px 6px; color:#fff; background:linear-gradient(to top,rgba(0,0,0,.6),transparent); text-align:left;}
+  .bg-tpl .chk{position:absolute; top:4px; right:4px; width:16px; height:16px; border-radius:50%; background:var(--accent); color:#fff; font-size:10px; display:none; align-items:center; justify-content:center;}
+  .bg-tpl.active .chk{display:flex;}
+  .bg-confirm{position:fixed; left:50%; bottom:24px; transform:translateX(-50%); z-index:120; display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--accent); border-radius:14px; padding:12px 18px; box-shadow:var(--shadow); font-size:13.5px; color:var(--text);}
+  .bg-confirm .bt{height:36px; padding:0 16px; border-radius:9px; font-weight:600; font-size:13px; cursor:pointer;}
+  .bg-confirm .apply{background:var(--accent); color:var(--accent-contrast); border:none;}
+  .bg-confirm .cancel{background:transparent; border:1px solid var(--border); color:var(--text-muted);}
+  @media(max-width:560px){.bg-templates{grid-template-columns:repeat(3,1fr);}}
+  .g-thumb-wrap{position:relative; aspect-ratio:4/5; overflow:hidden; background:var(--surface-2);}
+  .g-thumb{position:absolute; inset:0; background-size:cover; transition:filter .15s ease;}
+  .g-badge{position:absolute; top:10px; left:10px; font-size:10.5px; padding:4px 9px; border-radius:999px; background:rgba(255,255,255,.9); border:1px solid var(--border); display:flex; align-items:center; gap:5px; color:var(--text);}
+  .g-type{position:absolute; top:10px; right:10px; width:26px; height:26px; border-radius:50%; background:rgba(255,255,255,.9); display:flex; align-items:center; justify-content:center; border:1px solid var(--border);}
+  .g-lock{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:rgba(20,20,25,.18); opacity:0; transition:opacity .15s ease; text-align:center; padding:10px;}
+  .g-lock.show{opacity:1;}
+  .g-lock .price-tag{background:var(--accent); color:var(--accent-contrast); font-size:12.5px; font-weight:500; padding:6px 14px; border-radius:999px;}
+  .g-body{padding:12px 14px 14px; display:flex; flex-direction:column; gap:10px;}
+  .g-title{font-size:13.5px;}
+  .g-controls{display:flex; flex-direction:column; gap:8px;}
+  .g-row{display:flex; gap:8px; align-items:center;}
+  .g-row select, .g-row input{flex:1; font-size:12.5px; padding:7px 9px;}
+  .blur-row{display:flex; align-items:center; gap:8px;}
+  .blur-row input[type=range]{flex:1;}
+  .blur-val{font-size:11px; color:var(--text-faint); width:30px; text-align:right;}
+  .g-foot{display:flex; justify-content:space-between; align-items:center; gap:6px;}
+  .icon-x{background:none; border:none; color:var(--text-faint); font-size:15px; padding:2px 6px;}
+  .icon-x:hover{color:var(--warn);}
+  .icon-dup{background:none; border:none; color:var(--text-faint); font-size:13px; padding:2px 6px;}
+  .icon-dup:hover{color:var(--accent);}
+  .add-tile{border:1.5px dashed var(--border); border-radius:var(--radius); aspect-ratio:4/5; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; color:var(--text-faint); background:transparent;}
+  .add-tile:hover{border-color:var(--accent); color:var(--accent);}
+
+  .tier-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin-bottom:20px;}
+  .tier-card{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px; display:flex; flex-direction:column; gap:12px; position:relative;}
+  .tier-card.hi{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset;}
+  .tier-tag{position:absolute; top:-10px; right:18px; font-size:10px; letter-spacing:.06em; text-transform:uppercase; background:var(--accent); color:var(--accent-contrast); padding:3px 10px; border-radius:999px;}
+  .tier-name{border:none; background:transparent; font-family:var(--font-display); font-size:18px; font-weight:600; padding:0; width:100%;}
+  .tier-price-row{display:flex; align-items:baseline; gap:6px;}
+  .tier-price-row input{width:70px; font-size:21px; font-family:var(--font-display); font-weight:600; background:transparent; border:none; padding:0;}
+  .tier-price-row span{color:var(--text-faint); font-size:12.5px;}
+  .tier-perks{display:flex; flex-direction:column; gap:6px; font-size:12.5px; color:var(--text-muted); min-height:60px;}
+  .tier-perks textarea{width:100%; min-height:70px; font-size:12.5px; background:transparent; border:1px dashed var(--border); resize:vertical;}
+  .tier-foot{display:flex; justify-content:space-between; align-items:center; margin-top:auto;}
+  .add-tier{border:1.5px dashed var(--border); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; min-height:220px; color:var(--text-faint); background:transparent;}
+  .add-tier:hover{border-color:var(--accent); color:var(--accent);}
+  .ppv-panel{display:flex; flex-wrap:wrap; gap:24px; align-items:center; justify-content:space-between;}
+  .token-note{display:flex; align-items:center; gap:14px; font-size:12.5px; color:var(--text-muted);}
+  .token-note b{color:var(--accent-strong); font-weight:600;}
+
+  .share-panel{display:flex; flex-wrap:wrap; gap:24px;}
+  .share-link-box{display:flex; align-items:center; gap:8px; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:6px 6px 6px 16px; flex:1; min-width:260px;}
+  .share-link-box input{flex:1; border:none; background:transparent; padding:4px 0; font-size:13px; color:var(--text-muted);}
+  .social-row{display:flex; gap:10px; flex-wrap:wrap;}
+  .social-btn{width:42px; height:42px; border-radius:50%; background:var(--surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center;}
+  .social-btn:hover{border-color:var(--accent);}
+
+  .wallet-top{display:flex; flex-wrap:wrap; gap:16px; margin-bottom:24px;}
+  .wallet-balance{background:var(--accent-soft); border:1px solid var(--accent); border-radius:var(--radius); padding:24px 28px; flex:1; min-width:260px;}
+  .wallet-balance .amt{font-family:var(--font-display); font-size:36px; margin:6px 0; font-weight:700; color:var(--accent-strong);}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  thead th{text-align:left; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--text-faint); padding:10px 12px; border-bottom:1px solid var(--border); font-weight:500;}
+  tbody td{padding:12px; border-bottom:1px solid var(--border); color:var(--text-muted);}
+  tbody tr:hover td{color:var(--text); background:var(--surface-2);}
+  .status-tag{font-size:10.5px; padding:3px 10px; border-radius:999px; border:1px solid var(--border);}
+  .status-tag.paid{color:var(--ok); border-color:var(--ok);}
+  .status-tag.pending{color:var(--warn); border-color:var(--warn);}
+  .table-wrap{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden;}
+  .table-head-bar{display:flex; justify-content:space-between; align-items:center; padding:16px 18px;}
+
+  .master-switch-row{display:flex; align-items:center; justify-content:space-between; padding:16px 20px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:18px;}
+  .ms-left{display:flex; align-items:center; gap:12px;}
+  .ms-icon{width:38px; height:38px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:17px;}
+  .big-toggle{width:44px; height:26px; border-radius:999px; background:var(--border); border:none; position:relative; cursor:pointer; flex:none;}
+  .big-toggle .knob{position:absolute; top:3px; left:3px; width:20px; height:20px; border-radius:50%; background:var(--surface); box-shadow:0 1px 3px rgba(0,0,0,.3); transition:left .15s ease;}
+  .big-toggle.on{background:var(--accent);}
+  .big-toggle.on .knob{left:21px;}
+  .audience-row{display:flex; gap:18px; flex-wrap:wrap; margin-bottom:18px;}
+  .audience-check{display:flex; align-items:center; gap:8px; font-size:13px; color:var(--text-muted); background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:8px 16px;}
+  .audience-check input{width:auto;}
+  .goal-grid{display:grid; grid-template-columns:1.3fr 1fr; gap:16px; margin-bottom:16px;}
+  .progress-track{background:var(--surface-2); border-radius:999px; height:12px; overflow:hidden; margin:10px 0;}
+  .progress-fill{height:100%; background:var(--accent); border-radius:999px;}
+  .goal-nums{display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-muted);}
+  .goal-nums b{color:var(--text); font-family:var(--font-display); font-size:16px;}
+  .gift-catalog{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:12px; margin-bottom:18px;}
+  .gift-tile{background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:14px; display:flex; flex-direction:column; gap:8px;}
+  .gift-tile .emoji-row{display:flex; gap:8px; align-items:center;}
+  .gift-tile input[data-role="emoji"]{width:44px; text-align:center; font-size:16px; padding:8px 6px;}
+  .gift-tile input[data-role="label"]{width:100%; font-size:12.5px;}
+  .gift-tile input[data-role="amount"]{width:100%; font-size:12.5px;}
+  .gift-tile .gt-foot{display:flex; justify-content:flex-end;}
+  .add-gift-tile{border:1.5px dashed var(--border); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; min-height:120px; color:var(--text-faint); background:transparent;}
+  .add-gift-tile:hover{border-color:var(--accent); color:var(--accent);}
+
+  #toast{position:fixed; bottom:24px; right:24px; z-index:100; display:flex; flex-direction:column; gap:8px;}
+  .toast-msg{background:var(--surface); border:1px solid var(--accent); color:var(--text); padding:12px 18px; border-radius:var(--radius-sm); font-size:13px; box-shadow:var(--shadow); animation:toastIn .18s ease;}
+  @keyframes toastIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);}}
+
+  @media (max-width:900px){
+    .shell{grid-template-columns:1fr;}
+    .sidebar{position:relative; height:auto; flex-direction:row; align-items:center; overflow-x:auto; padding:16px;}
+    .nav{flex-direction:row;}
+    .side-foot, .side-note{display:none;}
+    .chart-grid, .appearance-grid, .goal-grid{grid-template-columns:1fr;}
+    .profile-row{flex-wrap:wrap;}
+  }
+  @media (prefers-reduced-motion:reduce){ *{animation:none !important; transition:none !important;} }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="mark">Secret<em>X</em>perience</div>
+      <div class="sub">Creator Studio</div>
+    </div>
+    <nav class="nav" id="navList">
+      <div class="nav-item active" data-target="profile">
+        <a href="#profile"><span class="n">01</span> Profile</a>
+        <button class="vis-toggle on" data-target="profile" title="Visible on public profile" aria-label="Toggle Profile visible on public profile"><span class="knob"></span></button>
+      </div>
+      <div class="nav-item" data-target="appearance">
+        <a href="#appearance"><span class="n">02</span> Appearance</a>
+        <span class="vis-locked" title="Always private — dashboard only" aria-label="Appearance is always private">🔒</span>
+      </div>
+      <div class="nav-item" data-target="stats">
+        <a href="#stats"><span class="n">03</span> Insights</a>
+        <span class="vis-locked" title="Always private — dashboard only" aria-label="Insights is always private">🔒</span>
+      </div>
+      <div class="nav-item" data-target="content">
+        <a href="#content"><span class="n">04</span> Content</a>
+        <button class="vis-toggle on" data-target="content" title="Visible on public profile" aria-label="Toggle Content visible on public profile"><span class="knob"></span></button>
+      </div>
+      <div class="nav-item" data-target="pricing">
+        <a href="#pricing"><span class="n">05</span> Pricing</a>
+        <button class="vis-toggle on" data-target="pricing" title="Visible on public profile" aria-label="Toggle Pricing visible on public profile"><span class="knob"></span></button>
+      </div>
+      <div class="nav-item" data-target="share">
+        <a href="#share"><span class="n">06</span> Share</a>
+        <button class="vis-toggle on" data-target="share" title="Visible on public profile" aria-label="Toggle Share visible on public profile"><span class="knob"></span></button>
+      </div>
+      <div class="nav-item" data-target="wallet">
+        <a href="#wallet"><span class="n">07</span> Wallet</a>
+        <span class="vis-locked" title="Always private — dashboard only" aria-label="Wallet is always private">🔒</span>
+      </div>
+      <div class="nav-item" data-target="gifts">
+        <a href="#gifts"><span class="n">08</span> Gifts</a>
+        <button class="vis-toggle on" data-target="gifts" title="Visible on public profile" aria-label="Toggle Gifts visible on public profile"><span class="knob"></span></button>
+      </div>
+    </nav>
+    <button class="btn btn-accent" id="uploadProfileBtn" style="justify-content:center; margin-top:6px;">
+      <span style="font-size:15px; line-height:1;">⤴</span> Upload profile
+    </button>
+    <div class="side-foot">
+      <div class="status-pill" id="liveStatus"><span class="dot"></span> Not published yet</div>
+      <div class="side-note">The switch next to each section sets whether that module shows on your public profile. Everything stays editable here either way.</div>
+      <button class="btn btn-ghost" style="justify-content:center;">Preview as visitor</button>
+    </div>
+  </aside>
+
+  <main>
+
+    <!-- PROFILE -->
+    <section id="profile">
+      <div class="sec-title-row"><p class="eyebrow">Step 01 — Set up</p></div>
+      <h1 class="sec-title">Your creator profile</h1>
+      <span class="visibility-flag on" id="flag-profile"><span class="fdot"></span> Visible on public profile</span>
+      <p class="sec-desc">This is what people see before they subscribe. Fill it in once — you can change any of it later.</p>
+
+      <div class="cover-wrap">
+        <div class="cover" id="coverImg"></div>
+        <div class="cover-edit"><button class="btn-icon" id="editCoverBtn" title="Change background photo" aria-label="Change background photo">⤴</button></div>
+      </div>
+
+      <div class="profile-row">
+        <div class="avatar-wrap">
+          <div class="avatar" id="avatarImg">A</div>
+          <button class="btn-icon avatar-edit" id="editAvatarBtn" title="Change profile photo" aria-label="Change profile photo">✎</button>
+        </div>
+        <div class="profile-meta">
+          <div class="name-line">
+            <input type="text" id="displayName" value="Aria Noir" aria-label="Display name">
+            <span class="verified">✓ Verified</span>
+            <div class="popover-anchor">
+              <button class="pencil-btn" id="openNamePop" aria-label="Edit name and username">✎ Edit name</button>
+              <div class="popover" id="namePopover" style="width:min(340px,88vw); left:0; right:auto;">
+                <div class="field-label">Display name</div>
+                <input type="text" id="nameEditInput" maxlength="80" aria-label="Display name">
+                <div class="field-label" style="margin-top:6px;">Username</div>
+                <div class="handle" style="border:1px solid var(--border); border-radius:var(--radius-sm); padding:2px 8px;">@ <input type="text" id="handleEditInput" maxlength="30" aria-label="Username" style="flex:1;"></div>
+                <div class="field-label" style="margin-top:6px;">Name colour</div>
+                <div class="swatch-row" id="nameColorSwatches" style="margin-bottom:0;"></div>
+                <div class="field-label" style="margin-top:6px;">Name size</div>
+                <div id="nameSizeRow" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+                <div class="popover-foot" style="margin-top:6px;">
+                  <span class="char-count">Shown on your public profile</span>
+                  <div class="popover-btns">
+                    <button class="btn btn-ghost" data-cancel="name">Cancel</button>
+                    <button class="btn btn-accent" data-save="name">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="handle">@ <input type="text" id="handleName" value="arianoir" aria-label="Username"></div>
+        </div>
+        <div class="profile-actions">
+          <button class="btn btn-ghost">Preview profile</button>
+          <button class="btn btn-accent">Save changes</button>
+        </div>
+      </div>
+
+      <div class="categories">
+        <span class="chip accent">Photo sets</span>
+        <span class="chip accent">Video</span>
+        <span class="chip">Livestreams</span>
+        <span class="chip">Custom requests</span>
+        <button class="chip" style="cursor:pointer;">+ Add category</button>
+      </div>
+
+      <div class="field-block">
+        <div class="field-label-row">
+          <span class="field-label">Promo headline</span>
+          <div class="popover-anchor">
+            <button class="pencil-btn" id="openHeadlinePop">✎ Edit</button>
+            <div class="popover" id="headlinePopover">
+              <textarea id="headlineInput" maxlength="90">New content every Friday — first week free for new subscribers.</textarea>
+              <div class="popover-foot">
+                <span class="char-count"><span id="headlineCount">0</span>/90</span>
+                <div class="popover-btns">
+                  <button class="btn btn-ghost" data-cancel="headline">Cancel</button>
+                  <button class="btn btn-accent" data-save="headline">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="static-text" id="headlineDisplay">New content every Friday — first week free for new subscribers.</p>
+      </div>
+
+      <div class="field-block" style="padding-bottom:6px;">
+        <div class="field-label-row">
+          <span class="field-label">Bio</span>
+          <div class="popover-anchor">
+            <button class="pencil-btn" id="openBioPop">✎ Edit</button>
+            <div class="popover" id="bioPopover" style="width:min(480px,88vw);">
+              <textarea id="bioInput" maxlength="300">Independent creator based in the EU. Photo sets and video drops weekly, plus monthly livestreams for VIP members. DMs open for custom requests.</textarea>
+              <div class="popover-foot">
+                <span class="char-count"><span id="bioCount">0</span>/300</span>
+                <div class="popover-btns">
+                  <button class="btn btn-ghost" data-cancel="bio">Cancel</button>
+                  <button class="btn btn-accent" data-save="bio">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="static-text" id="bioDisplay">Independent creator based in the EU. Photo sets and video drops weekly, plus monthly livestreams for VIP members. DMs open for custom requests.</p>
+      </div>
+    </section>
+
+    <!-- APPEARANCE -->
+    <section id="appearance">
+      <p class="eyebrow">Customize</p>
+      <h1 class="sec-title">Appearance</h1>
+      <span class="visibility-flag" id="flag-appearance"><span class="fdot"></span> Dashboard only</span>
+      <p class="sec-desc">Set the typography, accent color and background tone for your dashboard and public profile. Changes apply live.</p>
+
+      <div class="appearance-grid">
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">Typography</span></div>
+          <div class="font-grid" id="fontGrid"></div>
+          <div style="margin-top:18px;">
+            <div class="panel-sub" style="margin-bottom:8px;">Text colour</div>
+            <div class="swatch-row" id="typeColorSwatches" style="margin-bottom:0;"></div>
+          </div>
+          <div style="margin-top:16px;">
+            <div class="panel-sub" style="margin-bottom:8px;">Text size</div>
+            <div id="typeSizeRow" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><span class="panel-title">Accent color</span></div>
+          <div class="swatch-row" id="colorSwatches"></div>
+          <div class="color-custom-row">
+            <input type="color" id="accentPicker" value="#3e5c76" aria-label="Custom accent color">
+            <input type="text" id="accentHex" value="#3E5C76" aria-label="Accent hex value">
+            <button class="btn btn-ghost" id="applyHexBtn">Apply</button>
+          </div>
+          <div style="margin-top:20px;">
+            <div class="panel-sub" style="margin-bottom:4px;">Background templates</div>
+            <div style="font-size:11px; color:var(--text-faint); margin-bottom:10px;">Click to select · double-click to preview, then confirm.</div>
+            <div class="bg-templates" id="bgTemplates"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-head"><span class="panel-title">Background</span><span class="panel-sub">Live preview across the whole dashboard</span></div>
+
+        <div class="slider-block">
+          <div class="slider-label-row"><span>Background tone</span><b id="toneVal">96</b></div>
+          <input type="range" id="toneSlider" min="6" max="96" value="96">
+          <div class="slider-ends"><span>Dark</span><span>Light</span></div>
+        </div>
+
+        <div class="slider-block">
+          <div class="slider-label-row"><span>Warmth</span><b id="warmthVal">30</b></div>
+          <input type="range" id="warmthSlider" min="0" max="100" value="30">
+          <div class="slider-ends"><span>Cool</span><span>Warm</span></div>
+        </div>
+
+        <div class="slider-block">
+          <div class="slider-label-row"><span>Tint strength</span><b id="tintVal">5</b></div>
+          <input type="range" id="tintSlider" min="0" max="16" value="5">
+          <div class="slider-ends"><span>Neutral gray</span><span>Colored</span></div>
+        </div>
+
+        <div class="slider-block">
+          <div class="slider-label-row"><span>Surface contrast</span><b id="contrastVal">40</b></div>
+          <input type="range" id="contrastSlider" min="10" max="90" value="40">
+          <div class="slider-ends"><span>Subtle</span><span>Bold</span></div>
+        </div>
+
+        <div class="slider-block" style="margin-bottom:0;">
+          <div class="slider-label-row"><span>Corner radius</span><b id="radiusVal">10px</b></div>
+          <input type="range" id="radiusSlider" min="0" max="24" value="10">
+          <div class="radius-preview"><div class="radius-box"></div><span class="panel-sub">Sharp ↔ Rounded</span></div>
+        </div>
+
+        <div class="reset-row"><button class="btn btn-ghost" id="resetThemeBtn">Reset to default</button></div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section id="stats">
+      <p class="eyebrow">Step 03 — Track</p>
+      <h1 class="sec-title">Insights</h1>
+      <span class="visibility-flag" id="flag-stats"><span class="fdot"></span> Dashboard only</span>
+      <p class="sec-desc">How your profile is performing this month.</p>
+
+      <div class="stat-grid" style="margin-bottom:16px;">
+        <div class="stat-card"><span class="stat-label">Profile views</span><div class="stat-value">18,420</div><div class="stat-delta up">▲ 12.4% vs last month</div></div>
+        <div class="stat-card"><span class="stat-label">Followers</span><div class="stat-value">6,932</div><div class="stat-delta up">▲ 3.1%</div></div>
+        <div class="stat-card"><span class="stat-label">Paid subscribers</span><div class="stat-value">842</div><div class="stat-delta up">▲ 8.6%</div></div>
+        <div class="stat-card"><span class="stat-label">Wallet balance</span><div class="stat-value">€4,286</div><div class="stat-delta down">▼ payout pending</div></div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div><div class="panel-title">Traffic — last 14 days</div><div class="panel-sub">Unique profile visits</div></div>
+            <select id="trafficRange" style="font-size:12px; padding:6px 10px;">
+              <option>14 days</option><option>30 days</option><option>90 days</option>
+            </select>
+          </div>
+          <svg id="trafficChart" viewBox="0 0 560 200" width="100%" height="200"></svg>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><div><div class="panel-title">Audience split</div><div class="panel-sub">By access tier</div></div></div>
+          <div class="donut-wrap">
+            <svg id="donutChart" viewBox="0 0 140 140" width="140" height="140"></svg>
+            <div class="legend" style="flex-direction:column; gap:10px; margin-top:0;">
+              <span><span class="legend-swatch" id="legDonut1" style="background:var(--text-faint);"></span> Free followers · 82.4%</span>
+              <span><span class="legend-swatch" id="legDonut2" style="background:var(--accent);"></span> Subscribers · 14.1%</span>
+              <span><span class="legend-swatch" id="legDonut3" style="background:var(--warn);"></span> VIP · 3.5%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top:16px;">
+        <div class="panel-head"><div><div class="panel-title">Revenue by source — last 6 months</div><div class="panel-sub">Subscriptions, pay-per-view, tips</div></div></div>
+        <svg id="revChart" viewBox="0 0 700 190" width="100%" height="190"></svg>
+        <div class="legend">
+          <span><span class="legend-swatch" id="legRev1" style="background:var(--accent);"></span> Subscriptions</span>
+          <span><span class="legend-swatch" id="legRev2" style="background:var(--warn);"></span> Pay-per-view</span>
+          <span><span class="legend-swatch" id="legRev3" style="background:var(--text-faint);"></span> Tips</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTENT -->
+    <section id="content">
+      <p class="eyebrow">Step 04 — Publish</p>
+      <h1 class="sec-title">Content library</h1>
+      <span class="visibility-flag on" id="flag-content"><span class="fdot"></span> Visible on public profile</span>
+      <p class="sec-desc">Choose what's visible to everyone, what unlocks with a subscription, and what's sold individually. Use the blur control to set how much shows in a locked preview. Click a title to rename it.</p>
+
+      <div class="gallery-toolbar">
+        <div class="filter-row">
+          <button class="filter-chip active" data-filter="all">All (6)</button>
+          <button class="filter-chip" data-filter="public">Public</button>
+          <button class="filter-chip" data-filter="subscribers">Subscribers</button>
+          <button class="filter-chip" data-filter="ppv">Pay-per-view</button>
+        </div>
+        <button class="btn btn-accent" id="topAddBtn">＋ Upload content</button>
+      </div>
+
+      <div class="cl-folders" id="clFolders"></div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing">
+      <p class="eyebrow">Step 05 — Price it</p>
+      <h1 class="sec-title">Subscription tiers</h1>
+      <span class="visibility-flag on" id="flag-pricing"><span class="fdot"></span> Visible on public profile</span>
+      <p class="sec-desc">Subscribers get everything marked "Subscribers" in your library for the duration of their plan. Pay-per-view items are always priced separately.</p>
+
+      <div class="tier-grid" id="tierGrid"></div>
+
+      <div class="panel ppv-panel">
+        <div class="token-note"><span>◆</span><span>Platform tokens: <b>10 tokens = €1</b>. Fans can also pay per item directly in tokens.</span></div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label class="field-label" for="ppvDefault" style="text-transform:none; letter-spacing:0;">Default pay-per-view price</label>
+          <input type="number" id="ppvDefault" value="9.00" step="0.5" style="width:90px;">
+          <span style="color:var(--text-faint); font-size:12.5px;">EUR</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SHARE -->
+    <section id="share">
+      <p class="eyebrow">Step 06 — Grow</p>
+      <h1 class="sec-title">Share your profile</h1>
+      <span class="visibility-flag on" id="flag-share"><span class="fdot"></span> Visible on public profile</span>
+      <p class="sec-desc">Send people straight to your page, or drop your link on social platforms.</p>
+
+      <div class="share-panel">
+        <div class="share-link-box">
+          <input type="text" id="shareUrl" value="secretxperience.eu/c/arianoir" readonly>
+          <button class="btn btn-accent" id="copyLinkBtn">Copy link</button>
+        </div>
+        <div class="social-row">
+          <button class="social-btn" title="Share to X" data-share="x">𝕏</button>
+          <button class="social-btn" title="Share to Telegram" data-share="telegram">✈</button>
+          <button class="social-btn" title="Share to Reddit" data-share="reddit">◉</button>
+          <button class="social-btn" title="Share via email" data-share="email">✉</button>
+          <button class="social-btn" title="Copy embed code" data-share="embed">&lt;/&gt;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- WALLET -->
+    <section id="wallet">
+      <p class="eyebrow">Step 07 — Get paid</p>
+      <h1 class="sec-title">Wallet</h1>
+      <span class="visibility-flag" id="flag-wallet"><span class="fdot"></span> Dashboard only</span>
+      <p class="sec-desc">Earnings from subscriptions, pay-per-view unlocks, gifts and tips land here before payout.</p>
+
+      <div class="wallet-top">
+        <div class="wallet-balance"><span class="field-label">Available balance</span><div class="amt">€4,286.40</div><button class="btn btn-accent" id="payoutBtn">Request payout</button></div>
+        <div class="stat-card" style="flex:1; min-width:200px;"><span class="stat-label">Pending clearance</span><div class="stat-value" style="font-size:24px;">€612.00</div><span style="font-size:12px; color:var(--text-faint);">Clears in 2–5 days</span></div>
+        <div class="stat-card" style="flex:1; min-width:200px;"><span class="stat-label">Paid out to date</span><div class="stat-value" style="font-size:24px;">€28,910</div><span style="font-size:12px; color:var(--text-faint);">Since account start</span></div>
+      </div>
+
+      <div class="table-wrap">
+        <div class="table-head-bar">
+          <span class="panel-title">Recent transactions</span>
+          <select id="txFilter" style="font-size:12px; padding:6px 10px;">
+            <option value="all">All types</option><option value="Subscription">Subscriptions</option><option value="Pay-per-view">Pay-per-view</option><option value="Tip">Tips</option><option value="Gift">Gifts</option>
+          </select>
+        </div>
+        <table>
+          <thead><tr><th>Date</th><th>Fan</th><th>Type</th><th>Amount</th><th>Status</th></tr></thead>
+          <tbody id="txBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- GIFTS -->
+    <section id="gifts" style="border-bottom:none;">
+      <p class="eyebrow">Step 08 — Gifts &amp; goals</p>
+      <h1 class="sec-title">Gifts</h1>
+      <span class="visibility-flag on" id="flag-gifts"><span class="fdot"></span> Visible on public profile</span>
+      <p class="sec-desc">Let visitors, fans and members send you a gift on top of subscriptions. You can point gifts at a personal goal or a cause you support.</p>
+
+      <div class="master-switch-row">
+        <div class="ms-left">
+          <div class="ms-icon">🎁</div>
+          <div>
+            <div style="font-weight:500; font-size:14px;">Accept gifts</div>
+            <div style="font-size:12px; color:var(--text-faint);">Shows a "Send a gift" button on your public profile</div>
+          </div>
+        </div>
+        <button class="big-toggle on" id="giftsMasterToggle" aria-label="Toggle accepting gifts"><span class="knob"></span></button>
+      </div>
+
+      <div class="audience-row">
+        <label class="audience-check"><input type="checkbox" checked data-audience="visitors"> Visitors (not following)</label>
+        <label class="audience-check"><input type="checkbox" checked data-audience="fans"> Fans (free followers)</label>
+        <label class="audience-check"><input type="checkbox" checked data-audience="members"> Members (paid subscribers)</label>
+      </div>
+
+      <div class="goal-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div><div class="panel-title">Your goal</div><div class="panel-sub">Shown to everyone who opens the gift panel</div></div>
+            <div class="popover-anchor">
+              <button class="pencil-btn" id="openGoalPop">✎ Edit</button>
+              <div class="popover" id="goalPopover" style="width:min(440px,88vw);">
+                <select id="goalTypeInput" style="margin-bottom:4px;">
+                  <option value="charity">Supporting a good cause</option>
+                  <option value="personal">Personal goal</option>
+                  <option value="other">Other</option>
+                </select>
+                <textarea id="goalTextInput" maxlength="200">I support a good cause — every gift I receive goes toward a charity I'm currently saving for. Send a gift and help me reach the goal.</textarea>
+                <div class="popover-foot">
+                  <span class="char-count"><span id="goalCount">0</span>/200</span>
+                  <div class="popover-btns">
+                    <button class="btn btn-ghost" data-cancel="goal">Cancel</button>
+                    <button class="btn btn-accent" data-save="goal">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="chip accent" id="goalTypeChip" style="margin-bottom:10px; display:inline-block;">Supporting a good cause</span>
+          <p class="static-text" id="goalTextDisplay">I support a good cause — every gift I receive goes toward a charity I'm currently saving for. Send a gift and help me reach the goal.</p>
+          <div class="progress-track"><div class="progress-fill" id="goalProgressFill" style="width:64%;"></div></div>
+          <div class="goal-nums">
+            <span><b id="goalRaised">€1,280</b> raised</span>
+            <span>Target: <input type="number" id="goalTargetInput" value="2000" style="width:80px; display:inline-block; padding:4px 8px; font-size:12.5px;"> EUR</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">Gifts received</span>
+          <div class="stat-value" style="font-size:26px;">143</div>
+          <span class="stat-delta up">▲ 21 this week</span>
+          <div style="margin-top:14px;">
+            <span class="stat-label">Total gift value</span>
+            <div class="stat-value" style="font-size:22px;">€1,280.00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-head" style="margin-bottom:10px;"><span class="panel-title">Gift catalog</span><span class="panel-sub">What fans, members and visitors can choose from</span></div>
+      <div class="gift-catalog" id="giftCatalog"></div>
+
+      <div class="table-wrap">
+        <div class="table-head-bar"><span class="panel-title">Recent gifts</span></div>
+        <table>
+          <thead><tr><th>Date</th><th>From</th><th>Type</th><th>Gift</th><th>Message</th></tr></thead>
+          <tbody id="giftBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+<div class="bg-confirm" id="bgConfirm" style="display:none;">
+  <span id="bgConfirmLabel">Preview — keep this background?</span>
+  <button class="bt cancel" id="bgCancel">Cancel</button>
+  <button class="bt apply" id="bgApply">Install</button>
+</div>
+<input type="file" id="hiddenFileInput" accept="image/*" style="display:none;">
+
+<script>
+(function(){
+
+  function showToast(msg){
+    const t = document.createElement('div'); t.className='toast-msg'; t.textContent=msg;
+    document.getElementById('toast').appendChild(t);
+    setTimeout(()=>t.remove(), 2600);
+  }
+
+  /* ===================== DATA LAYER (live, same-origin) ===================== */
+  const API = '/api/creators/studio';
+  let PROFILE={}, POSTS=[], WALLET={balance:0}, LEDGER=[], GIFTS=[], STATS={}, REV=[], ACT=[];
+
+  const DEFAULTS = {
+    theme: null,
+    sections: { profile:true, appearance:false, stats:false, content:true, pricing:true, share:true, wallet:false, gifts:true },
+    categories: [ {label:'Photo sets',on:true},{label:'Video',on:true},{label:'Livestreams',on:false},{label:'Custom requests',on:false} ],
+    tiers: [
+      {name:'Fan', price:'9', perks:'Full photo library\nWeekly posts\nDirect messages', highlight:false},
+      {name:'Subscriber', price:'19', perks:'Everything in Fan\nAll videos included\nMonthly livestream access', highlight:true, tag:'Most popular'},
+      {name:'VIP', price:'39', perks:'Everything in Subscriber\n1 custom request / month\nPriority replies', highlight:false},
+    ],
+    ppvDefault: '9.00',
+    published: false,
+    publishedAt: null,
+    nameStyle: { color:null, size:'m' },
+    sectionOrder: ['profile','appearance','stats','content','pricing','share','wallet','gifts'],
+    folders: [],
+    postFolders: {},
+    postOrder: [],
+    giftsEnabled: true,
+    giftAudience: { visitors:true, fans:true, members:true },
+    goal: { type:'charity', text:"I support a good cause — every gift I receive goes toward a charity I'm currently saving for. Send a gift and help me reach the goal.", target:2000 },
+    giftCatalog: [ {emoji:'☕',label:'Coffee',amount:3},{emoji:'🌹',label:'Rose',amount:5},{emoji:'🍾',label:'Bubbly',amount:15},{emoji:'💎',label:'Diamond',amount:50} ],
+  };
+  let CONFIG = JSON.parse(JSON.stringify(DEFAULTS));
+
+  async function api(payload){
+    const r = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    let j = {}; try { j = await r.json(); } catch(e){}
+    if(!r.ok) throw new Error(j.error || 'Request failed');
+    return j;
+  }
+  let cfgTimer=null;
+  function persistConfig(note){
+    clearTimeout(cfgTimer);
+    cfgTimer = setTimeout(()=>{ api({action:'config', config:CONFIG}).then(()=>{ if(note) showToast(note); }).catch(err=>showToast(err.message)); }, 500);
+  }
+  function saveProfile(patch, note){
+    api(Object.assign({action:'profile'}, patch)).then(()=>{ if(note) showToast(note); }).catch(err=>showToast(err.message));
+  }
+
+  /* ============ VISIBILITY TOGGLES (public profile vs dashboard-only) ============ */
+  document.querySelectorAll('.vis-toggle').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      const on = btn.classList.toggle('on');
+      const target = btn.dataset.target;
+      const flag = document.getElementById('flag-'+target);
+      if(flag){
+        flag.classList.toggle('on', on);
+        flag.innerHTML = `<span class="fdot"></span> ${on ? 'Visible on public profile' : 'Dashboard only'}`;
+      }
+      CONFIG.sections[target] = on;
+      applySectionVisibility(target, on);
+      persistConfig();
+      showToast(on ? 'Section shown — now on your public profile' : 'Section hidden — off your public profile');
+    });
+  });
+  document.querySelectorAll('.nav-item a').forEach(link=>{
+    link.addEventListener('click', ()=>{
+      document.querySelectorAll('.nav-item').forEach(l=>l.classList.remove('active'));
+      link.closest('.nav-item').classList.add('active');
+    });
+  });
+  // Toggling a section off slides the switch left AND hides that section's card in
+  // the dashboard; it reappears only when re-activated. Locked sections are unaffected.
+  function applySectionVisibility(target, on){
+    const sec = document.getElementById(target);
+    if(sec) sec.classList.toggle('section-hidden', !on);
+    const item = document.querySelector(`.nav-item[data-target="${target}"]`);
+    if(item) item.classList.toggle('off', !on);
+  }
+  function applySectionToggles(){
+    document.querySelectorAll('.vis-toggle').forEach(btn=>{
+      const target = btn.dataset.target;
+      const on = !!CONFIG.sections[target];
+      btn.classList.toggle('on', on);
+      const flag = document.getElementById('flag-'+target);
+      if(flag){ flag.classList.toggle('on', on); flag.innerHTML = `<span class="fdot"></span> ${on ? 'Visible on public profile' : 'Dashboard only'}`; }
+      applySectionVisibility(target, on);
+    });
+  }
+
+  /* ============ DRAG-REORDER THE 8 STEPS ============ */
+  function currentOrder(){ return [...document.querySelectorAll('#navList .nav-item')].map(i=>i.dataset.target); }
+  function renumberNav(){ [...document.querySelectorAll('#navList .nav-item .n')].forEach((n,i)=>{ n.textContent=String(i+1).padStart(2,'0'); }); }
+  function applyOrderToNav(){
+    const nav=document.getElementById('navList'); if(!nav) return;
+    (CONFIG.sectionOrder||[]).forEach(t=>{ const it=nav.querySelector(`.nav-item[data-target="${t}"]`); if(it) nav.appendChild(it); });
+    renumberNav();
+  }
+  function applyOrderToSections(){
+    const main=document.querySelector('main'); if(!main) return;
+    (CONFIG.sectionOrder||[]).forEach(t=>{ const s=document.getElementById(t); if(s) main.appendChild(s); });
+  }
+  function saveOrderFromDom(){
+    CONFIG.sectionOrder = currentOrder();
+    applyOrderToSections(); renumberNav();
+    persistConfig('Layout order saved');
+  }
+  function initNavDrag(){
+    const nav=document.getElementById('navList'); if(!nav) return;
+    nav.querySelectorAll('.nav-item').forEach(item=>{
+      if(!item.querySelector('.nav-grip')){
+        const grip=document.createElement('span'); grip.className='nav-grip'; grip.textContent='⠿'; grip.title='Drag to reorder';
+        item.insertBefore(grip, item.firstChild);
+      }
+      item.setAttribute('draggable','true');
+    });
+    let dragEl=null;
+    const clearMarks=()=>nav.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('drop-before','drop-after'));
+    nav.addEventListener('dragstart', e=>{ const it=e.target.closest('.nav-item'); if(!it) return; dragEl=it; it.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain',it.dataset.target); }catch(_){} });
+    nav.addEventListener('dragend', ()=>{ if(dragEl) dragEl.classList.remove('dragging'); dragEl=null; clearMarks(); });
+    nav.addEventListener('dragover', e=>{
+      e.preventDefault(); const it=e.target.closest('.nav-item'); if(!it||it===dragEl) return;
+      const r=it.getBoundingClientRect(); const after=(e.clientY-r.top)/r.height>0.5;
+      clearMarks(); it.classList.add(after?'drop-after':'drop-before');
+    });
+    nav.addEventListener('drop', e=>{
+      e.preventDefault(); const it=e.target.closest('.nav-item'); if(!it||!dragEl||it===dragEl){ clearMarks(); return; }
+      const r=it.getBoundingClientRect(); const after=(e.clientY-r.top)/r.height>0.5;
+      if(after) it.after(dragEl); else it.before(dragEl);
+      clearMarks(); saveOrderFromDom();
+    });
+  }
+  initNavDrag();
+
+  /* ============ THEME ENGINE ============ */
+  const fontOptions = [
+    {key:'inter', label:'Modern Sans', desc:'Inter — clean & neutral', display:"'Inter', sans-serif", body:"'Inter', sans-serif"},
+    {key:'serif', label:'Editorial', desc:'Source Serif · Inter', display:"'Source Serif 4', serif", body:"'Inter', sans-serif"},
+    {key:'grotesk', label:'Grotesk', desc:'Space Grotesk · Inter', display:"'Space Grotesk', sans-serif", body:"'Inter', sans-serif"},
+    {key:'classic', label:'Classic', desc:'Playfair · PT Sans', display:"'Playfair Display', serif", body:"'PT Sans', sans-serif"},
+    {key:'plex', label:'Corporate', desc:'IBM Plex Sans', display:"'IBM Plex Sans', sans-serif", body:"'IBM Plex Sans', sans-serif"},
+  ];
+  const colorPresets = ['#3e5c76','#3a6b52','#5b4a8a','#8a4a4a','#8a6a2f','#3a3a3f'];
+  const defaults = {font:'inter', accent:'#3e5c76', tone:96, warmth:30, tint:5, contrast:40, radius:10, typeColor:null, typeScale:1, bgImage:null};
+  const BG_TEMPLATES = [
+    {key:'midnight', name:'Midnight', grad:'radial-gradient(120% 90% at 30% 15%, #2a1e4a, #0b0912)', tone:12, warmth:40, tint:6, contrast:45},
+    {key:'onyx',     name:'Onyx',     grad:'linear-gradient(160deg,#16181d,#0a0b0e)',                 tone:11, warmth:20, tint:2, contrast:40},
+    {key:'velvet',   name:'Velvet',   grad:'radial-gradient(120% 90% at 70% 15%, #3a1030, #0d0810)',  tone:10, warmth:85, tint:7, contrast:45},
+    {key:'abyss',    name:'Abyss',    grad:'linear-gradient(160deg,#0c1a2a,#070d16)',                 tone:12, warmth:5,  tint:6, contrast:45},
+    {key:'pine',     name:'Pine',     grad:'linear-gradient(160deg,#0f2018,#070f0b)',                 tone:13, warmth:55, tint:6, contrast:45},
+    {key:'ember',    name:'Ember',    grad:'radial-gradient(120% 90% at 30% 85%, #3a1a10, #100a08)',  tone:12, warmth:95, tint:7, contrast:45},
+    {key:'porcelain',name:'Porcelain',grad:'linear-gradient(160deg,#ffffff,#eceef1)',                 tone:96, warmth:25, tint:3, contrast:40},
+    {key:'blush',    name:'Blush',    grad:'linear-gradient(160deg,#fbeef3,#f2e5ec)',                 tone:95, warmth:80, tint:6, contrast:38},
+    {key:'mist',     name:'Mist',     grad:'linear-gradient(160deg,#eef3f6,#e3eaef)',                 tone:95, warmth:10, tint:5, contrast:38},
+    {key:'sand',     name:'Sand',     grad:'linear-gradient(160deg,#f7f1e6,#eee6d5)',                 tone:94, warmth:70, tint:6, contrast:40},
+  ];
+  const TYPE_COLORS = [
+    {key:'black', hex:'#111111'}, {key:'white', hex:'#ffffff'},
+    {key:'cyan', hex:'#00AEEF'}, {key:'magenta', hex:'#EC008C'},
+    {key:'yellow', hex:'#F6D500'}, {key:'key', hex:'#231F20'},
+  ];
+  const TYPE_SIZES = [ {key:'s', label:'Small', scale:0.9}, {key:'m', label:'Medium', scale:1}, {key:'l', label:'Large', scale:1.12} ];
+  let theme = Object.assign({}, defaults);
+
+  function hexToRgb(hex){ hex=(hex||'#3e5c76').replace('#',''); if(hex.length===3) hex=hex.split('').map(c=>c+c).join(''); const n=parseInt(hex,16); return {r:(n>>16)&255, g:(n>>8)&255, b:n&255}; }
+  function rgbToHex(r,g,b){ return '#'+[r,g,b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join(''); }
+  function mix(hex, targetHex, amt){ const a=hexToRgb(hex), b=hexToRgb(targetHex); return rgbToHex(a.r+(b.r-a.r)*amt, a.g+(b.g-a.g)*amt, a.b+(b.b-a.b)*amt); }
+  function luminance(hex){ const {r,g,b}=hexToRgb(hex); return (0.299*r+0.587*g+0.114*b)/255; }
+  function hueForWarmth(t){ return 210 - (t/100)*(210-30); }
+
+  function applyTheme(){
+    const root = document.documentElement.style;
+    const isDark = theme.tone < 50;
+    const bgHue = hueForWarmth(theme.warmth);
+    const sat = theme.tint;
+    const bg = `hsl(${bgHue.toFixed(0)}, ${sat}%, ${theme.tone}%)`;
+    const off = 2 + (theme.contrast/100)*12;
+    const surfaceL = isDark ? Math.min(96, theme.tone+off) : Math.max(4, theme.tone-off*0.55);
+    const surface = `hsl(${bgHue.toFixed(0)}, ${sat}%, ${surfaceL.toFixed(1)}%)`;
+    const surface2L = isDark ? Math.min(97, theme.tone+off*1.7) : Math.max(3, theme.tone-off*1.1);
+    const surface2 = `hsl(${bgHue.toFixed(0)}, ${sat}%, ${surface2L.toFixed(1)}%)`;
+    const borderL = isDark ? Math.min(98, theme.tone+off*2.2) : Math.max(2, theme.tone-off*1.6);
+    const border = `hsl(${bgHue.toFixed(0)}, ${sat}%, ${borderL.toFixed(1)}%)`;
+    const textL = isDark ? 95 : 12;
+    const mutedL = isDark ? 72 : 40;
+    const faintL = isDark ? 52 : 60;
+    const text = `hsl(${bgHue.toFixed(0)}, ${Math.min(sat,8)}%, ${textL}%)`;
+    const muted = `hsl(${bgHue.toFixed(0)}, ${Math.min(sat,8)}%, ${mutedL}%)`;
+    const faint = `hsl(${bgHue.toFixed(0)}, ${Math.min(sat,8)}%, ${faintL}%)`;
+
+    root.setProperty('--bg', bg);
+    root.setProperty('--surface', surface);
+    root.setProperty('--surface-2', surface2);
+    root.setProperty('--border', border);
+    root.setProperty('--text', text);
+    root.setProperty('--text-muted', muted);
+    root.setProperty('--text-faint', faint);
+
+    const accentSoft = mix(theme.accent, isDark? '#000000':'#ffffff', isDark?0.65:0.85);
+    const accentStrong = mix(theme.accent, '#000000', 0.22);
+    const accentContrast = luminance(theme.accent) > 0.55 ? '#141417' : '#ffffff';
+    root.setProperty('--accent', theme.accent);
+    root.setProperty('--accent-soft', accentSoft);
+    root.setProperty('--accent-strong', accentStrong);
+    root.setProperty('--accent-contrast', accentContrast);
+
+    root.setProperty('--radius', theme.radius+'px');
+    root.setProperty('--radius-sm', Math.round(theme.radius*0.6)+'px');
+    root.setProperty('--bg-image', theme.bgImage || 'none');
+    document.querySelectorAll('#bgTemplates .bg-tpl').forEach(el=>el.classList.toggle('active', el.dataset.grad===theme.bgImage));
+
+    const f = fontOptions.find(f=>f.key===theme.font) || fontOptions[0];
+    root.setProperty('--font-display', f.display);
+    root.setProperty('--font-body', f.body);
+
+    document.getElementById('toneVal').textContent = theme.tone;
+    document.getElementById('warmthVal').textContent = theme.warmth;
+    document.getElementById('tintVal').textContent = theme.tint;
+    document.getElementById('contrastVal').textContent = theme.contrast;
+    document.getElementById('radiusVal').textContent = theme.radius+'px';
+    document.getElementById('accentPicker').value = theme.accent;
+    document.getElementById('accentHex').value = theme.accent.toUpperCase();
+
+    document.querySelectorAll('.font-card').forEach(c=>c.classList.toggle('active', c.dataset.key===theme.font));
+    document.querySelectorAll('#colorSwatches .color-swatch').forEach(c=>c.classList.toggle('active', c.dataset.color.toLowerCase()===theme.accent.toLowerCase()));
+
+    // Typography colour override — when chosen, sets the dashboard text colour and
+    // derives muted/faint by mixing toward the background so it stays legible.
+    if(theme.typeColor){
+      const tc = theme.typeColor;
+      root.setProperty('--text', tc);
+      root.setProperty('--text-muted', mix(tc, bg, 0.35));
+      root.setProperty('--text-faint', mix(tc, bg, 0.6));
+    }
+    document.querySelectorAll('#typeColorSwatches .color-swatch').forEach(c=>c.classList.toggle('active', (theme.typeColor||'').toLowerCase()===c.dataset.color.toLowerCase()));
+
+    // Typography size — scale the content area's type.
+    const mainEl = document.querySelector('main');
+    if(mainEl) mainEl.style.zoom = String(theme.typeScale || 1);
+    document.querySelectorAll('#typeSizeRow .size-btn').forEach(b=>b.classList.toggle('active', Number(b.dataset.scale)===Number(theme.typeScale||1)));
+
+    if(typeof rerenderCharts === 'function') rerenderCharts();
+  }
+  function themeChanged(){ CONFIG.theme = Object.assign({}, theme); persistConfig(); }
+
+  function buildFontGrid(){
+    const grid = document.getElementById('fontGrid');
+    grid.innerHTML = fontOptions.map(f=>`
+      <button type="button" class="font-card" data-key="${f.key}">
+        <span class="aa" style="font-family:${f.display};">Aa</span>
+        <span class="fname">${f.label}<br>${f.desc}</span>
+      </button>
+    `).join('');
+    grid.querySelectorAll('.font-card').forEach(btn=>{
+      btn.addEventListener('click', ()=>{ theme.font = btn.dataset.key; applyTheme(); themeChanged(); showToast('Typography updated'); });
+    });
+  }
+  function buildSwatches(){
+    const row = document.getElementById('colorSwatches');
+    row.innerHTML = colorPresets.map(c=>`<button type="button" class="color-swatch" data-color="${c}" style="background:${c};" aria-label="Set accent color ${c}"></button>`).join('');
+    row.querySelectorAll('.color-swatch').forEach(sw=>{
+      sw.addEventListener('click', ()=>{ theme.accent = sw.dataset.color; applyTheme(); themeChanged(); showToast('Accent color updated'); });
+    });
+  }
+  function buildTypeColors(){
+    const row = document.getElementById('typeColorSwatches');
+    if(!row) return;
+    row.innerHTML = TYPE_COLORS.map(c=>`<button type="button" class="color-swatch" data-color="${c.hex}" style="background:${c.hex};" title="${c.key}" aria-label="Set text colour ${c.key}"></button>`).join('');
+    row.querySelectorAll('.color-swatch').forEach(sw=>{
+      sw.addEventListener('click', ()=>{
+        theme.typeColor = (theme.typeColor && theme.typeColor.toLowerCase()===sw.dataset.color.toLowerCase()) ? null : sw.dataset.color;
+        applyTheme(); themeChanged(); showToast(theme.typeColor ? 'Text colour updated' : 'Text colour reset to automatic');
+      });
+    });
+  }
+  function buildTypeSizes(){
+    const row = document.getElementById('typeSizeRow');
+    if(!row) return;
+    row.innerHTML = TYPE_SIZES.map(s=>`<button type="button" class="size-btn" data-scale="${s.scale}"><span class="g" style="font-size:${13*s.scale}px;">Aa</span>${s.label}</button>`).join('');
+    row.querySelectorAll('.size-btn').forEach(b=>{
+      b.addEventListener('click', ()=>{ theme.typeScale = Number(b.dataset.scale); applyTheme(); themeChanged(); showToast('Text size updated'); });
+    });
+  }
+  // Background templates — click to select, double-click to live-preview + confirm.
+  let bgSnapshot = null;
+  function buildBgTemplates(){
+    const grid = document.getElementById('bgTemplates');
+    if(!grid) return;
+    grid.innerHTML = BG_TEMPLATES.map(t=>`
+      <button type="button" class="bg-tpl" data-key="${t.key}" data-grad="${t.grad.replace(/"/g,'&quot;')}" title="${t.name} — double-click to preview">
+        <span class="swatch" style="background:${t.grad};"></span>
+        <span class="chk">✓</span>
+        <span class="nm">${t.name}</span>
+      </button>`).join('');
+    grid.querySelectorAll('.bg-tpl').forEach(el=>{
+      el.addEventListener('click', ()=>{ grid.querySelectorAll('.bg-tpl').forEach(x=>x.classList.remove('active')); el.classList.add('active'); });
+      el.addEventListener('dblclick', ()=>{ previewTemplate(el.dataset.key); });
+    });
+  }
+  function previewTemplate(key){
+    const t = BG_TEMPLATES.find(x=>x.key===key); if(!t) return;
+    if(!bgSnapshot) bgSnapshot = Object.assign({}, theme);
+    theme.tone = t.tone; theme.warmth = t.warmth; theme.tint = t.tint; theme.contrast = t.contrast; theme.bgImage = t.grad;
+    document.getElementById('toneSlider').value = t.tone;
+    document.getElementById('warmthSlider').value = t.warmth;
+    document.getElementById('tintSlider').value = t.tint;
+    document.getElementById('contrastSlider').value = t.contrast;
+    applyTheme();
+    const bar = document.getElementById('bgConfirm');
+    document.getElementById('bgConfirmLabel').textContent = `Preview: ${t.name} — keep this background?`;
+    bar.style.display = 'flex';
+  }
+  document.getElementById('bgApply').addEventListener('click', ()=>{
+    bgSnapshot = null; document.getElementById('bgConfirm').style.display='none';
+    themeChanged(); showToast('Background installed');
+  });
+  document.getElementById('bgCancel').addEventListener('click', ()=>{
+    if(bgSnapshot){ theme = Object.assign({}, bgSnapshot); bgSnapshot=null;
+      document.getElementById('toneSlider').value = theme.tone;
+      document.getElementById('warmthSlider').value = theme.warmth;
+      document.getElementById('tintSlider').value = theme.tint;
+      document.getElementById('contrastSlider').value = theme.contrast;
+      applyTheme();
+    }
+    document.getElementById('bgConfirm').style.display='none';
+  });
+
+  buildFontGrid();
+  buildSwatches();
+  buildTypeColors();
+  buildTypeSizes();
+  buildBgTemplates();
+
+  document.getElementById('accentPicker').addEventListener('input', e=>{ theme.accent = e.target.value; applyTheme(); });
+  document.getElementById('accentPicker').addEventListener('change', themeChanged);
+  document.getElementById('applyHexBtn').addEventListener('click', ()=>{
+    let v = document.getElementById('accentHex').value.trim();
+    if(!v.startsWith('#')) v = '#'+v;
+    if(/^#([0-9a-f]{6}|[0-9a-f]{3})$/i.test(v)){ theme.accent = v; applyTheme(); themeChanged(); showToast('Accent color updated'); }
+    else showToast('Enter a valid hex color, e.g. #3E5C76');
+  });
+  [['toneSlider','tone'],['warmthSlider','warmth'],['tintSlider','tint'],['contrastSlider','contrast'],['radiusSlider','radius']].forEach(([id,key])=>{
+    const el = document.getElementById(id);
+    el.addEventListener('input', e=>{ theme[key] = parseInt(e.target.value); applyTheme(); });
+    el.addEventListener('change', themeChanged);
+  });
+  document.getElementById('resetThemeBtn').addEventListener('click', ()=>{
+    theme = Object.assign({}, defaults);
+    document.getElementById('toneSlider').value = theme.tone;
+    document.getElementById('warmthSlider').value = theme.warmth;
+    document.getElementById('tintSlider').value = theme.tint;
+    document.getElementById('contrastSlider').value = theme.contrast;
+    document.getElementById('radiusSlider').value = theme.radius;
+    applyTheme(); themeChanged();
+    showToast('Appearance reset to default');
+  });
+
+  /* ---------- Cover / avatar / content upload (live to storage) ---------- */
+  let pendingTarget = null;
+  const hiddenInput = document.getElementById('hiddenFileInput');
+  document.getElementById('editCoverBtn').addEventListener('click', ()=>{ pendingTarget='cover'; hiddenInput.accept='image/*'; hiddenInput.click(); });
+  document.getElementById('editAvatarBtn').addEventListener('click', ()=>{ pendingTarget='avatar'; hiddenInput.accept='image/*'; hiddenInput.click(); });
+  function setLiveStatus(){
+    const pill = document.getElementById('liveStatus');
+    if(!pill) return;
+    if(CONFIG.published){
+      pill.classList.add('is-live');
+      pill.innerHTML = '<span class="dot"></span> Profile live';
+      pill.style.color = '#22e584';
+      pill.querySelector('.dot').style.background = '#22e584';
+    } else {
+      pill.classList.remove('is-live');
+      pill.innerHTML = '<span class="dot"></span> Not published yet';
+      pill.style.color = '';
+      pill.querySelector('.dot').style.background = '';
+    }
+  }
+  async function publishProfile(){
+    const btn = document.getElementById('uploadProfileBtn');
+    const first = !CONFIG.published;
+    clearTimeout(cfgTimer);
+    const prevHtml = btn.innerHTML;
+    btn.disabled = true; btn.style.opacity = '.7';
+    btn.innerHTML = '<span style="font-size:15px; line-height:1;">⤴</span> Publishing…';
+    try {
+      // Push the latest profile fields live alongside the config, so one click
+      // makes everything the creator sees here visible on the public page.
+      const patch = {
+        full_name: (document.getElementById('displayName').value||'').trim(),
+        username: (document.getElementById('handleName').value||'').trim(),
+        headline: (document.getElementById('headlineInput').value||'').trim(),
+        bio: (document.getElementById('bioInput').value||'').trim(),
+      };
+      await api(Object.assign({action:'profile'}, patch));
+      CONFIG.published = true;
+      CONFIG.publishedAt = new Date().toISOString();
+      await api({action:'config', config:CONFIG});
+      PROFILE.username = patch.username || PROFILE.username;
+      window.__pubUrl = PROFILE.username ? `secretxperience.eu/c/${PROFILE.username}` : 'secretxperience.eu/creators';
+      const su = document.getElementById('shareUrl'); if(su) su.value = window.__pubUrl;
+      setLiveStatus();
+      showToast(first ? 'Profile published — it is now live at '+window.__pubUrl : 'Changes published — your public profile is updated');
+    } catch(err){
+      showToast(err.message || 'Could not publish — please try again');
+    } finally {
+      btn.disabled = false; btn.style.opacity = ''; btn.innerHTML = prevHtml;
+    }
+  }
+  document.getElementById('uploadProfileBtn').addEventListener('click', publishProfile);
+
+  async function uploadFile(file, target){
+    const fd = new FormData(); fd.append('file', file); fd.append('target', target);
+    const r = await fetch(API+'/upload', { method:'POST', body: fd });
+    let j={}; try{ j=await r.json(); }catch(e){}
+    if(!r.ok) throw new Error(j.error || 'Upload failed');
+    return j;
+  }
+  hiddenInput.addEventListener('change', async (e)=>{
+    const file = e.target.files[0]; hiddenInput.value=''; if(!file) return;
+    const target = pendingTarget; pendingTarget=null;
+    if(target==='cover' || target==='avatar'){
+      showToast('Uploading…');
+      try{
+        const {url} = await uploadFile(file, target);
+        if(target==='cover'){ document.getElementById('coverImg').style.backgroundImage = `url(${url})`; }
+        else { const av=document.getElementById('avatarImg'); av.style.backgroundImage=`url(${url})`; av.textContent=''; }
+        showToast(target==='cover'?'Background photo updated':'Profile photo updated');
+      }catch(err){ showToast(err.message); }
+    } else if(target==='content-new' || (target && target.startsWith('content-replace:'))){
+      showToast('Uploading…');
+      try{
+        const {url, type} = await uploadFile(file, 'content');
+        if(target==='content-new'){
+          const {post} = await api({action:'post_create', mediaUrl:url, mediaType:type, title:'New upload', visibility:'public', blur:0, price:0});
+          POSTS.unshift(post); (CONFIG.postOrder||(CONFIG.postOrder=[])).unshift(post.id); persistConfig(); renderGallery(); renderFolders(); showToast('Content added');
+        } else {
+          const id = target.split(':')[1]; const it = POSTS.find(p=>p.id===id);
+          if(it){ it.media_url=url; it.media_type=type; renderGallery(); showToast('Content updated'); }
+        }
+      }catch(err){ showToast(err.message); }
+    }
+  });
+
+  /* ---------- Popovers ---------- */
+  function wirePopover(openBtnId, popId, inputId, displayId, countId, onSave){
+    const openBtn=document.getElementById(openBtnId), pop=document.getElementById(popId), input=document.getElementById(inputId), display=document.getElementById(displayId), count=document.getElementById(countId);
+    function updateCount(){ if(count) count.textContent = input.value.length; }
+    updateCount();
+    input.addEventListener('input', updateCount);
+    openBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      document.querySelectorAll('.popover.open').forEach(p=>{ if(p!==pop) p.classList.remove('open'); });
+      pop.classList.toggle('open'); if(pop.classList.contains('open')) input.focus();
+    });
+    pop.querySelector('[data-save]').addEventListener('click', ()=>{ display.textContent=input.value; pop.classList.remove('open'); if(onSave) onSave(); showToast('Saved'); });
+    pop.querySelector('[data-cancel]').addEventListener('click', ()=>{ input.value=display.textContent; updateCount(); pop.classList.remove('open'); });
+    pop.addEventListener('click', (e)=>e.stopPropagation());
+  }
+  wirePopover('openHeadlinePop','headlinePopover','headlineInput','headlineDisplay','headlineCount', ()=>{
+    saveProfile({ headline: document.getElementById('headlineDisplay').textContent });
+  });
+  wirePopover('openBioPop','bioPopover','bioInput','bioDisplay','bioCount', ()=>{
+    saveProfile({ bio: document.getElementById('bioDisplay').textContent });
+  });
+  wirePopover('openGoalPop','goalPopover','goalTextInput','goalTextDisplay','goalCount', ()=>{
+    const typeLabels = {charity:'Supporting a good cause', personal:'Personal goal', other:'Other goal'};
+    const type = document.getElementById('goalTypeInput').value;
+    document.getElementById('goalTypeChip').textContent = typeLabels[type];
+    CONFIG.goal.type = type; CONFIG.goal.text = document.getElementById('goalTextDisplay').textContent;
+    persistConfig();
+  });
+  document.addEventListener('click', ()=>{ document.querySelectorAll('.popover.open').forEach(p=>p.classList.remove('open')); });
+
+  /* ---------- Name & username edit (text, colour, size) ---------- */
+  const NAME_SIZES = [ {key:'s', label:'S', px:18}, {key:'m', label:'M', px:21}, {key:'l', label:'L', px:26} ];
+  function applyNameStyle(){
+    const el = document.getElementById('displayName'); if(!el) return;
+    const ns = CONFIG.nameStyle || {};
+    el.style.color = ns.color || '';
+    const sz = NAME_SIZES.find(s=>s.key===(ns.size||'m')) || NAME_SIZES[1];
+    el.style.fontSize = sz.px+'px';
+  }
+  function buildNameStyleControls(){
+    const cRow = document.getElementById('nameColorSwatches');
+    if(cRow) {
+      cRow.innerHTML = TYPE_COLORS.map(c=>`<button type="button" class="color-swatch" data-color="${c.hex}" style="background:${c.hex};" title="${c.key}"></button>`).join('');
+      cRow.querySelectorAll('.color-swatch').forEach(sw=>sw.addEventListener('click', ()=>{
+        CONFIG.nameStyle.color = (CONFIG.nameStyle.color && CONFIG.nameStyle.color.toLowerCase()===sw.dataset.color.toLowerCase()) ? null : sw.dataset.color;
+        markNameActive(); applyNameStyle();
+      }));
+    }
+    const sRow = document.getElementById('nameSizeRow');
+    if(sRow){
+      sRow.innerHTML = NAME_SIZES.map(s=>`<button type="button" class="size-btn" data-size="${s.key}"><span class="g">${s.label}</span></button>`).join('');
+      sRow.querySelectorAll('.size-btn').forEach(b=>b.addEventListener('click', ()=>{ CONFIG.nameStyle.size = b.dataset.size; markNameActive(); applyNameStyle(); }));
+    }
+  }
+  function markNameActive(){
+    document.querySelectorAll('#nameColorSwatches .color-swatch').forEach(c=>c.classList.toggle('active', (CONFIG.nameStyle.color||'').toLowerCase()===c.dataset.color.toLowerCase()));
+    document.querySelectorAll('#nameSizeRow .size-btn').forEach(b=>b.classList.toggle('active', b.dataset.size===(CONFIG.nameStyle.size||'m')));
+  }
+  (function wireNamePopover(){
+    const openBtn=document.getElementById('openNamePop'), pop=document.getElementById('namePopover');
+    if(!openBtn||!pop) return;
+    openBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      document.querySelectorAll('.popover.open').forEach(p=>{ if(p!==pop) p.classList.remove('open'); });
+      const opening = !pop.classList.contains('open');
+      pop.classList.toggle('open', opening);
+      if(opening){
+        document.getElementById('nameEditInput').value = document.getElementById('displayName').value;
+        document.getElementById('handleEditInput').value = document.getElementById('handleName').value;
+        markNameActive();
+      }
+    });
+    pop.addEventListener('click', (e)=>e.stopPropagation());
+    pop.querySelector('[data-cancel="name"]').addEventListener('click', ()=>pop.classList.remove('open'));
+    pop.querySelector('[data-save="name"]').addEventListener('click', ()=>{
+      const nm = document.getElementById('nameEditInput').value.trim();
+      const un = document.getElementById('handleEditInput').value.trim();
+      document.getElementById('displayName').value = nm;
+      document.getElementById('handleName').value = un;
+      applyNameStyle();
+      saveProfile({ full_name: nm, username: un }, 'Name saved');
+      persistConfig();
+      pop.classList.remove('open');
+    });
+  })();
+
+  /* ---------- Profile save + preview ---------- */
+  const profSaveBtn = document.querySelector('#profile .profile-actions .btn-accent');
+  if(profSaveBtn) profSaveBtn.addEventListener('click', ()=>{
+    saveProfile({
+      full_name: document.getElementById('displayName').value,
+      username: document.getElementById('handleName').value,
+      bio: document.getElementById('bioDisplay').textContent,
+      headline: document.getElementById('headlineDisplay').textContent,
+    }, 'Profile saved');
+  });
+  document.querySelectorAll('.profile-actions .btn-ghost, .side-foot .btn-ghost').forEach(b=>b.addEventListener('click', ()=>{ const path = window.__pubUrl ? '/'+window.__pubUrl.split('/').slice(1).join('/') : '/creators'; window.open(path, '_blank'); }));
+
+  /* ---------- Charts ---------- */
+  function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+  function buildLineChart(svgEl, data, color){
+    if(!svgEl) return;
+    const w=560,h=200,pad=24;
+    if(!data.length) data=[0,0];
+    const max=Math.max(...data), min=Math.min(...data);
+    const stepX=(w-pad*2)/(data.length-1);
+    const scaleY=v=>h-pad-((v-min)/(max-min||1))*(h-pad*1.6);
+    let path=''; let area=`M${pad},${h-pad} `;
+    data.forEach((v,i)=>{ const x=pad+i*stepX, y=scaleY(v); path+=(i===0?'M':'L')+x+','+y+' '; area+=`L${x},${y} `; });
+    area += `L${pad+(data.length-1)*stepX},${h-pad} Z`;
+    let svg = `<defs><linearGradient id="lg1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity="0.28"/><stop offset="100%" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>`;
+    const bd = cssVar('--border') || '#e0e0e3';
+    for(let i=0;i<=3;i++){ const y = pad + i*((h-pad*1.6)/3); svg += `<line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="${bd}" stroke-width="1"/>`; }
+    svg += `<path d="${area}" fill="url(#lg1)"/>`;
+    svg += `<path d="${path}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>`;
+    data.forEach((v,i)=>{ const x=pad+i*stepX, y=scaleY(v); svg += `<circle cx="${x}" cy="${y}" r="${i===data.length-1?4:2.4}" fill="${color}"/>`; });
+    svgEl.innerHTML = svg;
+  }
+  function buildDonut(svgEl, segments, centerText){
+    if(!svgEl) return;
+    const cx=70, cy=70, r=52, sw=18; let angle=-90, out='';
+    const circumference = 2*Math.PI*r;
+    const total = segments.reduce((a,s)=>a+s.value,0) || 1;
+    segments.forEach(seg=>{
+      const pct = (seg.value/total)*100;
+      const len=(pct/100)*circumference;
+      out += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${seg.color}" stroke-width="${sw}" stroke-dasharray="${len} ${circumference-len}" stroke-dashoffset="${-((angle+90)/360)*circumference}" transform="rotate(-90 ${cx} ${cy})" stroke-linecap="butt"/>`;
+      angle += (pct/100)*360;
+    });
+    out += `<circle cx="${cx}" cy="${cy}" r="${r-sw/2-4}" fill="${cssVar('--surface')||'#fff'}"/>`;
+    out += `<text x="${cx}" y="${cy+5}" text-anchor="middle" font-family="${cssVar('--font-display')||'Inter'}" font-size="17" fill="${cssVar('--text')||'#1c1c1f'}">${centerText}</text>`;
+    svgEl.innerHTML = out;
+  }
+  function buildBars(svgEl, values, labels, color){
+    if(!svgEl) return;
+    const w=700,h=190,pad=30, gap=18;
+    const barW = (w-pad*2-gap*(values.length-1))/values.length;
+    const max = Math.max(1, ...values);
+    let out='';
+    values.forEach((val,i)=>{
+      const x = pad + i*(barW+gap); const totalH=(h-pad*1.6);
+      const segH=(val/max)*totalH; const y=(h-pad)-segH;
+      out += `<rect x="${x}" y="${y}" width="${barW}" height="${Math.max(0,segH)}" rx="3" fill="${color}"/>`;
+      out += `<text x="${x+barW/2}" y="${h-8}" text-anchor="middle" font-size="11" fill="${cssVar('--text-faint')||'#93939c'}" font-family="${cssVar('--font-body')||'Inter'}">${labels[i]}</text>`;
+    });
+    svgEl.innerHTML = out;
+  }
+
+  function rerenderCharts(){
+    const accent = cssVar('--accent') || '#3e5c76';
+    const warn = cssVar('--warn') || '#b0822f';
+    const faint = cssVar('--text-faint') || '#93939c';
+    buildLineChart(document.getElementById('trafficChart'), ACT.length?ACT:[0,0], accent);
+    const pub = POSTS.filter(p=>p.visibility==='public').length;
+    const sub = POSTS.filter(p=>p.visibility==='subscribers').length;
+    const ppv = POSTS.filter(p=>p.visibility==='ppv').length;
+    buildDonut(document.getElementById('donutChart'), [ {value:pub,color:faint},{value:sub,color:accent},{value:ppv,color:warn} ], String(POSTS.length));
+    buildBars(document.getElementById('revChart'), REV.map(m=>m.tokens), REV.map(m=>m.label), accent);
+    const dl = document.querySelector('#stats .donut-wrap .legend');
+    if(dl) dl.innerHTML = `
+      <span><span class="legend-swatch" style="background:${faint};"></span> Public · ${pub}</span>
+      <span><span class="legend-swatch" style="background:${accent};"></span> Subscribers · ${sub}</span>
+      <span><span class="legend-swatch" style="background:${warn};"></span> Pay-per-view · ${ppv}</span>`;
+    const rl = document.querySelector('#revChart').parentElement.querySelector('.legend');
+    if(rl) rl.innerHTML = `<span><span class="legend-swatch" style="background:${accent};"></span> Token income</span>`;
+  }
+  const trafRange = document.getElementById('trafficRange');
+  if(trafRange) trafRange.addEventListener('change', rerenderCharts);
+
+  /* ---------- Gallery (live posts) ---------- */
+  const gradients = [
+    'linear-gradient(150deg,var(--accent-soft),var(--surface-2))',
+    'linear-gradient(150deg,var(--surface-2),var(--border))',
+    'linear-gradient(150deg,var(--accent-soft),var(--surface))',
+    'linear-gradient(150deg,var(--border),var(--surface-2))',
+    'linear-gradient(150deg,var(--surface-2),var(--accent-soft))',
+    'linear-gradient(150deg,var(--surface),var(--border))'
+  ];
+  let activeFilter = 'all';
+  let activeFolder = null; // null = All
+  function visLabel(v){ return v==='public'?'Public':v==='subscribers'?'Subscribers':'Pay-per-view'; }
+  function titleOf(p){ return p.title || p.caption || 'Untitled'; }
+  function normalizeOrder(){
+    const ids = POSTS.map(p=>p.id);
+    CONFIG.postOrder = (CONFIG.postOrder||[]).filter(id=>ids.includes(id));
+    ids.forEach(id=>{ if(!CONFIG.postOrder.includes(id)) CONFIG.postOrder.push(id); });
+  }
+  function orderedPosts(){
+    normalizeOrder();
+    const byId = {}; POSTS.forEach(p=>byId[p.id]=p);
+    return CONFIG.postOrder.map(id=>byId[id]).filter(Boolean);
+  }
+  function reorderPost(dragId, targetId, after){
+    normalizeOrder();
+    const o = CONFIG.postOrder;
+    const di = o.indexOf(dragId); if(di>-1) o.splice(di,1);
+    let ti = o.indexOf(targetId); if(ti<0){ o.push(dragId); }
+    else o.splice(after?ti+1:ti, 0, dragId);
+    renderGallery(); persistConfig('Order saved');
+  }
+  function folderCount(fid){ return POSTS.filter(p=>(CONFIG.postFolders[p.id]||null)===fid).length; }
+  function renderFolders(){
+    const bar = document.getElementById('clFolders'); if(!bar) return;
+    const folders = CONFIG.folders || [];
+    bar.innerHTML =
+      `<div class="cl-folder ${activeFolder===null?'active':''}" data-folder="__all"><span class="fi">🗂️</span> All <span class="fc">${POSTS.length}</span></div>` +
+      folders.map(f=>`<div class="cl-folder ${activeFolder===f.id?'active':''}" data-folder="${f.id}" title="Click to filter · drop content here"><span class="fi">📁</span><span class="fname">${(f.name||'Folder').replace(/</g,'&lt;')}</span><span class="fc">${folderCount(f.id)}</span><button class="fx" data-ren="${f.id}" title="Rename folder">✎</button><button class="fx" data-del="${f.id}" title="Delete folder">✕</button></div>`).join('') +
+      (folders.length < 6 ? `<button class="cl-addfolder" id="clAddFolder">＋ New folder</button>` : '');
+
+    bar.querySelectorAll('.cl-folder').forEach(el=>{
+      el.addEventListener('click', e=>{ if(e.target.closest('button')) return; const f=el.dataset.folder; activeFolder = f==='__all'?null:f; renderFolders(); renderGallery(); });
+      el.addEventListener('dragover', e=>{ e.preventDefault(); el.classList.add('drop'); });
+      el.addEventListener('dragleave', ()=>el.classList.remove('drop'));
+      el.addEventListener('drop', e=>{
+        e.preventDefault(); el.classList.remove('drop');
+        let id=''; try{ id=e.dataTransfer.getData('text/plain'); }catch(_){}
+        if(!id) return;
+        const f = el.dataset.folder;
+        if(f==='__all') delete CONFIG.postFolders[id]; else CONFIG.postFolders[id]=f;
+        renderFolders(); renderGallery(); persistConfig('Moved to folder');
+      });
+    });
+    bar.querySelectorAll('[data-ren]').forEach(btn=>btn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const f=(CONFIG.folders||[]).find(x=>x.id===e.currentTarget.dataset.ren); if(!f) return;
+      const nm = prompt('Rename folder', f.name); if(nm && nm.trim()){ f.name=nm.trim().slice(0,24); renderFolders(); persistConfig('Folder renamed'); }
+    }));
+    bar.querySelectorAll('[data-del]').forEach(btn=>btn.addEventListener('click', e=>{
+      e.stopPropagation(); const fid=e.currentTarget.dataset.del;
+      CONFIG.folders = (CONFIG.folders||[]).filter(x=>x.id!==fid);
+      Object.keys(CONFIG.postFolders).forEach(pid=>{ if(CONFIG.postFolders[pid]===fid) delete CONFIG.postFolders[pid]; });
+      if(activeFolder===fid) activeFolder=null;
+      renderFolders(); renderGallery(); persistConfig('Folder deleted');
+    }));
+    const add=document.getElementById('clAddFolder');
+    if(add) add.addEventListener('click', ()=>{
+      if((CONFIG.folders||[]).length>=6){ showToast('Maximum 6 folders'); return; }
+      CONFIG.folders.push({ id:'f'+Date.now().toString(36), name:'New folder' });
+      renderFolders(); persistConfig('Folder added');
+    });
+  }
+
+  function renderGallery(){
+    const grid = document.getElementById('galleryGrid');
+    const items = orderedPosts().filter(it =>
+      (activeFilter==='all' || it.visibility===activeFilter) &&
+      (activeFolder===null || (CONFIG.postFolders[it.id]||null)===activeFolder));
+    grid.innerHTML = items.map((it,idx)=>{
+      const showLock = it.visibility !== 'public';
+      const price = Number(it.price)||0;
+      const blur = Number(it.blur)||0;
+      const bg = it.media_url ? `url(${it.media_url}) center/cover` : gradients[idx % gradients.length];
+      return `
+      <div class="g-card" data-id="${it.id}" draggable="true">
+        <div class="g-thumb-wrap">
+          <div class="g-thumb" style="background:${bg}; filter:blur(${blur}px);"></div>
+          <span class="g-drag" title="Drag to reorder, or onto a folder">⠿ drag</span>
+          <div class="g-badge">${it.visibility==='ppv' ? '€'+price.toFixed(2) : visLabel(it.visibility)}</div>
+          <div class="g-type">${it.media_type==='video'?'▶':'◧'}</div>
+          <div class="g-lock ${showLock?'show':''}"><span class="price-tag">${it.visibility==='ppv' ? 'Unlock · €'+price.toFixed(2) : 'Subscribers only'}</span></div>
+        </div>
+        <div class="g-body">
+          <div class="g-title editable-title" contenteditable="true" data-id="${it.id}" spellcheck="false">${titleOf(it)}</div>
+          <div class="g-controls">
+            <div class="g-row">
+              <select data-role="visibility" data-id="${it.id}">
+                <option value="public" ${it.visibility==='public'?'selected':''}>Public</option>
+                <option value="subscribers" ${it.visibility==='subscribers'?'selected':''}>Subscribers only</option>
+                <option value="ppv" ${it.visibility==='ppv'?'selected':''}>Pay-per-view</option>
+              </select>
+              ${it.visibility==='ppv' ? `<input type="number" step="0.5" min="0" value="${price}" data-role="price" data-id="${it.id}" style="width:64px;">` : ''}
+            </div>
+            <div class="blur-row">
+              <span style="font-size:11px; color:var(--text-faint);">Blur</span>
+              <input type="range" min="0" max="20" value="${blur}" data-role="blur" data-id="${it.id}">
+              <span class="blur-val">${blur}px</span>
+            </div>
+          </div>
+          <div class="g-foot">
+            <div style="display:flex; gap:2px;">
+              <button class="btn btn-ghost" style="font-size:11.5px; padding:6px 12px;" data-role="replace" data-id="${it.id}">Replace</button>
+            </div>
+            <button class="icon-x" data-role="remove" data-id="${it.id}" aria-label="Remove content">✕</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('') + `<button class="add-tile" id="addTileBtn"><span style="font-size:24px;">＋</span><span style="font-size:12.5px;">Upload content</span></button>`;
+
+    // filter counts
+    const allChip = document.querySelector('.filter-chip[data-filter="all"]');
+    if(allChip) allChip.textContent = `All (${POSTS.length})`;
+
+    grid.querySelectorAll('[data-role="visibility"]').forEach(sel=>sel.addEventListener('change', e=>{
+      const it = POSTS.find(g=>g.id===e.target.dataset.id); if(!it) return;
+      it.visibility = e.target.value;
+      if(it.visibility==='ppv' && !Number(it.price)) it.price = parseFloat(document.getElementById('ppvDefault').value)||9;
+      if(it.visibility!=='public' && Number(it.blur)===0) it.blur = 8;
+      if(it.visibility==='public') it.blur = 0;
+      renderGallery();
+      api({action:'post_update', id:it.id, visibility:it.visibility, blur:it.blur, price:it.price}).then(()=>showToast('Visibility updated')).catch(err=>showToast(err.message));
+    }));
+    grid.querySelectorAll('[data-role="price"]').forEach(inp=>inp.addEventListener('change', e=>{
+      const it = POSTS.find(g=>g.id===e.target.dataset.id); if(!it) return; it.price = parseFloat(e.target.value)||0;
+      api({action:'post_update', id:it.id, price:it.price}).then(()=>showToast('Price updated')).catch(err=>showToast(err.message));
+    }));
+    grid.querySelectorAll('[data-role="blur"]').forEach(rng=>{
+      rng.addEventListener('input', e=>{
+        const it = POSTS.find(g=>g.id===e.target.dataset.id); if(!it) return; it.blur = parseInt(e.target.value);
+        const card = e.target.closest('.g-card');
+        card.querySelector('.g-thumb').style.filter = `blur(${it.blur}px)`;
+        card.querySelector('.blur-val').textContent = it.blur+'px';
+      });
+      rng.addEventListener('change', e=>{
+        const it = POSTS.find(g=>g.id===e.target.dataset.id); if(!it) return;
+        api({action:'post_update', id:it.id, blur:it.blur}).catch(err=>showToast(err.message));
+      });
+    });
+    grid.querySelectorAll('[data-role="remove"]').forEach(btn=>btn.addEventListener('click', e=>{
+      const id=e.currentTarget.dataset.id; const i=POSTS.findIndex(g=>g.id===id);
+      if(i>-1){ const removed=POSTS[i]; POSTS.splice(i,1);
+        delete CONFIG.postFolders[id]; CONFIG.postOrder=(CONFIG.postOrder||[]).filter(x=>x!==id); persistConfig();
+        renderGallery(); renderFolders();
+        api({action:'post_delete', id}).then(()=>showToast('Content removed')).catch(err=>{ POSTS.splice(i,0,removed); renderGallery(); renderFolders(); showToast(err.message); });
+      }
+    }));
+    grid.querySelectorAll('[data-role="replace"]').forEach(btn=>btn.addEventListener('click', e=>{
+      pendingTarget = 'content-replace:'+e.currentTarget.dataset.id; hiddenInput.accept='image/*,video/*'; hiddenInput.click();
+    }));
+    grid.querySelectorAll('.editable-title').forEach(el=>el.addEventListener('blur', e=>{
+      const it = POSTS.find(g=>g.id===e.target.dataset.id); if(!it) return;
+      const nt = e.target.textContent.trim() || titleOf(it);
+      if(nt!==titleOf(it)){ it.title = nt; api({action:'post_update', id:it.id, title:nt}).catch(err=>showToast(err.message)); }
+    }));
+    const addTile = document.getElementById('addTileBtn');
+    if(addTile) addTile.addEventListener('click', ()=>{ pendingTarget='content-new'; hiddenInput.accept='image/*,video/*'; hiddenInput.click(); });
+
+    // Drag to reorder open content (and drop onto a folder chip to file it).
+    let gDrag=null;
+    const clearGmarks=()=>grid.querySelectorAll('.g-card').forEach(c=>c.classList.remove('drop-before','drop-after'));
+    grid.querySelectorAll('.g-card').forEach(card=>{
+      card.addEventListener('dragstart', e=>{ gDrag=card; card.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain', card.dataset.id); }catch(_){} });
+      card.addEventListener('dragend', ()=>{ if(gDrag) gDrag.classList.remove('dragging'); gDrag=null; clearGmarks(); });
+      card.addEventListener('dragover', e=>{ e.preventDefault(); if(!gDrag||card===gDrag) return; const r=card.getBoundingClientRect(); const after=(e.clientX-r.left)/r.width>0.5; clearGmarks(); card.classList.add(after?'drop-after':'drop-before'); });
+      card.addEventListener('drop', e=>{ e.preventDefault(); if(!gDrag||card===gDrag){ clearGmarks(); return; } const r=card.getBoundingClientRect(); const after=(e.clientX-r.left)/r.width>0.5; const dragId=gDrag.dataset.id; clearGmarks(); reorderPost(dragId, card.dataset.id, after); });
+    });
+  }
+  document.getElementById('topAddBtn').addEventListener('click', ()=>{ pendingTarget='content-new'; hiddenInput.accept='image/*,video/*'; hiddenInput.click(); });
+  document.querySelectorAll('.filter-chip').forEach(chip=>chip.addEventListener('click', ()=>{
+    document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active'); activeFilter = chip.dataset.filter; renderGallery();
+  }));
+
+  /* ---------- Pricing tiers (persisted to config) ---------- */
+  function renderTiers(){
+    const grid = document.getElementById('tierGrid');
+    const tiers = CONFIG.tiers;
+    grid.innerHTML = tiers.map((t,i)=>`
+      <div class="tier-card ${t.highlight?'hi':''}">
+        ${t.tag?`<span class="tier-tag">${t.tag}</span>`:''}
+        <input class="tier-name" value="${(t.name||'').replace(/"/g,'&quot;')}" data-i="${i}" data-f="name">
+        <div class="tier-price-row"><span style="color:var(--text-faint);">€</span><input type="number" value="${t.price}" data-i="${i}" data-f="price"><span>/ month</span></div>
+        <textarea class="tier-perks" data-i="${i}" data-f="perks">${t.perks||''}</textarea>
+        <div class="tier-foot">
+          <label style="display:flex; align-items:center; gap:6px; font-size:11.5px; color:var(--text-faint);">
+            <input type="checkbox" data-i="${i}" data-f="highlight" ${t.highlight?'checked':''} style="width:auto;"> Highlight tier
+          </label>
+          <button class="icon-x" data-remove-tier="${i}">✕</button>
+        </div>
+      </div>
+    `).join('') + `<button class="add-tier" id="addTierBtn">＋ Add tier</button>`;
+
+    grid.querySelectorAll('[data-f]').forEach(el=>el.addEventListener('change', e=>{
+      const i=+e.target.dataset.i, f=e.target.dataset.f;
+      if(f==='highlight'){ tiers[i][f]=e.target.checked; tiers[i].tag = e.target.checked ? 'Most popular' : null; renderTiers(); }
+      else tiers[i][f]=e.target.value;
+      persistConfig();
+    }));
+    grid.querySelectorAll('[data-remove-tier]').forEach(btn=>btn.addEventListener('click', e=>{
+      tiers.splice(parseInt(e.currentTarget.dataset.removeTier),1); renderTiers(); persistConfig();
+    }));
+    document.getElementById('addTierBtn').addEventListener('click', ()=>{
+      tiers.push({name:'New tier', price:'15', perks:"Describe what's included", highlight:false});
+      renderTiers(); persistConfig(); showToast('Tier added');
+    });
+  }
+  const ppvDefault = document.getElementById('ppvDefault');
+  ppvDefault.addEventListener('change', ()=>{ CONFIG.ppvDefault = ppvDefault.value; persistConfig('Default price saved'); });
+
+  /* ---------- Categories ---------- */
+  function renderCategories(){
+    const wrap = document.querySelector('.categories'); if(!wrap) return;
+    wrap.innerHTML = CONFIG.categories.map((c,i)=>`<span class="chip ${c.on?'accent':''}" data-cat="${i}" style="cursor:pointer;">${(c.label||'').replace(/</g,'&lt;')}</span>`).join('')
+      + `<button class="chip" id="addCatBtn" style="cursor:pointer;">+ Add category</button>`;
+    wrap.querySelectorAll('[data-cat]').forEach(ch=>ch.addEventListener('click', ()=>{
+      const i=+ch.dataset.cat; CONFIG.categories[i].on = !CONFIG.categories[i].on; renderCategories(); persistConfig();
+    }));
+    document.getElementById('addCatBtn').addEventListener('click', ()=>{
+      const name = prompt('New category name'); if(name && name.trim()){ CONFIG.categories.push({label:name.trim().slice(0,30), on:true}); renderCategories(); persistConfig(); }
+    });
+  }
+
+  /* ---------- Share ---------- */
+  document.getElementById('copyLinkBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('shareUrl'); input.select();
+    navigator.clipboard?.writeText(input.value).catch(()=>{});
+    showToast('Link copied to clipboard');
+  });
+  document.querySelectorAll('[data-share]').forEach(btn=>btn.addEventListener('click', ()=>{
+    const kind = btn.dataset.share;
+    const link = 'https://' + document.getElementById('shareUrl').value;
+    const enc = encodeURIComponent(link);
+    const urls = {
+      x: `https://twitter.com/intent/tweet?url=${enc}`,
+      telegram: `https://t.me/share/url?url=${enc}`,
+      reddit: `https://www.reddit.com/submit?url=${enc}`,
+      email: `mailto:?body=${enc}`,
+    };
+    if(kind==='embed'){ navigator.clipboard?.writeText(`<iframe src="${link}"></iframe>`).catch(()=>{}); showToast('Embed code copied'); }
+    else if(urls[kind]){ window.open(urls[kind], '_blank'); }
+  }));
+
+  /* ---------- Wallet (live ledger) ---------- */
+  function fmtDate(iso){ try{ return new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }catch(e){ return iso; } }
+  function renderWallet(){
+    const bal = WALLET.balance||0;
+    const balEl = document.querySelector('#wallet .wallet-balance .amt'); if(balEl) balEl.textContent = bal.toLocaleString()+' tok';
+    const head = document.querySelector('#wallet thead tr'); if(head) head.innerHTML = '<th>Date</th><th>Description</th><th>Type</th><th>Amount</th><th>Balance</th>';
+    // repurpose the two side cards to real totals
+    const cards = document.querySelectorAll('#wallet .wallet-top .stat-card .stat-value');
+    if(cards[0]) cards[0].textContent = (WALLET.total_purchased||0).toLocaleString();
+    if(cards[1]) cards[1].textContent = (WALLET.total_spent||0).toLocaleString();
+    const labels = document.querySelectorAll('#wallet .wallet-top .stat-card .stat-label');
+    if(labels[0]) labels[0].textContent = 'Tokens purchased';
+    if(labels[1]) labels[1].textContent = 'Tokens spent';
+    const subs = document.querySelectorAll('#wallet .wallet-top .stat-card span[style*="font-size:12px"]');
+    if(subs[0]) subs[0].textContent = 'Lifetime';
+    if(subs[1]) subs[1].textContent = 'Lifetime';
+    renderTx(document.getElementById('txFilter') ? document.getElementById('txFilter').value : 'all');
+  }
+  function renderTx(filter){
+    const body = document.getElementById('txBody');
+    let rows = LEDGER;
+    if(filter==='Subscription') rows = LEDGER.filter(t=>t.type==='purchase');
+    else if(filter==='Pay-per-view'||filter==='Tip'||filter==='Gift') rows = LEDGER.filter(t=>t.type==='spend');
+    body.innerHTML = rows.map(t=>{
+      const amt = (t.amount>0?'+':'') + (t.amount||0);
+      const cls = t.type==='purchase' ? 'paid' : 'pending';
+      return `<tr><td>${fmtDate(t.created_at)}</td><td>${(t.description||'—')}</td><td>${t.type||'—'}</td><td>${amt} tok</td><td>${t.balance_after!=null?t.balance_after+' tok':'—'}</td></tr>`;
+    }).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--text-faint); padding:24px;">No transactions yet</td></tr>`;
+  }
+  document.getElementById('txFilter').addEventListener('change', e=>renderTx(e.target.value));
+  document.getElementById('payoutBtn').addEventListener('click', ()=>showToast('Payouts are handled by our team — we’ll be in touch about your balance.'));
+
+  /* ---------- Gifts ---------- */
+  const giftsMasterToggle = document.getElementById('giftsMasterToggle');
+  giftsMasterToggle.addEventListener('click', ()=>{
+    const on = giftsMasterToggle.classList.toggle('on');
+    CONFIG.giftsEnabled = on; persistConfig();
+    showToast(on ? 'Gifts enabled on your profile' : 'Gifts turned off');
+  });
+  document.querySelectorAll('[data-audience]').forEach(cb=>cb.addEventListener('change', e=>{
+    CONFIG.giftAudience[e.target.dataset.audience] = e.target.checked; persistConfig();
+    showToast((e.target.dataset.audience.charAt(0).toUpperCase()+e.target.dataset.audience.slice(1)) + (e.target.checked ? ' can now send gifts' : ' can no longer send gifts'));
+  }));
+  const goalTargetInput = document.getElementById('goalTargetInput');
+  goalTargetInput.addEventListener('change', ()=>{
+    CONFIG.goal.target = parseFloat(goalTargetInput.value)||1;
+    updateGoalProgress(); persistConfig('Goal target updated');
+  });
+  function updateGoalProgress(){
+    const target = parseFloat(CONFIG.goal.target)||1;
+    const raised = STATS.giftTokens||0;
+    const pct = Math.min(100, (raised/target)*100);
+    const fill = document.getElementById('goalProgressFill'); if(fill) fill.style.width = pct+'%';
+    const rEl = document.getElementById('goalRaised'); if(rEl) rEl.textContent = raised.toLocaleString()+' tok';
+    // relabel EUR → tokens next to target input
+    const targetLabel = goalTargetInput.nextSibling;
+    if(targetLabel && targetLabel.nodeType===3) targetLabel.textContent = ' tokens';
+  }
+
+  function renderGiftCatalog(){
+    const wrap = document.getElementById('giftCatalog');
+    const giftTiers = CONFIG.giftCatalog;
+    wrap.innerHTML = giftTiers.map((g,i)=>`
+      <div class="gift-tile">
+        <div class="emoji-row">
+          <input type="text" data-role="emoji" data-i="${i}" value="${(g.emoji||'').replace(/"/g,'&quot;')}" maxlength="2">
+          <input type="text" data-role="label" data-i="${i}" value="${(g.label||'').replace(/"/g,'&quot;')}">
+        </div>
+        <div style="display:flex; align-items:center; gap:6px;">
+          <span style="color:var(--text-faint); font-size:12.5px;">◆</span>
+          <input type="number" data-role="amount" data-i="${i}" value="${g.amount}" min="1" step="1">
+        </div>
+        <div class="gt-foot"><button class="icon-x" data-remove-gift="${i}">✕</button></div>
+      </div>
+    `).join('') + `<button class="add-gift-tile" id="addGiftBtn">＋ Add gift</button>`;
+
+    wrap.querySelectorAll('[data-role]').forEach(inp=>inp.addEventListener('change', e=>{
+      const i=+e.target.dataset.i, role=e.target.dataset.role;
+      if(role==='amount') giftTiers[i].amount = parseFloat(e.target.value)||1;
+      else giftTiers[i][role] = e.target.value;
+      persistConfig();
+    }));
+    wrap.querySelectorAll('[data-remove-gift]').forEach(btn=>btn.addEventListener('click', e=>{
+      giftTiers.splice(parseInt(e.currentTarget.dataset.removeGift),1); renderGiftCatalog(); persistConfig();
+    }));
+    document.getElementById('addGiftBtn').addEventListener('click', ()=>{
+      giftTiers.push({emoji:'🎁', label:'New gift', amount:10});
+      renderGiftCatalog(); persistConfig(); showToast('Gift added to catalog');
+    });
+  }
+  function renderGiftsReceived(){
+    const body = document.getElementById('giftBody');
+    body.innerHTML = GIFTS.map(g=>`
+      <tr><td>${fmtDate(g.created_at)}</td><td>${(g.sender_name||'Anonymous')}</td><td>+${g.amount_tokens} tok</td><td>◆ Gift</td><td>${g.message ? g.message.replace(/</g,'&lt;') : '—'}</td></tr>
+    `).join('') || `<tr><td colspan="5" style="text-align:center; color:var(--text-faint); padding:24px;">No gifts yet</td></tr>`;
+    // stat card counts
+    const gv = document.querySelectorAll('#gifts .goal-grid .stat-card .stat-value');
+    if(gv[0]) gv[0].textContent = (STATS.giftsCount||0).toLocaleString();
+    if(gv[1]) gv[1].textContent = (STATS.giftTokens||0).toLocaleString()+' tok';
+  }
+
+  /* ---------- Insights stat tiles (real) ---------- */
+  function renderStats(){
+    const grid = document.querySelector('#stats .stat-grid');
+    if(grid) grid.innerHTML = `
+      <div class="stat-card"><span class="stat-label">Subscribers</span><div class="stat-value">${(STATS.subscribers||0).toLocaleString()}</div><div class="stat-delta up">${(STATS.mrrTokens||0).toLocaleString()} tokens / mo</div></div>
+      <div class="stat-card"><span class="stat-label">Followers</span><div class="stat-value">${(STATS.followers||0).toLocaleString()}</div><div class="stat-delta">Free follows</div></div>
+      <div class="stat-card"><span class="stat-label">Wallet balance</span><div class="stat-value">${(STATS.balance||0).toLocaleString()} tok</div><div class="stat-delta">Available now</div></div>
+      <div class="stat-card"><span class="stat-label">Tokens earned</span><div class="stat-value">${(STATS.tokensEarned||0).toLocaleString()}</div><div class="stat-delta up">Subs · gifts · purchases</div></div>
+      <div class="stat-card"><span class="stat-label">Gifts received</span><div class="stat-value">${(STATS.giftsCount||0).toLocaleString()}</div><div class="stat-delta up">${(STATS.giftTokens||0).toLocaleString()} tokens</div></div>
+      <div class="stat-card"><span class="stat-label">Content posts</span><div class="stat-value">${(STATS.posts||0).toLocaleString()}</div><div class="stat-delta">${(STATS.likes||0).toLocaleString()} likes</div></div>`;
+    // relabel chart panels to reflect real data
+    const tp = document.querySelector('#trafficChart').closest('.panel').querySelector('.panel-title'); if(tp) tp.textContent='Token income — last 14 days';
+    const tps = document.querySelector('#trafficChart').closest('.panel').querySelector('.panel-sub'); if(tps) tps.textContent='Daily inflow';
+    const dp = document.querySelector('#donutChart').closest('.panel').querySelector('.panel-title'); if(dp) dp.textContent='Content mix';
+    const dps = document.querySelector('#donutChart').closest('.panel').querySelector('.panel-sub'); if(dps) dps.textContent='By access level';
+    const rp = document.querySelector('#revChart').closest('.panel').querySelector('.panel-title'); if(rp) rp.textContent='Token income — last 6 months';
+    const rps = document.querySelector('#revChart').closest('.panel').querySelector('.panel-sub'); if(rps) rps.textContent='Purchases & gifts';
+  }
+
+  /* ===================== LOAD ===================== */
+  function mergeConfig(server){
+    const c = JSON.parse(JSON.stringify(DEFAULTS));
+    if(server && typeof server==='object'){
+      for(const k in server){ if(server[k]!==undefined && server[k]!==null) c[k]=server[k]; }
+      // deep-ensure nested defaults exist
+      c.sections = Object.assign({}, DEFAULTS.sections, server.sections||{});
+      c.giftAudience = Object.assign({}, DEFAULTS.giftAudience, server.giftAudience||{});
+      c.goal = Object.assign({}, DEFAULTS.goal, server.goal||{});
+      c.nameStyle = Object.assign({}, DEFAULTS.nameStyle, server.nameStyle||{});
+      c.folders = Array.isArray(server.folders) ? server.folders.slice(0,6) : [];
+      c.postFolders = (server.postFolders && typeof server.postFolders==='object') ? server.postFolders : {};
+      c.postOrder = Array.isArray(server.postOrder) ? server.postOrder : [];
+      if(!Array.isArray(c.categories)||!c.categories.length) c.categories = DEFAULTS.categories;
+      if(!Array.isArray(c.tiers)||!c.tiers.length) c.tiers = DEFAULTS.tiers;
+      if(!Array.isArray(c.giftCatalog)||!c.giftCatalog.length) c.giftCatalog = DEFAULTS.giftCatalog;
+      // section order: keep saved order but reconcile with the canonical set (adds new, drops stale)
+      const canon = DEFAULTS.sectionOrder;
+      const saved = Array.isArray(server.sectionOrder) ? server.sectionOrder.filter(t=>canon.includes(t)) : [];
+      canon.forEach(t=>{ if(!saved.includes(t)) saved.push(t); });
+      c.sectionOrder = saved;
+    }
+    return c;
+  }
+
+  async function loadStudio(){
+    let data;
+    try {
+      const r = await fetch(API, { headers:{'Accept':'application/json'} });
+      if(r.status===401){ document.getElementById('displayName').value='Please log in'; showToast('Please log in to manage your studio'); return; }
+      data = await r.json();
+    } catch(e){ showToast('Could not load your studio data'); return; }
+
+    PROFILE = data.profile||{}; POSTS = data.posts||[]; WALLET = data.wallet||{balance:0};
+    LEDGER = data.ledger||[]; GIFTS = data.gifts||[]; STATS = data.stats||{};
+    REV = data.revenueByMonth||[]; ACT = data.activity14||[];
+    CONFIG = mergeConfig(data.config);
+    // Appearance / Insights / Wallet are always private — never exposable on the public profile.
+    ['appearance','stats','wallet'].forEach(k=>{ CONFIG.sections[k] = false; });
+
+    // Profile
+    document.getElementById('displayName').value = PROFILE.full_name || '';
+    document.getElementById('handleName').value = PROFILE.username || '';
+    if(PROFILE.avatar_url){ const av=document.getElementById('avatarImg'); av.style.backgroundImage=`url(${PROFILE.avatar_url})`; av.textContent=''; }
+    else { const av=document.getElementById('avatarImg'); av.textContent=(PROFILE.full_name||'A').trim().charAt(0).toUpperCase()||'A'; }
+    if(PROFILE.cover_url) document.getElementById('coverImg').style.backgroundImage=`url(${PROFILE.cover_url})`;
+    document.querySelector('#profile .verified').style.display = PROFILE.verified ? '' : 'none';
+    if(PROFILE.headline){ document.getElementById('headlineDisplay').textContent=PROFILE.headline; document.getElementById('headlineInput').value=PROFILE.headline; }
+    if(PROFILE.bio){ document.getElementById('bioDisplay').textContent=PROFILE.bio; document.getElementById('bioInput').value=PROFILE.bio; }
+    window.__pubUrl = PROFILE.username ? `secretxperience.eu/c/${PROFILE.username}` : 'secretxperience.eu/creators';
+    document.getElementById('shareUrl').value = window.__pubUrl;
+    setLiveStatus();
+
+    // Config-driven UI
+    if(CONFIG.theme){ theme = Object.assign({}, defaults, CONFIG.theme);
+      document.getElementById('toneSlider').value=theme.tone; document.getElementById('warmthSlider').value=theme.warmth;
+      document.getElementById('tintSlider').value=theme.tint; document.getElementById('contrastSlider').value=theme.contrast;
+      document.getElementById('radiusSlider').value=theme.radius; }
+    applyOrderToNav();
+    applyOrderToSections();
+    applySectionToggles();
+    buildNameStyleControls();
+    applyNameStyle();
+    renderCategories();
+    // headline/bio popover text from config already from profile
+    document.getElementById('goalTextInput').value = CONFIG.goal.text; document.getElementById('goalTextDisplay').textContent = CONFIG.goal.text;
+    document.getElementById('goalTypeInput').value = CONFIG.goal.type;
+    document.getElementById('goalTypeChip').textContent = {charity:'Supporting a good cause',personal:'Personal goal',other:'Other goal'}[CONFIG.goal.type]||'Supporting a good cause';
+    document.getElementById('goalTargetInput').value = CONFIG.goal.target;
+    giftsMasterToggle.classList.toggle('on', CONFIG.giftsEnabled!==false);
+    document.querySelectorAll('[data-audience]').forEach(cb=>{ cb.checked = CONFIG.giftAudience[cb.dataset.audience]!==false; });
+    ppvDefault.value = CONFIG.ppvDefault || '9.00';
+
+    // Renders
+    renderStats();
+    renderFolders();
+    renderGallery();
+    renderTiers();
+    renderWallet();
+    renderGiftCatalog();
+    renderGiftsReceived();
+    updateGoalProgress();
+    applyTheme(); // also rerenders charts
+  }
+
+  /* init */
+  applyTheme();
+  loadStudio();
+
+})();
+</script>
+</body>
+</html>

@@ -390,8 +390,12 @@ function ContentCard({ p, isSubscriber, onLocked }: { p: PublicPost; isSubscribe
   return (
     <div className="cp-card">
       {p.media_url
-        ? /* eslint-disable-next-line @next/next/no-img-element */
-          <img src={p.media_url} alt={p.title || 'post'} loading="lazy" style={blur ? { filter: `blur(${blur}px)`, transform: 'scale(1.06)' } : undefined} />
+        ? (isVideo
+            ? (locked
+                ? <div className="ph" style={{ filter: `blur(${blur}px)`, transform: 'scale(1.06)' }}>▶</div>
+                : <video src={p.media_url} controls playsInline preload="metadata" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', background: '#000' }} />)
+            : /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={p.media_url} alt={p.title || 'post'} loading="lazy" style={blur ? { filter: `blur(${blur}px)`, transform: 'scale(1.06)' } : undefined} />)
         : <div className="ph">{isVideo ? '▶' : '◧'}</div>}
       <div className="cp-ov" />
       {label && <span className="cp-badge">{label}</span>}

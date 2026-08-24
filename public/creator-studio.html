@@ -1179,6 +1179,21 @@
     if(!r.ok) throw new Error(j.error || 'Upload failed');
     return j;
   }
+  // Content media: videos (max 30 MB) go straight to the storage bucket via a
+  // signed URL so they skip the 4.5 MB serverless body limit; images use the route.
+  async function uploadContentMedia(file){
+    if(file.type.startsWith('video/')){
+      if(file.size > 30*1024*1024) throw new Error('Video is too large — max 30 MB.');
+      const r = await fetch('/api/upload-video-url', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ contentType:file.type, size:file.size, filename:file.name }) });
+      let j={}; try{ j=await r.json(); }catch(e){}
+      if(!r.ok) throw new Error(j.error || 'Could not start video upload');
+      const put = await fetch(j.signedUrl, { method:'PUT', headers:{ 'content-type':file.type, 'x-upsert':'true' }, body:file });
+      if(!put.ok) throw new Error('Video upload failed — please try again.');
+      return { url:j.publicUrl, type:'video' };
+    }
+    if(file.size > 4.5*1024*1024) throw new Error('Image is too large — max 4.5 MB.');
+    return await uploadFile(file, 'content');
+  }
   hiddenInput.addEventListener('change', async (e)=>{
     const file = e.target.files[0]; hiddenInput.value=''; if(!file) return;
     const target = pendingTarget; pendingTarget=null;
@@ -1191,9 +1206,9 @@
         showToast(target==='cover'?'Background photo updated':'Profile photo updated');
       }catch(err){ showToast(err.message); }
     } else if(target==='content-new' || (target && target.startsWith('content-replace:'))){
-      showToast('Uploading…');
+      showToast(file.type.startsWith('video/') ? 'Uploading video…' : 'Uploading…');
       try{
-        const {url, type} = await uploadFile(file, 'content');
+        const {url, type} = await uploadContentMedia(file);
         if(target==='content-new'){
           const {post} = await api({action:'post_create', mediaUrl:url, mediaType:type, title:'New upload', visibility:'public', blur:0, price:0});
           POSTS.unshift(post); (CONFIG.postOrder||(CONFIG.postOrder=[])).unshift(post.id); persistConfig(); renderGallery(); renderFolders(); showToast('Content added');
@@ -1458,10 +1473,13 @@
       const price = Number(it.price)||0;
       const blur = Number(it.blur)||0;
       const bg = it.media_url ? `url(${it.media_url}) center/cover` : gradients[idx % gradients.length];
+      const thumb = (it.media_type==='video' && it.media_url)
+        ? `<video class="g-thumb" src="${it.media_url}" muted playsinline preload="metadata" style="object-fit:cover; filter:blur(${blur}px);"></video>`
+        : `<div class="g-thumb" style="background:${bg}; filter:blur(${blur}px);"></div>`;
       return `
       <div class="g-card" data-id="${it.id}" draggable="true">
         <div class="g-thumb-wrap">
-          <div class="g-thumb" style="background:${bg}; filter:blur(${blur}px);"></div>
+          ${thumb}
           <span class="g-drag" title="Drag to reorder, or onto a folder">⠿ drag</span>
           <div class="g-badge">${it.visibility==='ppv' ? '€'+price.toFixed(2) : visLabel(it.visibility)}</div>
           <div class="g-type">${it.media_type==='video'?'▶':'◧'}</div>

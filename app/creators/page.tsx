@@ -167,15 +167,7 @@ export default async function CreatorsPage() {
             </div>
           </div>
 
-          {/* COLLABS partner block — banner + looping promo video (right) → collabs-photography.com */}
-          <div style={{ marginBottom: '2.5rem' }}>
-            <CollabsPromo />
-          </div>
-
-          {/* CREATOR HUB — slide banners, stats, meet & greets, expos, journal, earnings, brands */}
-          <CreatorHub creatorCount={allListings.length} />
-
-          {/* LATEST — marketplace grid with filter rail + search (in CreatorFeed) */}
+          {/* ALL CREATORS — marketplace grid with filter rail + search (in CreatorFeed) — pinned to top */}
           <div id="latest" style={{ marginBottom: '3rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.1rem', flexWrap: 'wrap', gap: '10px' }}>
               <h2 style={{ fontFamily: 'var(--serif)', fontSize: '27px', fontWeight: 500, margin: 0 }}>All creators</h2>
@@ -185,6 +177,14 @@ export default async function CreatorsPage() {
             </div>
             <CreatorFeed posts={posts} directory={directory} />
           </div>
+
+          {/* COLLABS partner block — banner + looping promo video (right) → collabs-photography.com */}
+          <div style={{ marginBottom: '2.5rem' }}>
+            <CollabsPromo />
+          </div>
+
+          {/* CREATOR HUB — slide banners, stats, meet & greets, expos, journal, earnings, brands */}
+          <CreatorHub creatorCount={allListings.length} />
 
           {/* OnlyFans directory — inherits the neon palette */}
           <div style={{ margin: '0 -1.5rem 3rem' }}>

@@ -3,30 +3,33 @@ import { useEffect, useRef } from 'react'
 
 /* ------------------------------------------------------------------ *
  * CollabsPromo — COLLABS partner block on the /creators frontpage.
- * Left: the COLLABS banner (image /promos/collabs.jpg, wordmark
- * fallback). Right: a looping promo video (/promos/collabs-promo.mp4)
- * that autoplays muted and repeats forever. Both link out to
- * collabs-photography.com (external affiliate → nofollow + sponsored).
+ * Both cells play the looping COLLABS promo video
+ * (/promos/collabs-promo.mp4), autoplaying muted and repeating
+ * forever. Left is the wide hero, right is a narrow companion.
+ * Both link out to collabs-photography.com (external affiliate →
+ * nofollow + sponsored).
  * ------------------------------------------------------------------ */
 
 const HREF = 'https://www.collabs-photography.com/'
+const VIDEO = '/promos/collabs-promo.mp4'
 
 export default function CollabsPromo() {
-  const vid = useRef<HTMLVideoElement>(null)
+  const root = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const v = vid.current
-    if (!v) return
-    v.muted = true // ensure muted so autoplay is allowed
-    const tryPlay = () => { v.play().catch(() => {}) }
-    tryPlay()
-    // resume if the browser paused it (tab switch, etc.)
-    v.addEventListener('canplay', tryPlay)
-    return () => v.removeEventListener('canplay', tryPlay)
+    const el = root.current
+    if (!el) return
+    const vids = Array.from(el.querySelectorAll('video'))
+    const play = () => vids.forEach((v) => { v.muted = true; v.play().catch(() => {}) })
+    play()
+    // resume if the browser paused any of them (tab switch, etc.)
+    vids.forEach((v) => v.addEventListener('canplay', play))
+    return () => vids.forEach((v) => v.removeEventListener('canplay', play))
   }, [])
 
   return (
     <section
+      ref={root}
       className="collabs-promo"
       style={{
         display: 'grid',
@@ -49,29 +52,33 @@ export default function CollabsPromo() {
         }
       `}</style>
 
-      {/* LEFT — COLLABS banner (image with wordmark fallback) */}
+      {/* LEFT — COLLABS animated promo (wide hero) */}
       <a href={HREF} target="_blank" rel="noopener noreferrer nofollow sponsored" aria-label="COLLABS — Fashion Photography"
-         className="cp-cell cp-banner" style={{ background: 'linear-gradient(120deg,#0c1a1c 0%,#123033 45%,#0a1416 100%)' }}>
-        <div className="cp-media" style={{ position: 'absolute', inset: 0, zIndex: 1, backgroundImage: 'url(/promos/collabs.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
-        {/* fallback wordmark (revealed only if the photo file is missing) */}
-        <div style={{ position: 'absolute', inset: 0, zIndex: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '1rem' }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 70% 40%,rgba(64,140,140,0.35),transparent 60%)' }} />
-          <div style={{ position: 'relative', fontFamily: 'var(--serif)', fontWeight: 400, fontSize: 'clamp(2.6rem,8vw,5rem)', letterSpacing: '0.06em', color: '#f4f1ea', lineHeight: 1, textShadow: '0 2px 20px rgba(0,0,0,0.5)' }}>COLLABS</div>
-          <div style={{ position: 'relative', marginTop: '0.6rem', fontSize: 'clamp(0.65rem,1.6vw,1rem)', letterSpacing: '0.42em', textTransform: 'uppercase', color: '#cfe3e0', fontWeight: 500 }}>Fashion&nbsp;Photography</div>
-        </div>
-        <span style={{ position: 'absolute', bottom: '12px', right: '14px', zIndex: 2, display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '20px', background: 'rgba(8,6,18,0.55)', border: '0.5px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(6px)', color: '#f4f1ea', fontSize: '11px', fontWeight: 600 }}>
+         className="cp-cell cp-banner" style={{ background: '#000' }}>
+        <video
+          className="cp-media"
+          src={VIDEO}
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          controls={false}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block', zIndex: 1 }}
+        />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 2, background: 'linear-gradient(180deg,rgba(0,0,0,0.28),transparent 28%,transparent 68%,rgba(0,0,0,0.42))', pointerEvents: 'none' }} />
+        <span style={{ position: 'absolute', bottom: '12px', right: '14px', zIndex: 3, display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', borderRadius: '20px', background: 'rgba(8,6,18,0.55)', border: '0.5px solid rgba(255,255,255,0.2)', backdropFilter: 'blur(6px)', color: '#f4f1ea', fontSize: '11px', fontWeight: 600 }}>
           Visit COLLABS <i className="ti ti-arrow-up-right" />
         </span>
       </a>
 
-      {/* RIGHT — looping promo video */}
+      {/* RIGHT — looping promo video (narrow companion) */}
       <a href={HREF} target="_blank" rel="noopener noreferrer nofollow sponsored" aria-label="COLLABS promo video — visit collabs-photography.com"
          className="cp-cell cp-video" style={{ background: '#000' }}>
         <video
-          ref={vid}
           className="cp-media"
-          src="/promos/collabs-promo.mp4"
-          poster="/promos/collabs.jpg"
+          src={VIDEO}
           autoPlay
           loop
           muted

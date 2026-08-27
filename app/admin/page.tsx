@@ -184,6 +184,7 @@ export default function AdminPage() {
         Verification: (vr.data || []).filter((v: any) => new Date(v.submitted_at || v.created_at).getTime() > seenVerification).length,
         Reports:      (rr.data || []).filter((r: any) => r.status === 'open' && new Date(r.created_at).getTime() > seenReports).length,
         Bookings:     bs.filter((b: any) => new Date(b.created_at).getTime() > seenBookings).length,
+        Payouts:      0,
         Newsletter:   0,
         Contacts:     (leadsr.data || []).filter((l: any) => new Date(l.created_at).getTime() > seenContacts).length,
         Acquisition:  0,
@@ -624,7 +625,7 @@ export default function AdminPage() {
             <div style={{ minWidth: 0 }}>
             <h1 style={{ fontFamily: 'var(--serif)', fontWeight: 500, fontSize: '36px', color: 'var(--t, #ece8e1)', margin: 0, lineHeight: 1.1 }}>{tab}</h1>
             <div style={{ font: '300 11px/1 var(--sans)', color: 'var(--t3, #4c4a47)', marginTop: '4px', letterSpacing: '0.04em' }}>
-              {tab === 'Listings' ? `${filteredListings.length} listings` : tab === 'Users' ? `${filteredUsers.length} users` : tab === 'Reports' ? `${reports.filter(r => r.status === 'open').length} open · ${reports.length} total` : tab === 'Payouts' ? `${payouts.filter(p => p.status === 'requested').length} pending · ${payouts.length} total` : tab === 'Newsletter' ? (search ? `${filteredNlSubs.length} of ${nlSubCount ?? '…'} subscribers` : `${nlSubCount ?? '…'} subscribers`) : tab === 'Contacts' ? `${optinContacts.length} opted-in · ${leads.length} leads` : tab === 'Acquisition' ? `${acqTotal} tracked signups · ${acq.length} sources` : tab === 'Keywords' ? `${kwResults.length ? `${kwResults.length} results` : 'SEO research'}` : tab === 'Tools' ? 'Admin tools' : `${filteredBookings.length} bookings`}
+              {tab === 'Listings' ? `${filteredListings.length} listings` : tab === 'Users' ? `${filteredUsers.length} users` : tab === 'Reports' ? `${reports.filter(r => r.status === 'open').length} open · ${reports.length} total` : tab === 'Payouts' ? `${payouts.filter(p => p.status === 'requested').length} pending · ${payouts.length} total` : tab === 'Newsletter' ? (search ? `${filteredNlSubs.length} of ${nlSubCount ?? '…'} subscribers` : `${nlSubCount ?? '…'} subscribers`) : tab === 'Contacts' ? `${listings.filter((l: any) => (l.contact_phone || '').trim()).length} advertiser contacts · ${optinContacts.length} opted-in · ${leads.length} leads` : tab === 'Acquisition' ? `${acqTotal} tracked signups · ${acq.length} sources` : tab === 'Keywords' ? `${kwResults.length ? `${kwResults.length} results` : 'SEO research'}` : tab === 'Tools' ? 'Admin tools' : `${filteredBookings.length} bookings`}
             </div>
             </div>
           </div>
@@ -1202,6 +1203,19 @@ export default function AdminPage() {
               (!contactFilter.country || (c.country || '').toLowerCase().includes(contactFilter.country.toLowerCase())) &&
               (!contactFilter.category || c.category === contactFilter.category)
             )
+            // Every advertiser that left a phone on their listing — not only the
+            // ones who ticked the WhatsApp-consent box. Sourced from listings
+            // already loaded in state (no extra query). The opt-in flag is kept
+            // separate so we never misrepresent who actually consented.
+            const allPhoneContacts = listings.filter((l: any) => (l.contact_phone || '').trim())
+            const filteredAllContacts = allPhoneContacts.filter((c: any) =>
+              (!contactFilter.country || (c.country || '').toLowerCase().includes(contactFilter.country.toLowerCase())) &&
+              (!contactFilter.category || c.category === contactFilter.category) &&
+              (!search ||
+                (c.title || '').toLowerCase().includes(search.toLowerCase()) ||
+                (c.contact_phone || '').toLowerCase().includes(search.toLowerCase()) ||
+                (c.city || '').toLowerCase().includes(search.toLowerCase()))
+            )
             const filteredLeads = leads.filter(l =>
               (!contactFilter.country || (l.country || '').toLowerCase().includes(contactFilter.country.toLowerCase())) &&
               (!contactFilter.category || l.category === contactFilter.category) &&
@@ -1300,6 +1314,60 @@ export default function AdminPage() {
                               </a>
                             </td>
                             <td style={{ padding: '12px 16px', color: 'var(--t3, #4c4a47)', fontSize: '11px' }}>{new Date(c.created_at).toLocaleDateString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Section 1b: All advertiser contacts (every listing with a phone) */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <div>
+                      <div style={{ font: '600 11px/1 var(--sans)', color: 'var(--t2, #8c8880)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                        <i className="ti ti-address-book" style={{ marginRight: '6px', color: 'var(--gold)' }} />
+                        All Advertiser Contacts
+                      </div>
+                      <div style={{ font: '300 11px/1 var(--sans)', color: 'var(--t3, #4c4a47)' }}>{filteredAllContacts.length} listings with a phone number · <span style={{ color: '#25d366' }}>✓ = WhatsApp consent given</span></div>
+                    </div>
+                    <button
+                      onClick={() => exportCsv(filteredAllContacts.map((c: any) => ({ title: c.title, category: c.category, city: c.city, country: c.country, phone: c.contact_phone, whatsapp_consent: c.whatsapp_optin ? 'yes' : 'no', created: c.created_at })), `sx-advertiser-contacts-${new Date().toISOString().slice(0,10)}.csv`)}
+                      className="adm-action-icon-btn"
+                      style={{ color: 'var(--gold)', borderColor: 'var(--gbrd)', gap: '6px' }}
+                    >
+                      <i className="ti ti-download" />
+                      <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
+                    </button>
+                  </div>
+                  <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden', maxHeight: '560px', overflowY: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                      <thead>
+                        <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
+                          {['Listing', 'Category', 'City', 'Country', 'Phone', 'Consent'].map(h => (
+                            <th key={h} style={{ textAlign: 'left', padding: '12px 16px', font: '600 9px/1 var(--sans)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--t3, #4c4a47)', position: 'sticky', top: 0, background: 'var(--bg2, #0f0f0f)' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredAllContacts.length === 0 && <tr><td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: 'var(--t3, #4c4a47)' }}>No advertiser contacts</td></tr>}
+                        {filteredAllContacts.map((c: any) => (
+                          <tr key={c.id} className="adm-tr" style={{ borderTop: '0.5px solid var(--b, rgba(255,255,255,0.04))' }}>
+                            <td style={{ padding: '12px 16px', fontWeight: 500, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.title || '—'}</td>
+                            <td style={{ padding: '12px 16px', color: 'var(--t2, #8c8880)', fontSize: '12px' }}>{c.category || '—'}</td>
+                            <td style={{ padding: '12px 16px', color: 'var(--t2, #8c8880)', fontSize: '12px' }}>{c.city || '—'}</td>
+                            <td style={{ padding: '12px 16px', color: 'var(--t2, #8c8880)', fontSize: '12px' }}>{c.country || '—'}</td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <a href={`https://wa.me/${(c.contact_phone || '').replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25d366', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                <i className="ti ti-brand-whatsapp" style={{ fontSize: '14px' }} />
+                                {c.contact_phone}
+                              </a>
+                            </td>
+                            <td style={{ padding: '12px 16px' }}>
+                              {c.whatsapp_optin
+                                ? <span style={{ color: '#25d366', fontSize: '13px' }} title="WhatsApp consent given"><i className="ti ti-circle-check-filled" /></span>
+                                : <span style={{ color: 'var(--t3, #4c4a47)', fontSize: '11px' }}>—</span>}
+                            </td>
                           </tr>
                         ))}
                       </tbody>

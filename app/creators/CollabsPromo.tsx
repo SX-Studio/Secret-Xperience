@@ -11,8 +11,7 @@ import { useEffect, useRef } from 'react'
  * ------------------------------------------------------------------ */
 
 const HREF = 'https://www.collabs-photography.com/'
-const VIDEO = '/promos/collabs-promo.mp4'        // 10s loop — right companion cell
-const HERO_VIDEO = '/promos/collabs-promo-3s.mp4' // 3s flash — left hero cell
+const VIDEO = '/promos/collabs-promo-3s.mp4' // 3s flash — both cells
 
 export default function CollabsPromo() {
   const root = useRef<HTMLElement>(null)
@@ -58,7 +57,7 @@ export default function CollabsPromo() {
          className="cp-cell cp-banner" style={{ background: '#000' }}>
         <video
           className="cp-media"
-          src={HERO_VIDEO}
+          src={VIDEO}
           autoPlay
           loop
           muted

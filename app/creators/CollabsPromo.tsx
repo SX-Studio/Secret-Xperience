@@ -11,7 +11,8 @@ import { useEffect, useRef } from 'react'
  * ------------------------------------------------------------------ */
 
 const HREF = 'https://www.collabs-photography.com/'
-const VIDEO = '/promos/collabs-promo-3s.mp4' // 3s flash — both cells
+const VIDEO_FLASH = '/promos/collabs-promo-3s.mp4'       // 3s logo flash — left hero cell
+const VIDEO_PROMO = '/promos/collabs-promo-original.mp4' // original fashion promo — right cell
 
 export default function CollabsPromo() {
   const root = useRef<HTMLElement>(null)
@@ -57,7 +58,7 @@ export default function CollabsPromo() {
          className="cp-cell cp-banner" style={{ background: '#000' }}>
         <video
           className="cp-media"
-          src={VIDEO}
+          src={VIDEO_FLASH}
           autoPlay
           loop
           muted
@@ -78,7 +79,7 @@ export default function CollabsPromo() {
          className="cp-cell cp-video" style={{ background: '#000' }}>
         <video
           className="cp-media"
-          src={VIDEO}
+          src={VIDEO_PROMO}
           autoPlay
           loop
           muted

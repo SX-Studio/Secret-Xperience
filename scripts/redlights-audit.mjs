@@ -106,11 +106,19 @@ function parseProfile(html) {
   const title = (html.match(/<title>([^<|]+)/) || [])[1] || ''
   const desc = (html.match(/property="og:description" content="([^"]*)"/) || [])[1] || ''
   const metaPhone = (desc.match(/\+?\d[\d ]{7,}\d/) || [])[0] || ''
+  // Collect every number the profile exposes — meta description first, then
+  // tel: links, then any international-format number in the body — so a profile
+  // that omits the phone from its meta tag still gets indexed (higher recall).
+  const cand = []
+  if (metaPhone) cand.push(metaPhone)
+  for (const m of html.matchAll(/href="tel:([^"]+)"/g)) cand.push(m[1])
+  for (const m of html.matchAll(/\+\d{9,14}/g)) cand.push(m[0])
+  const phones = [...new Set(cand.map(normPhone).filter((p) => p.length >= 9 && p.length <= 14))]
   // photo filename carries an update timestamp: name-YYYYMMDDhhmmss.jpg
   const ts = [...html.matchAll(/-(\d{14})\.(?:jpg|jpeg|png|webp)/g)].map((m) => m[1]).sort().pop() || ''
   const name = title.replace(/\(.*$/, '').trim()
   const age = (title.match(/\((\d+)\s*jaar/) || [])[1] || ''
-  return { name, age, phone: normPhone(metaPhone), photoTs: ts }
+  return { name, age, phone: phones[0] || '', phones, photoTs: ts }
 }
 
 async function fetchProfile(url) {
@@ -156,13 +164,17 @@ async function buildIndex() {
   await Promise.all(Array.from({ length: CONCURRENCY }, worker))
   saveCache(cache)
 
-  // phone -> [{url,name,age,photoTs}] for profiles that are still live
+  // phone -> [{url,name,age,photoTs}] for profiles that are still live.
+  // Index every number a profile exposes (older cache entries only have .phone).
   const byPhone = new Map()
   for (const [url, e] of Object.entries(cache)) {
     if (!liveSet.has(url) && urls.length) continue // only trust currently-live profiles
-    if (!e || !e.phone) continue
-    if (!byPhone.has(e.phone)) byPhone.set(e.phone, [])
-    byPhone.get(e.phone).push({ url, name: e.name, age: e.age, photoTs: e.photoTs })
+    if (!e) continue
+    const nums = e.phones && e.phones.length ? e.phones : e.phone ? [e.phone] : []
+    for (const p of nums) {
+      if (!byPhone.has(p)) byPhone.set(p, [])
+      byPhone.get(p).push({ url, name: e.name, age: e.age, photoTs: e.photoTs })
+    }
   }
   return { byPhone, liveCount: liveSet.size, cachedCount: Object.keys(cache).length }
 }

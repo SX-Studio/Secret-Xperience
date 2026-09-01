@@ -365,6 +365,19 @@ export default function EscortsPage() {
 
   useEffect(() => { fetchListings() }, [fetchListings])
 
+  // Read ?gender= query param from the pill dropdowns on the homepage and
+  // pre-apply the matching filter on mount.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const g = new URLSearchParams(window.location.search).get('gender')
+    if (!g) return
+    if (g === 'female')      setEscortType('women')
+    else if (g === 'male')   setEscortType('men')
+    else if (g === 'trans')  setEscortType('trans-woman')
+    else if (g === 'couple') setEscortType('couples')
+    else if (g === 'gay')    { setEscortType('all'); setOrientation('gay') }
+  }, [])
+
   useEffect(() => {
     async function fetchLive() {
       const { data } = await supabase.from('live_streams').select('provider_id').eq('status', 'live')

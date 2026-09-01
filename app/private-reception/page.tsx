@@ -283,7 +283,17 @@ export default function PrivateReceptionPage() {
     return false
   })
 
-  const [hostType, setHostType]         = useState('women')
+  const [hostType, setHostType]         = useState(() => {
+    if (typeof window !== 'undefined') {
+      const g = new URLSearchParams(window.location.search).get('gender')
+      if (g === 'female') return 'women'
+      if (g === 'male')   return 'men'
+      if (g === 'trans')  return 'trans-woman'
+      if (g === 'couple') return 'couples'
+      if (g === 'gay')    return 'all'
+    }
+    return 'women'
+  })
   const [category, setCategory]         = useState(() => {
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search).get('cat')
@@ -291,7 +301,13 @@ export default function PrivateReceptionPage() {
     }
     return 'all'
   })
-  const [orientation, setOrientation]   = useState('all')
+  const [orientation, setOrientation]   = useState(() => {
+    if (typeof window !== 'undefined') {
+      const g = new URLSearchParams(window.location.search).get('gender')
+      if (g === 'gay') return 'gay'
+    }
+    return 'all'
+  })
   const [city, setCity]                 = useState('All Cities')
   const [priceMin, setPriceMin]         = useState(0)
   const [priceMax, setPriceMax]         = useState(1000)

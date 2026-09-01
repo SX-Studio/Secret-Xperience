@@ -275,8 +275,10 @@ const langPickerScript = `
   }
 
   function buildPicker() {
-    var wrap = document.getElementById('langPickerWrap');
+    var navMount = document.getElementById('langPickerNavMount');
+    var wrap = navMount || document.getElementById('langPickerWrap');
     if (!wrap) return;
+    var inNav = !!navMount;
 
     var btn = document.createElement('button');
     btn.id = 'langPickerBtn';
@@ -287,7 +289,7 @@ const langPickerScript = `
 
     var dropdown = document.createElement('div');
     dropdown.id = 'langDropdown';
-    dropdown.style.cssText = 'display:none;position:absolute;bottom:calc(100% + 8px);right:0;background:var(--bg1,#100e1a);border:0.5px solid var(--b2,rgba(255,255,255,0.12));border-radius:12px;padding:6px;min-width:170px;box-shadow:0 16px 48px rgba(0,0,0,0.7);z-index:10000;';
+    dropdown.style.cssText = 'display:none;position:absolute;' + (inNav ? 'top:calc(100% + 8px)' : 'bottom:calc(100% + 8px)') + ';right:0;background:var(--bg1,#100e1a);border:0.5px solid var(--b2,rgba(255,255,255,0.12));border-radius:12px;padding:6px;min-width:170px;box-shadow:0 16px 48px rgba(0,0,0,0.7);z-index:10000;';
 
     LANGS.forEach(function(lang) {
       var item = document.createElement('button');
@@ -312,7 +314,9 @@ const langPickerScript = `
     });
     document.addEventListener('click', function() { dropdown.style.display = 'none'; });
 
-    wrap.style.cssText = 'position:fixed;bottom:100px;right:24px;z-index:9997;';
+    if (!inNav) {
+      wrap.style.cssText = 'position:fixed;bottom:100px;right:24px;z-index:9997;';
+    }
     wrap.appendChild(btn);
     wrap.appendChild(dropdown);
 
@@ -324,10 +328,20 @@ const langPickerScript = `
     }
   }
 
+  var built = false;
+  function tryBuild(attempt) {
+    if (built) return;
+    if (document.getElementById('langPickerNavMount') || document.getElementById('langPickerWrap')) {
+      built = true;
+      buildPicker();
+      return;
+    }
+    if (attempt < 40) setTimeout(function(){ tryBuild(attempt + 1); }, 150);
+  }
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', buildPicker);
+    document.addEventListener('DOMContentLoaded', function(){ tryBuild(0); });
   } else {
-    buildPicker();
+    tryBuild(0);
   }
 })();
 `

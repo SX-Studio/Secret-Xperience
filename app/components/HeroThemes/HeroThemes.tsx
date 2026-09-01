@@ -387,12 +387,21 @@ const THEMES: Array<{ id: string; name: string; dots: string[]; render: () => Re
 
 export default function HeroThemes() {
   const [mountEl, setMountEl] = useState<HTMLElement | null>(null)
+  const [pickerMountEl, setPickerMountEl] = useState<HTMLElement | null>(null)
   const [theme, setTheme] = useState<string>('')
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
     setMountEl(document.getElementById('heroThemesMount'))
     try { setTheme(localStorage.getItem(LS_KEY) || '') } catch {}
+    let attempts = 0
+    const findNav = () => {
+      const el = document.getElementById('heroThemesNavMount')
+      if (el) { setPickerMountEl(el); return }
+      attempts++
+      if (attempts < 40) setTimeout(findNav, 150)
+    }
+    findNav()
   }, [])
 
   // Hide/show the built-in hero depending on selection
@@ -405,10 +414,16 @@ export default function HeroThemes() {
   if (!mountEl) return null
   const active = THEMES.find(t => t.id === theme)
 
+  const inNav = !!pickerMountEl
   const picker = (
-      <div style={{ position: 'fixed', left: 18, bottom: 84, zIndex: 99999 }}>
+      <div style={inNav
+        ? { position: 'relative', display: 'inline-flex', zIndex: 99999 }
+        : { position: 'fixed', left: 18, bottom: 84, zIndex: 99999 }}>
         {open && (
-          <div style={{ marginBottom: 10, background: 'rgba(14,10,16,0.97)', border: '0.5px solid rgba(197,160,90,0.35)', borderRadius: 16, padding: 10, width: 228, boxShadow: '0 20px 60px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', maxHeight: '60vh', overflowY: 'auto' }}>
+          <div style={inNav
+            ? { position: 'absolute', top: 'calc(100% + 8px)', left: 0, background: 'rgba(14,10,16,0.97)', border: '0.5px solid rgba(197,160,90,0.35)', borderRadius: 16, padding: 10, width: 228, boxShadow: '0 20px 60px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', maxHeight: '60vh', overflowY: 'auto' }
+            : { marginBottom: 10, background: 'rgba(14,10,16,0.97)', border: '0.5px solid rgba(197,160,90,0.35)', borderRadius: 16, padding: 10, width: 228, boxShadow: '0 20px 60px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', maxHeight: '60vh', overflowY: 'auto' }
+          }>
             <div style={{ fontSize: 10, letterSpacing: '.14em', color: 'rgba(197,160,90,0.7)', textTransform: 'uppercase', padding: '4px 8px 8px' }}>✨ Kies jouw look</div>
             <button onClick={() => { setTheme(''); setOpen(false) }} style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 10px', background: theme === '' ? 'rgba(197,160,90,0.14)' : 'transparent', border: 'none', borderRadius: 10, cursor: 'pointer', color: '#ece8e1', fontSize: 13, fontFamily: 'inherit', textAlign: 'left' }}>
               <span style={{ display: 'inline-flex' }}><span style={{ width: 14, height: 14, borderRadius: '50%', background: '#c5a05a' }} /><span style={{ width: 14, height: 14, borderRadius: '50%', background: '#1a1024', marginLeft: -5 }} /></span>
@@ -425,7 +440,9 @@ export default function HeroThemes() {
             ))}
           </div>
         )}
-        <button onClick={() => setOpen(o => !o)} aria-label="Kies jouw look" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(14,10,16,0.95)', border: '0.5px solid rgba(197,160,90,0.5)', borderRadius: 999, padding: '10px 16px', color: '#e8c97e', fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', fontFamily: 'inherit' }}>
+        <button onClick={(e) => { e.stopPropagation(); setOpen(o => !o) }} aria-label="Kies jouw look" style={inNav
+          ? { display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(14,10,16,0.85)', border: '0.5px solid rgba(197,160,90,0.4)', borderRadius: 999, padding: '6px 12px', color: '#e8c97e', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }
+          : { display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(14,10,16,0.95)', border: '0.5px solid rgba(197,160,90,0.5)', borderRadius: 999, padding: '10px 16px', color: '#e8c97e', fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', fontFamily: 'inherit' }}>
           🎨 {active ? active.name : 'Kies jouw look'}
         </button>
       </div>
@@ -434,7 +451,7 @@ export default function HeroThemes() {
   return (
     <>
       {createPortal(<>{active?.render()}</>, mountEl)}
-      {createPortal(picker, document.body)}
+      {createPortal(picker, pickerMountEl || document.body)}
     </>
   )
 }

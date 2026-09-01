@@ -40,6 +40,19 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
+// Only run the auth gate on the protected routes themselves. Previously the
+// matcher fired on every request (all public pages, API routes, sitemap, etc.),
+// spinning up a Supabase client and parsing cookies on traffic that never needed
+// it — pure edge latency. Keep this list in sync with `protectedRoutes` above.
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)']
+  matcher: [
+    '/dashboard/:path*',
+    '/bookings/:path*',
+    '/messages/:path*',
+    '/profile/:path*',
+    '/listings/create/:path*',
+    '/verify/:path*',
+    '/tokens/:path*',
+    '/go-live/:path*',
+  ]
 }

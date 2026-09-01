@@ -312,7 +312,7 @@ const langPickerScript = `
     });
     document.addEventListener('click', function() { dropdown.style.display = 'none'; });
 
-    wrap.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:9997;';
+    wrap.style.cssText = 'position:fixed;bottom:100px;right:24px;z-index:9997;';
     wrap.appendChild(btn);
     wrap.appendChild(dropdown);
 

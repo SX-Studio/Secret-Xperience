@@ -283,7 +283,7 @@ export default function AdvertisePage() {
           <Link href="/login?next=/listings/create" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '15px 36px', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', border: 'none', borderRadius: 'var(--r)', color: '#0a0a0a', fontSize: '16px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
             <i className="ti ti-plus" /> Create your free profile
           </Link>
-          <p style={{ marginTop: '1.25rem', fontSize: '12px', color: 'var(--t3)' }}>Questions? Contact us at <a href="mailto:hello@secretxperience.eu" style={{ color: 'var(--gold)' }}>hello@secretxperience.eu</a></p>
+          <p style={{ marginTop: '1.25rem', fontSize: '12px', color: 'var(--t3)' }}>Questions? Contact us at <a href="mailto:support@secretxperience.eu" style={{ color: 'var(--gold)' }}>support@secretxperience.eu</a></p>
         </div>
       </section>
 

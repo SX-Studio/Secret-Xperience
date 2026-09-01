@@ -2072,8 +2072,8 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 
   <!-- NAV -->
   <nav role="navigation" aria-label="Main navigation" style="display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:64px;position:sticky;top:0;z-index:200;background:rgba(8,6,18,0.92);backdrop-filter:blur(18px);border-bottom:0.5px solid var(--b);">
+    <div id="heroThemesNavMount" style="position:relative;margin-right:76px;display:flex;align-items:center;"></div>
     <div class="nav-logo">Secret<em style="font-style:italic;font-weight:300">Xperience</em></div>
-    <div id="heroThemesNavMount" style="position:relative;margin-left:10px;display:flex;align-items:center;"></div>
     <div class="nav-right">
       <button class="nb" id="locBtn" aria-label="Location"><i class="ti ti-map-pin" aria-hidden="true"></i> Brussels</button>
       <button onclick="__cycleTheme()" aria-label="Toggle theme" style="width:34px;height:34px;background:var(--bg2);border:0.5px solid var(--b2);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:16px;flex-shrink:0;"><i class="ti ti-moon-stars" id="themeIcon"></i></button>
@@ -2132,36 +2132,57 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </div>
   </nav>
 
-  <!-- CATEGORY BAR -->
-  <div class="catbar" role="navigation" aria-label="Categories" id="catBar">
-    <!-- All -->
-    <div class="cat active" data-cat="all">All</div>
+  <!-- CATEGORY BAR (colorful pill row) -->
+  <div class="catbar sx-pillbar" role="navigation" aria-label="Categories" id="catBar" style="display:flex;gap:9px;flex-wrap:wrap;padding:12px 1.5rem;align-items:center;">
 
-    <!-- COMPANIONS group: Escorts + incall personal services -->
+    <!-- ESCORT group (💋 outcall) -->
     <div class="cat-group">
-      <button class="cat-group-pill" data-group="companions" aria-haspopup="true" aria-expanded="false">
-        Companions <i class="ti ti-chevron-down cg-chev"></i>
+      <button class="cat-group-pill sx-pill" data-group="escort" aria-haspopup="true" aria-expanded="false" style="background:linear-gradient(90deg,#ff8a5c,#ff5c7a);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        💋 Escort <i class="ti ti-chevron-down cg-chev" style="font-size:12px;"></i>
       </button>
-      <div class="cat-group-menu" id="cgm-companions" role="menu">
-        <span class="cat-group-label">Outcall</span>
-        <a class="cat-group-item" href="/escorts" role="menuitem">
-          Escorts
-          <span class="cat-group-item-sub">Advertiser travels to you</span>
-        </a>
-        <a class="cat-group-item" href="/private-reception" role="menuitem" style="color:var(--gold);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 14px 4px;font-weight:600;">
-          Incall · Private Reception →
-        </a>
-        <a class="cat-group-item" href="/private-reception?cat=companionship" role="menuitem">Companionship</a>
-        <a class="cat-group-item" href="/private-reception?cat=massage" role="menuitem">Massage</a>
-        <a class="cat-group-item" href="/private-reception?cat=domination" role="menuitem">Domination</a>
-        <a class="cat-group-item" href="/private-reception?cat=experiences" role="menuitem">Experiences</a>
+      <div class="cat-group-menu" id="cgm-escort" role="menu">
+        <a class="cat-group-item" href="/escorts?gender=female" role="menuitem">Vrouwen</a>
+        <a class="cat-group-item" href="/escorts?gender=male" role="menuitem">Mannen</a>
+        <a class="cat-group-item" href="/escorts?gender=gay" role="menuitem">Homo's</a>
+        <a class="cat-group-item" href="/escorts?gender=trans" role="menuitem">Transgenders</a>
+        <a class="cat-group-item" href="/escorts?gender=couple" role="menuitem">Koppels</a>
       </div>
     </div>
 
-    <!-- VENUES group -->
+    <!-- PRIVE group (🏠 incall) -->
     <div class="cat-group">
-      <button class="cat-group-pill" data-group="venues" aria-haspopup="true" aria-expanded="false">
-        Venues <i class="ti ti-chevron-down cg-chev"></i>
+      <button class="cat-group-pill sx-pill" data-group="prive" aria-haspopup="true" aria-expanded="false" style="background:linear-gradient(90deg,#b45cff,#7a4dff);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        🏠 Privé <i class="ti ti-chevron-down cg-chev" style="font-size:12px;"></i>
+      </button>
+      <div class="cat-group-menu" id="cgm-prive" role="menu">
+        <a class="cat-group-item" href="/private-reception?gender=female" role="menuitem">Vrouwen</a>
+        <a class="cat-group-item" href="/private-reception?gender=male" role="menuitem">Mannen</a>
+        <a class="cat-group-item" href="/private-reception?gender=gay" role="menuitem">Homo's</a>
+        <a class="cat-group-item" href="/private-reception?gender=trans" role="menuitem">Transgenders</a>
+        <a class="cat-group-item" href="/private-reception?gender=couple" role="menuitem">Koppels</a>
+      </div>
+    </div>
+
+    <!-- XPERIENCE group (✨ services/discover/events/jobs) -->
+    <div class="cat-group">
+      <button class="cat-group-pill sx-pill" data-group="xperience" aria-haspopup="true" aria-expanded="false" style="background:linear-gradient(90deg,#ff5c9e,#e02d94);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        ✨ Xperience <i class="ti ti-chevron-down cg-chev" style="font-size:12px;"></i>
+      </button>
+      <div class="cat-group-menu" id="cgm-xperience" role="menu">
+        <a class="cat-group-item" href="/private-reception?cat=companionship" role="menuitem">Companionship</a>
+        <a class="cat-group-item" href="/private-reception?cat=massage" role="menuitem">Massage</a>
+        <a class="cat-group-item" href="/private-reception?cat=domination" role="menuitem">Dominantie</a>
+        <a class="cat-group-item" href="/discover" role="menuitem">Discover</a>
+        <a class="cat-group-item" href="/events" role="menuitem">Event</a>
+        <a class="cat-group-item" href="/jobs" role="menuitem">Jobs</a>
+        <a class="cat-group-item" href="/events?cat=swingers" role="menuitem">Swingers</a>
+      </div>
+    </div>
+
+    <!-- VENUES group (🥂 nightlife/rentals/hotels) -->
+    <div class="cat-group">
+      <button class="cat-group-pill sx-pill" data-group="venues" aria-haspopup="true" aria-expanded="false" style="background:linear-gradient(90deg,#ffb46b,#ff8a3c);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        🥂 Venues <i class="ti ti-chevron-down cg-chev" style="font-size:12px;"></i>
       </button>
       <div class="cat-group-menu" id="cgm-venues" role="menu">
         <a class="cat-group-item" href="/nightlife" role="menuitem">Nightlife</a>
@@ -2170,10 +2191,10 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       </div>
     </div>
 
-    <!-- Standalone categories -->
-    <div class="cat" data-cat="creators">Creators</div>
-    <div class="cat" data-cat="events">Events</div>
-    <div class="cat" data-cat="shop">Adult Shop</div>
+    <!-- Standalone pills -->
+    <a class="sx-pill" href="/creators" style="background:linear-gradient(90deg,#5c8bff,#7a4dff);color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">🎨 Content Creators</a>
+    <a class="sx-pill" href="/live" style="background:linear-gradient(90deg,#2dd4a0,#0e9f8f);color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">📹 Live</a>
+    <a class="sx-pill" href="/shop" style="background:linear-gradient(90deg,#e8c97e,#c5883f);color:#0a0a0a;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">🛍️ Webshop &amp; Brands</a>
   </div>
 
   <!-- ══ EDITORIAL HERO ══ -->

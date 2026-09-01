@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
+import { twilioConfigured, sendOtp } from '../../../lib/twilio'
 
 export const dynamic = 'force-dynamic'
 
@@ -70,15 +71,30 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'expired' }, { status: 410 })
   }
 
-  const { error } = await db.from('control_room_sessions').update({
+  // On approval, fire the SMS-OTP second factor if Twilio is configured. If the send
+  // fails we fall back to no-OTP rather than lock the admin out (they already proved the
+  // phone-approval factor to get here).
+  let otpRequired = false
+  if (decision === 'approved' && twilioConfigured()) {
+    const sent = await sendOtp()
+    if (sent.ok) otpRequired = true
+    else console.error('[controlekamer] OTP send failed, granting without 2FA:', sent.error)
+  }
+
+  const update: Record<string, any> = {
     status: decision,
     approved_by: decision === 'approved' ? gate.userId : null,
     approved_at: new Date().toISOString(),
-  }).eq('id', sess.id)
+    otp_required: otpRequired,
+  }
+  // Give the OTP room to arrive and be typed on the desktop.
+  if (otpRequired) update.expires_at = new Date(Date.now() + 5 * 60 * 1000).toISOString()
+
+  const { error } = await db.from('control_room_sessions').update(update).eq('id', sess.id)
   if (error) {
     console.error('[controlekamer] approve update failed:', error.message)
     return NextResponse.json({ error: 'Could not record decision.' }, { status: 500 })
   }
 
-  return NextResponse.json({ ok: true, status: decision })
+  return NextResponse.json({ ok: true, status: decision, otpRequired })
 }

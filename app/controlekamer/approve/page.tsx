@@ -45,7 +45,12 @@ export default function ApprovePage() {
       })
       const j = await r.json()
       if (!r.ok) { setResult({ ok: false, text: j.error === 'expired' ? 'De code is verlopen.' : 'Kon niet verwerken.' }) }
-      else if (action === 'approve') setResult({ ok: true, text: 'Desktop goedgekeurd. Je kan verder op de computer.' })
+      else if (action === 'approve') setResult({
+        ok: true,
+        text: j.otpRequired
+          ? 'Goedgekeurd. We stuurden een SMS-code — voer die nu in op de desktop om af te ronden.'
+          : 'Desktop goedgekeurd. Je kan verder op de computer.',
+      })
       else setResult({ ok: false, text: 'Aanvraag geweigerd.' })
       setPhase('done')
     } catch { setResult({ ok: false, text: 'Netwerkfout.' }); setPhase('done') }

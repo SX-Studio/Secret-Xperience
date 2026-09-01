@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import QRCode from 'qrcode'
 import { newToken, newCode, mintGrant, GRANT_COOKIE, GRANT_TTL_HOURS } from '../../../lib/controlekamer'
+import { maskPhone, otpPhone } from '../../../lib/twilio'
 
 export const dynamic = 'force-dynamic'
 
@@ -61,7 +62,7 @@ export async function GET(req: Request) {
   const db = admin()
   const { data: sess } = await db
     .from('control_room_sessions')
-    .select('id, status, expires_at, approved_by')
+    .select('id, status, expires_at, approved_by, otp_required, otp_verified')
     .eq('token', token)
     .maybeSingle()
 
@@ -73,6 +74,14 @@ export async function GET(req: Request) {
   }
 
   if (sess.status === 'approved' && sess.approved_by) {
+    // Second factor pending: hold the grant until the SMS-OTP is verified on the desktop.
+    if (sess.otp_required && !sess.otp_verified) {
+      if (new Date(sess.expires_at).getTime() < Date.now()) {
+        await db.from('control_room_sessions').update({ status: 'expired' }).eq('id', sess.id)
+        return NextResponse.json({ status: 'expired' })
+      }
+      return NextResponse.json({ status: 'awaiting_otp', phoneHint: maskPhone(otpPhone()) })
+    }
     // Consume once, so a leaked token can't be replayed for a second grant.
     await db.from('control_room_sessions').update({ status: 'consumed' }).eq('id', sess.id)
     const res = NextResponse.json({ status: 'approved' })

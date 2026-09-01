@@ -61,6 +61,12 @@ export const CK_CSS = `
 .ck-ok .ck-state-ic{color:var(--ok)} .ck-bad .ck-state-ic{color:var(--bad)}
 .ck-btn{background:var(--sx-bg);border:1px solid var(--sx-brd);color:var(--sx);border-radius:999px;padding:9px 20px;font:600 13px/1 "IBM Plex Sans",sans-serif;cursor:pointer;transition:filter .15s}
 .ck-btn:hover{filter:brightness(1.15)}
+.ck-btn:disabled{opacity:.55;cursor:default}
+.ck-otp{display:flex;flex-direction:column;align-items:center;gap:10px;min-height:240px;justify-content:center}
+.ck-otp-input{width:200px;text-align:center;background:var(--panel2);border:1px solid var(--line);border-radius:12px;color:var(--ink);
+  font:600 26px/1 "IBM Plex Mono",monospace;letter-spacing:.3em;padding:14px 10px 14px 20px;outline:none;transition:border-color .15s}
+.ck-otp-input:focus{border-color:var(--core-brd)}
+.ck-otp-err{color:var(--bad);font-size:12.5px}
 
 /* ---- control room ---- */
 .ck-room{min-height:100dvh;background:

@@ -385,6 +385,28 @@ export default function PrivateReceptionPage() {
 
   useEffect(() => { fetchListings() }, [fetchListings])
 
+  // Filter toast for arrivals from homepage pill dropdowns
+  const [filterToast, setFilterToast] = useState<string | null>(null)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const g = new URLSearchParams(window.location.search).get('gender')
+    const c = new URLSearchParams(window.location.search).get('cat')
+    let label = ''
+    if (g === 'female')      label = 'Vrouwen'
+    else if (g === 'male')   label = 'Mannen'
+    else if (g === 'trans')  label = 'Transgenders'
+    else if (g === 'couple') label = 'Koppels'
+    else if (g === 'gay')    label = "Homo's"
+    else if (c === 'companionship') label = 'Companionship'
+    else if (c === 'massage')       label = 'Massage'
+    else if (c === 'domination')    label = 'Dominantie'
+    else if (c === 'experiences')   label = 'Experiences'
+    if (!label) return
+    setFilterToast(`Gefilterd op: ${label}`)
+    const t = setTimeout(() => setFilterToast(null), 3500)
+    return () => clearTimeout(t)
+  }, [])
+
   function toggleService(s: string) {
     setSelectedServices(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])
   }
@@ -427,6 +449,12 @@ export default function PrivateReceptionPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {filterToast && (
+        <div style={{ position: 'fixed', top: 78, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: 'linear-gradient(90deg,#b45cff,#7a4dff)', color: '#fff', borderRadius: 999, padding: '10px 20px', fontSize: 13, fontWeight: 600, boxShadow: '0 12px 32px rgba(0,0,0,0.4)', display: 'inline-flex', alignItems: 'center', gap: 8, animation: 'sxFilterToastIn .35s cubic-bezier(.2,.8,.4,1)' }}>
+          <span>🏠</span> {filterToast}
+        </div>
+      )}
+      <style>{`@keyframes sxFilterToastIn { from { opacity:0; transform:translate(-50%,-10px) } to { opacity:1; transform:translate(-50%,0) } }`}</style>
       <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--t)', fontFamily: 'var(--sans)' }}>
         <style>{`
           *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

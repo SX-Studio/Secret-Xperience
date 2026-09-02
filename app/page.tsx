@@ -2222,19 +2222,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 
   <!-- ══ EDITORIAL HERO ══ -->
   <!-- Visitor-selectable hero styles render here (HeroThemes) -->
-  <div id="heroThemesMount" style="margin-top:76px;position:relative;z-index:0;"></div>
-  <style>
-    /* Push the hero DOWN into the middle of the twelve-worlds section so
-       it renders as a background layer behind the grid. Grid tiles are
-       opaque; the 1 rem gaps between them let the hero (colour + card)
-       peek through. */
-    #editorialHero, #heroThemesMount { position: relative; z-index: 0; }
-    #editorialHero { margin-bottom: -65vh; }
-    #heroThemesMount { margin-bottom: -65vh; }
-    @media (max-width: 640px) {
-      #editorialHero, #heroThemesMount { margin-bottom: -55vh; }
-    }
-  </style>
+  <div id="heroThemesMount" style="margin-top:76px"></div>
 
   <section id="editorialHero" style="width:100%;background:var(--grad-candle);border-top:0.5px solid var(--b);border-bottom:0.5px solid var(--b);padding:4rem 1.5rem;">
     <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr;gap:2rem;align-items:center;">

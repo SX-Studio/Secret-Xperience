@@ -5,19 +5,16 @@
 
 .cat-anim-section {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   padding: 6rem 1.5rem 5rem;
-  background: transparent;
-  border-top: none;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(197,160,90,0.06) 0%, transparent 60%),
+    var(--bg);
+  border-top: 0.5px solid var(--b);
 }
 .section-inner { max-width: 1200px; margin: 0 auto; }
 
-.section-head {
-  text-align: center; margin: 0 auto 4rem; max-width: 760px;
-  /* Keep the intro headline legible when the section is overlapping a
-     photo-heavy hero backdrop. */
-  text-shadow: 0 2px 18px rgba(0,0,0,0.55), 0 0 2px rgba(0,0,0,0.35);
-}
+.section-head { text-align: center; margin: 0 auto 4rem; max-width: 760px; }
 .section-head .t-eyebrow-gold { display: inline-block; margin-bottom: 1.5rem; font-size: 12px; letter-spacing: 0.20em; }
 .section-title { font-size: clamp(38px, 5.2vw, 60px); line-height: 1.06; margin-bottom: 1.5rem; }
 .section-title em { font-style: italic; font-weight: 500; background: var(--grad-gold); -webkit-background-clip: text; background-clip: text; color: transparent; }

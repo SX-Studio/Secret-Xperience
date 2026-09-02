@@ -104,7 +104,6 @@ function GoldenAura() {
 }
 
 function SunsetVelvet() {
-  const cp: CSSProperties = { padding: '9px 18px', borderRadius: 999, fontSize: 12.5, fontWeight: 600, color: '#fff', textDecoration: 'none' }
   return (
     <section style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(2rem,5vw,4rem) clamp(1rem,4vw,3.5rem)', background: 'radial-gradient(ellipse 60% 70% at 88% 8%,rgba(255,110,90,.35),transparent 55%),radial-gradient(ellipse 55% 60% at 70% 100%,rgba(255,45,120,.28),transparent 60%),#190a18' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 40, flexWrap: 'wrap' }}>
@@ -113,13 +112,6 @@ function SunsetVelvet() {
           <SearchBar btnBg="linear-gradient(90deg,#ff8a5c,#ff2d78)" btnColor="#fff" />
           <LivePill color="#ffb46b" />
           <Stats color="#ff9d7a" />
-          <div style={{ display: 'flex', gap: 9, marginTop: 24, flexWrap: 'wrap' }}>
-            <a href="/escorts" style={{ ...cp, background: 'linear-gradient(90deg,#ff8a5c,#ff5c7a)' }}>💋 Escorts</a>
-            <a href="/private-reception" style={{ ...cp, background: 'linear-gradient(90deg,#b45cff,#7a4dff)' }}>🏠 Privé</a>
-            <a href="/private-reception?cat=massage" style={{ ...cp, background: 'linear-gradient(90deg,#ff5c9e,#e02d94)' }}>💆 Massage</a>
-            <a href="/live" style={{ ...cp, background: 'linear-gradient(90deg,#2dd4a0,#0e9f8f)' }}>📹 Live</a>
-            <a href="/nightlife" style={{ ...cp, background: 'linear-gradient(90deg,#ffb46b,#ff8a3c)' }}>🥂 Nightlife</a>
-          </div>
         </div>
         <div style={{ position: 'relative' }}>
           <div style={{ position: 'absolute', inset: -3, borderRadius: 23, background: 'linear-gradient(140deg,#ff8a5c,#ff2d78 55%,#b45cff)' }} />

@@ -2130,7 +2130,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   </nav>
 
   <!-- CATEGORY BAR (colorful pill row) -->
-  <div class="catbar sx-pillbar" role="navigation" aria-label="Categories" id="catBar" style="display:flex;gap:9px;flex-wrap:wrap;padding:12px 1.5rem;align-items:center;">
+  <div class="catbar sx-pillbar" role="navigation" aria-label="Categories" id="catBar" style="display:flex;gap:9px;flex-wrap:nowrap;padding:12px 1.5rem;align-items:center;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-snap-type:x proximity;scroll-padding-left:1.5rem;">
 
     <!-- ESCORT group (💋 outcall) -->
     <div class="cat-group">
@@ -2201,6 +2201,13 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </div>
     <a class="sx-pill" href="/shop" style="background:linear-gradient(90deg,#e8c97e,#c5883f);color:#0a0a0a;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">🛍️ Webshop &amp; Brands</a>
   </div>
+  <style>
+    #catBar::-webkit-scrollbar { display:none; }
+    #catBar > .cat-group, #catBar > .sx-pill { flex-shrink:0; scroll-snap-align:start; }
+    /* Soft fade on the right edge to hint that there's more to swipe */
+    .catbar-wrap { position:relative; }
+    .catbar-wrap::after { content:''; position:absolute; top:0; right:0; bottom:0; width:36px; pointer-events:none; background:linear-gradient(90deg,transparent,var(--bg) 90%); }
+  </style>
 
   <!-- ══ EDITORIAL HERO ══ -->
   <!-- Visitor-selectable hero styles render here (HeroThemes) -->

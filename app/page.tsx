@@ -2199,7 +2199,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 
   <!-- ══ EDITORIAL HERO ══ -->
   <!-- Visitor-selectable hero styles render here (HeroThemes) -->
-  <div id="heroThemesMount"></div>
+  <div id="heroThemesMount" style="margin-top:76px"></div>
 
   <section id="editorialHero" style="width:100%;background:var(--grad-candle);border-top:0.5px solid var(--b);border-bottom:0.5px solid var(--b);padding:4rem 1.5rem;">
     <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr;gap:2rem;align-items:center;">

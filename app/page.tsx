@@ -197,9 +197,20 @@ document.querySelectorAll('.cat').forEach(function(c){
       var isOpen = menu && menu.classList.contains('open');
       closeAllGroups();
       if (!isOpen && menu){
+        // Belt-and-braces: re-portal to body every open. Guarantees the menu
+        // escapes the catbar's overflow:auto clip region even if the initial
+        // portal missed it or the catbar was rebuilt.
+        if (menu.parentElement !== document.body) document.body.appendChild(menu);
         var rect = pill.getBoundingClientRect();
-        (menu as HTMLElement).style.left = rect.left + 'px';
-        (menu as HTMLElement).style.top = (rect.bottom + 8) + 'px';
+        var m = menu as HTMLElement;
+        m.style.position = 'fixed';
+        m.style.zIndex = '99999';
+        // Flip to the right edge if the menu would run off-screen
+        var estWidth = 220;
+        var left = rect.left;
+        if (left + estWidth > window.innerWidth - 8) left = Math.max(8, window.innerWidth - estWidth - 8);
+        m.style.left = left + 'px';
+        m.style.top = (rect.bottom + 8) + 'px';
         menu.classList.add('open');
         pill.classList.add('open');
         (pill as HTMLElement).setAttribute('aria-expanded','true');

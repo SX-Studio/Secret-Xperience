@@ -2072,8 +2072,8 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 
   <!-- NAV -->
   <nav role="navigation" aria-label="Main navigation" style="display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:64px;position:sticky;top:0;z-index:200;background:rgba(8,6,18,0.92);backdrop-filter:blur(18px);border-bottom:0.5px solid var(--b);">
-    <div id="heroThemesNavMount" style="position:relative;margin-right:76px;display:flex;align-items:center;"></div>
     <div class="nav-logo">Secret<em style="font-style:italic;font-weight:300">Xperience</em></div>
+    <div id="heroThemesNavMount" style="position:relative;margin-left:14px;display:flex;align-items:center;"></div>
     <div class="nav-right">
       <button class="nb" id="locBtn" aria-label="Location"><i class="ti ti-map-pin" aria-hidden="true"></i> Brussels</button>
       <button onclick="__cycleTheme()" aria-label="Toggle theme" style="width:34px;height:34px;background:var(--bg2);border:0.5px solid var(--b2);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:16px;flex-shrink:0;"><i class="ti ti-moon-stars" id="themeIcon"></i></button>

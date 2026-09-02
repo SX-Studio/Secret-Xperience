@@ -6,16 +6,10 @@
 .cat-anim-section {
   position: relative;
   z-index: 2;
-  /* Pull the section up over the hero so the hero renders as a background
-     layer behind the twelve worlds. Grid tiles stay opaque; the 1 rem gaps
-     between them stay transparent, letting the hero's colour/photo peek
-     through. */
-  margin-top: -32vh;
   padding: 6rem 1.5rem 5rem;
   background: transparent;
   border-top: none;
 }
-@media (max-width: 640px) { .cat-anim-section { margin-top: -22vh; padding-top: 3.5rem; } }
 .section-inner { max-width: 1200px; margin: 0 auto; }
 
 .section-head {

@@ -2079,9 +2079,6 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <button onclick="__cycleTheme()" aria-label="Toggle theme" style="width:34px;height:34px;background:var(--bg2);border:0.5px solid var(--b2);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:16px;flex-shrink:0;"><i class="ti ti-moon-stars" id="themeIcon"></i></button>
       <!-- logged-out -->
       <a href="/discover" class="nb" style="text-decoration:none;display:flex;align-items:center;gap:5px;color:var(--gold);font-weight:500;" title="Swipe to discover"><i class="ti ti-sparkles" aria-hidden="true"></i> Discover</a>
-      <a href="/livestreams" class="nb" style="text-decoration:none;display:flex;align-items:center;gap:5px;color:#ef4444;font-weight:600;" title="Our performers live now"><i class="ti ti-broadcast" aria-hidden="true"></i> Live Shows <span style="width:5px;height:5px;border-radius:50%;background:#ef4444;display:inline-block;animation:liveblink 1.2s ease-in-out infinite;margin-left:1px;"></span></a>
-      <a href="/live" class="nb" style="text-decoration:none;display:flex;align-items:center;gap:5px;color:var(--t2);font-weight:500;" title="Cam models"><i class="ti ti-live-photo" aria-hidden="true"></i> Cams</a>
-      <a href="/events" class="nb" style="text-decoration:none;display:flex;align-items:center;gap:6px;"><i class="ti ti-calendar-event" aria-hidden="true"></i> Events</a>
       <button class="nb" id="loginBtn">Log in</button>
       <button class="nb pri" id="signupBtn" onclick="window.location.href='/advertise'">List your service</button>
       <!-- logged-in: List service + profile avatar -->
@@ -2193,7 +2190,15 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 
     <!-- Standalone pills -->
     <a class="sx-pill" href="/creators" style="background:linear-gradient(90deg,#5c8bff,#7a4dff);color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">🎨 Content Creators</a>
-    <a class="sx-pill" href="/live" style="background:linear-gradient(90deg,#2dd4a0,#0e9f8f);color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">📹 Live</a>
+    <div class="cat-group">
+      <button class="cat-group-pill sx-pill" data-group="live" aria-haspopup="true" aria-expanded="false" style="background:linear-gradient(90deg,#2dd4a0,#0e9f8f);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        📹 Live <i class="ti ti-chevron-down cg-chev" style="font-size:12px;"></i>
+      </button>
+      <div class="cat-group-menu" id="cgm-live" role="menu">
+        <a class="cat-group-item" href="/livestreams" role="menuitem">Live Shows</a>
+        <a class="cat-group-item" href="/live" role="menuitem">Cams</a>
+      </div>
+    </div>
     <a class="sx-pill" href="/shop" style="background:linear-gradient(90deg,#e8c97e,#c5883f);color:#0a0a0a;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">🛍️ Webshop &amp; Brands</a>
   </div>
 

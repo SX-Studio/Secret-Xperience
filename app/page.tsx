@@ -2141,7 +2141,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   </nav>
 
   <!-- CATEGORY BAR (colorful pill row) -->
-  <div class="catbar sx-pillbar" role="navigation" aria-label="Categories" id="catBar" style="display:flex;gap:9px;flex-wrap:nowrap;padding:12px 1.5rem;align-items:center;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-snap-type:x proximity;scroll-padding-left:1.5rem;">
+  <div class="catbar sx-pillbar" role="navigation" aria-label="Categories" id="catBar" style="display:flex;gap:9px;flex-wrap:nowrap;padding:12px 1.5rem;align-items:center;overflow-x:auto;overflow-y:hidden;height:auto;min-height:60px;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-snap-type:x proximity;scroll-padding-left:1.5rem;touch-action:pan-x;">
 
     <!-- ESCORT group (💋 outcall) -->
     <div class="cat-group">

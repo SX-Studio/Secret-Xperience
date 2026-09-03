@@ -4,6 +4,7 @@ import CookieBanner from './components/CookieBanner'
 import AttributionTracker from './components/AttributionTracker'
 import PageviewTracker from './components/PageviewTracker'
 import PrideMode from './components/PrideMode'
+import BackToTop from './components/BackToTop'
 import WelcomeChoice from './components/WelcomeChoice'
 import PrivacyPanic from './components/PrivacyPanic'
 import './globals.css'
@@ -389,6 +390,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AttributionTracker />
         <PageviewTracker />
         <PrideMode />
+        <BackToTop />
       </body>
     </html>
   )

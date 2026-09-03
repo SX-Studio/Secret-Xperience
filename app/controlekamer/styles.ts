@@ -13,6 +13,8 @@ export const CK_CSS = `
   --infra:#9aa3b4; --infra-bg:rgba(154,163,180,.11); --infra-brd:rgba(154,163,180,.30);
   --google:#e8a13a; --google-bg:rgba(232,161,58,.12); --google-brd:rgba(232,161,58,.40);
   --pay:#5fbf7a; --pay-bg:rgba(95,191,122,.12); --pay-brd:rgba(95,191,122,.40);
+  --domain:#5aa9e6; --domain-bg:rgba(90,169,230,.12); --domain-brd:rgba(90,169,230,.40);
+  --social:#e6699b; --social-bg:rgba(230,105,155,.12); --social-brd:rgba(230,105,155,.40);
   --ok:#5fbf7a; --bad:#e2607a;
   color:var(--ink);
   font-family:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
@@ -98,6 +100,7 @@ export const CK_CSS = `
 .ck-card::before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--accent, var(--infra))}
 .ck-card.sx{--accent:var(--sx)} .ck-card.c24{--accent:var(--c24)} .ck-card.core{--accent:var(--core)}
 .ck-card.infra{--accent:var(--infra)} .ck-card.google{--accent:var(--google)} .ck-card.pay{--accent:var(--pay)}
+.ck-card.domain{--accent:var(--domain)} .ck-card.social{--accent:var(--social)}
 .ck-card-h{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
 .ck-card-h h3{font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:14px;margin:0;color:var(--ink)}
 .ck-card-blurb{color:var(--muted);font-size:12.5px;margin:0 0 12px;line-height:1.5}

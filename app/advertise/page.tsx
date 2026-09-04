@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import DestinationDeals from './DestinationDeals'
 
 const categories = [
   { icon: 'ti-user', title: 'Escorts & Companions', desc: 'Independent escorts, agency companions, GFE, touring — verified profiles with booking calendar and private messaging.', color: 'var(--grad-boudoir)' },
@@ -167,6 +168,9 @@ export default function AdvertisePage() {
           ))}
         </div>
       </section>
+
+      {/* POPULAR DESTINATIONS (Booking.com) */}
+      <DestinationDeals />
 
       {/* BENEFITS */}
       <section style={{ padding: '6rem 1.5rem', background: 'var(--bg1)', borderTop: '0.5px solid var(--b)' }}>

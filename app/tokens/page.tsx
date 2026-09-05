@@ -135,6 +135,7 @@ export default function TokensPage() {
   const [session,  setSession]  = useState<any>(null)
   const [loading,  setLoading]  = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
+  const [cryptoId, setCryptoId] = useState<string | null>(null)
   const [showPayModal, setShowPayModal] = useState(false)
   const [status,   setStatus]   = useState<'idle' | 'success' | 'cancel'>('idle')
   const [role,     setRole]     = useState<string>('Member')
@@ -185,6 +186,27 @@ export default function TokensPage() {
       setShowPayModal(true)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Crypto rail (NOWPayments) — parallel to Verotel. Same graceful fallback:
+  // configured:false → the "coming soon" modal, never a raw error.
+  async function payWithCrypto(pkg: Package | typeof FALLBACK_PACKAGES[0]) {
+    if (!session) { window.location.href = '/login?next=/tokens'; return }
+    setCryptoId(pkg.id)
+    try {
+      const res  = await fetch('/api/nowpayments/charge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ packageId: pkg.id }),
+      })
+      const data = await res.json()
+      if (data.url) { window.location.href = data.url; return }
+      setShowPayModal(true)
+    } catch {
+      setShowPayModal(true)
+    } finally {
+      setCryptoId(null)
     }
   }
 
@@ -289,6 +311,26 @@ export default function TokensPage() {
           border: 0.5px solid rgba(197,160,90,0.4);
         }
         .tok-cta-btn.secondary:hover { background: rgba(197,160,90,0.06); }
+        .tok-crypto-btn {
+          width: 100%;
+          margin-top: 8px;
+          padding: 9px 0;
+          border-radius: 9px;
+          background: transparent;
+          color: rgba(236,232,225,0.6);
+          border: 0.5px solid rgba(236,232,225,0.14);
+          font: 500 10px/1 'Poppins', sans-serif;
+          letter-spacing: 0.09em;
+          text-transform: uppercase;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          transition: color 0.15s, border-color 0.15s, background 0.15s;
+        }
+        .tok-crypto-btn:hover { color: #c5a05a; border-color: rgba(197,160,90,0.4); background: rgba(197,160,90,0.04); }
+        .tok-crypto-btn:disabled { opacity: 0.45; cursor: default; }
 
         .tok-section-rule {
           height: 0.5px;
@@ -732,6 +774,13 @@ export default function TokensPage() {
                       disabled={loading && selected === pkg.id}
                     >
                       {loading && selected === pkg.id ? 'Redirecting…' : 'Buy now'}
+                    </button>
+                    <button
+                      className="tok-crypto-btn"
+                      onClick={() => payWithCrypto(pkg as any)}
+                      disabled={cryptoId === pkg.id}
+                    >
+                      {cryptoId === pkg.id ? 'Redirecting…' : <><span aria-hidden>◎</span> Pay with crypto</>}
                     </button>
                   </div>
                 </div>

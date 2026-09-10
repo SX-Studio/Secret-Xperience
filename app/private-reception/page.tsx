@@ -160,7 +160,7 @@ function SpotlightStrip({ items, discreet }: { items: Listing[]; discreet: boole
 
 function HostCard({ l, discreet, isPremier }: { l: Listing; discreet: boolean; isPremier?: boolean }) {
   const [imgIdx, setImgIdx] = useState(0)
-  const imgs = l.images || []
+  const imgs = (l.images || []).slice(0, 5) // max 5 photos per ad
   const img = imgs[imgIdx] || imgs[0] || null
   const availNow = isAvailableNow(l.tags)
   const isNew = isNewListing(l.created_at)
@@ -316,7 +316,7 @@ export default function PrivateReceptionPage() {
   const [hairColor, setHairColor]       = useState('Any')
   const [build, setBuild]               = useState('Any')
   const [selectedServices, setSelectedServices] = useState<string[]>([])
-  const [sortBy, setSortBy]             = useState<'rating' | 'price_asc' | 'price_desc' | 'newest' | 'available'>('rating')
+  const [sortBy, setSortBy]             = useState<'rating' | 'price_asc' | 'price_desc' | 'newest' | 'available' | 'city'>('rating')
 
   const fetchListings = useCallback(async () => {
     setLoading(true)
@@ -338,6 +338,7 @@ export default function PrivateReceptionPage() {
     if (sortBy === 'rating') q = q.order('rating', { ascending: false, nullsFirst: false })
     else if (sortBy === 'price_asc') q = q.order('price_from', { ascending: true, nullsFirst: false })
     else if (sortBy === 'price_desc') q = q.order('price_from', { ascending: false, nullsFirst: false })
+    else if (sortBy === 'city') q = q.order('city', { ascending: true, nullsFirst: false })
     else q = q.order('created_at', { ascending: false })
 
     q = q.limit(60)
@@ -676,6 +677,7 @@ export default function PrivateReceptionPage() {
                   <option value="price_asc">Price: Low → High</option>
                   <option value="price_desc">Price: High → Low</option>
                   <option value="newest">Newest</option>
+                  <option value="city">Per gemeente (A–Z)</option>
                 </select>
               </div>
             </div>
@@ -703,7 +705,34 @@ export default function PrivateReceptionPage() {
                 <p style={{ fontSize: '14px', marginBottom: '1.5rem' }}>Try adjusting your filters</p>
                 <button onClick={resetFilters} style={{ background: 'var(--grad-gold)', border: 'none', borderRadius: '999px', padding: '10px 24px', color: '#000', fontWeight: 700, fontSize: '13px', cursor: 'pointer', fontFamily: 'var(--sans)' }}>Clear all filters</button>
               </div>
-            ) : (() => {
+            ) : sortBy === 'city' ? (() => {
+                // Redlights-style: grouped per municipality, each header shows the city + ad count
+                const groups = Object.entries(
+                  listings.reduce((acc: Record<string, Listing[]>, l) => {
+                    const c = (l.city || '').trim() || 'Overige'
+                    ;(acc[c] ||= []).push(l)
+                    return acc
+                  }, {})
+                ).sort((a, b) => a[0].localeCompare(b[0], 'nl'))
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+                    {groups.map(([cityName, items]) => (
+                      <div key={cityName}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+                          <span style={{ fontFamily: 'var(--serif)', fontSize: '20px', color: 'var(--t)', whiteSpace: 'nowrap' }}>
+                            <i className="ti ti-map-pin" style={{ color: 'var(--gold)', marginRight: 6 }} />{cityName}
+                            <span style={{ color: 'var(--gold)', marginLeft: 8 }}>{items.length}</span>
+                          </span>
+                          <div style={{ flex: 1, height: '0.5px', background: 'linear-gradient(90deg, rgba(197,160,90,0.35), transparent)' }} />
+                        </div>
+                        <div className="listing-grid">
+                          {items.map(l => <HostCard key={l.id} l={l} discreet={discreetMode} isPremier={l.premium} />)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })() : (() => {
                 const now = new Date().toISOString()
                 const premierList  = listings.filter(l => l.premium && !(l.featured_until && l.featured_until > now))
                 const standardList = listings.filter(l => !l.premium)

@@ -1,24 +1,28 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import Link from 'next/link'
 import ProductGrid from './ProductGrid'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
 import ShopShowcase from '../components/ShopShowcase/ShopShowcase'
+import { ShopHeader, ShopFooter } from './ShopChrome'
+import { SHOP_ORIGIN, isShopHost } from '../lib/domains'
 
 export async function generateMetadata() {
   return {
     title: 'The Boutique | SecretXperience',
     description: 'Curated luxury accessories, intimate gifts, and premium wellness. Discreet EU shipping in plain packaging.',
+    alternates: { canonical: `${SHOP_ORIGIN}/` },
     openGraph: {
       title: 'The Boutique | SecretXperience',
       description: 'Curated luxury accessories, intimate gifts, and premium wellness.',
-      url: 'https://www.secretxperience.eu/shop',
+      url: `${SHOP_ORIGIN}/`,
     },
   }
 }
 
 
 export default async function ShopPage() {
+  const standalone = isShopHost(headers().get('host'))
   const cookieStore = cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -40,10 +44,9 @@ export default async function ShopPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([
         { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.secretxperience.eu' },
-          { '@type': 'ListItem', position: 2, name: 'Shop', item: 'https://www.secretxperience.eu/shop' },
+          { '@type': 'ListItem', position: 1, name: 'The Boutique', item: `${SHOP_ORIGIN}/` },
         ]},
-        { '@context': 'https://schema.org', '@type': 'Service', name: 'Adult Shop', serviceType: 'Adult Products & Accessories', advertiser: { '@type': 'Organization', name: 'SecretXperience', url: 'https://www.secretxperience.eu' }, areaServed: ['BE','NL','DE','FR','LU','CH'], url: 'https://www.secretxperience.eu/shop', description: 'Premium adult products, accessories and lifestyle items delivered discreetly across Europe.' },
+        { '@context': 'https://schema.org', '@type': 'Store', name: 'SecretXperience Boutique', url: `${SHOP_ORIGIN}/`, areaServed: ['BE','NL','DE','FR','LU','CH'], description: 'Premium adult products, accessories and lifestyle items delivered discreetly across Europe.' },
       ]) }} />
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -82,30 +85,7 @@ export default async function ShopPage() {
           <span style={{ color: 'var(--gold)', marginLeft: '8px' }}>✦</span>
         </div>
 
-        {/* NAV */}
-        <nav style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 1.5rem', height: '58px',
-          position: 'sticky', top: '34px', zIndex: 200,
-          background: 'rgba(8,6,18,0.96)', backdropFilter: 'blur(18px)',
-          borderBottom: '0.5px solid var(--b)',
-        }}>
-          <Link href="/" style={{ fontFamily: 'var(--serif)', fontSize: '22px', color: 'var(--gold)', letterSpacing: '.02em', textDecoration: 'none', filter: 'drop-shadow(0 0 12px rgba(197,160,90,0.25))' }}>
-            Secret<em style={{ fontStyle: 'italic', fontWeight: 300 }}>Xperience</em>
-          </Link>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <Link href="/events" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Events</Link>
-            <Link href="/advertise" style={{
-              height: '34px', padding: '0 16px',
-              background: 'linear-gradient(135deg,var(--gold),var(--goldd))',
-              borderRadius: 'var(--r)', color: '#0a0a0a',
-              fontSize: '13px', fontWeight: 700,
-              textDecoration: 'none', display: 'flex', alignItems: 'center',
-            }}>
-              List your shop
-            </Link>
-          </div>
-        </nav>
+        <ShopHeader standalone={standalone} />
 
         {/* HERO */}
         <div style={{
@@ -140,48 +120,53 @@ export default async function ShopPage() {
 
           <PremiumBanner placement="section" category="shop" />
 
-          {/* Dorcel Collection affiliate banner */}
-          <a
-            href="https://www.dorcelclub.com/en?aff=8103"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="dorcel-banner"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr auto',
-              alignItems: 'center',
-              gap: '1.5rem',
-              background: 'linear-gradient(120deg, rgba(20,8,8,0.95) 0%, rgba(80,10,20,0.7) 100%)',
-              border: '0.5px solid rgba(180,20,40,0.4)',
-              borderRadius: 16,
-              padding: '1.4rem 1.8rem',
-              marginBottom: '2rem',
-              textDecoration: 'none',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 700, color: '#e02030', marginBottom: 8 }}>
-                ✦ Official Partner · Premium Content
+          {/* Dorcel Club is a porn-subscription affiliate, not a product this shop
+              ships. It stays on the marketplace but is kept off the standalone
+              storefront, whose whole purpose is to present as clean commerce to a
+              payment processor. Flip this condition to show it on both. */}
+          {!standalone && (
+            <a
+              href="https://www.dorcelclub.com/en?aff=8103"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="dorcel-banner"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr auto',
+                alignItems: 'center',
+                gap: '1.5rem',
+                background: 'linear-gradient(120deg, rgba(20,8,8,0.95) 0%, rgba(80,10,20,0.7) 100%)',
+                border: '0.5px solid rgba(180,20,40,0.4)',
+                borderRadius: 16,
+                padding: '1.4rem 1.8rem',
+                marginBottom: '2rem',
+                textDecoration: 'none',
+                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 700, color: '#e02030', marginBottom: 8 }}>
+                  ✦ Official Partner · Premium Content
+                </div>
+                <div style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(18px,3vw,26px)', fontWeight: 400, color: '#ece8e1', lineHeight: 1.15, marginBottom: 6 }}>
+                  Dorcel Club
+                </div>
+                <div style={{ fontSize: 13, color: 'rgba(236,232,225,0.5)', lineHeight: 1.5 }}>
+                  Europe&apos;s most prestigious adult studio — exclusive HD films, series &amp; live shows.
+                </div>
               </div>
-              <div style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(18px,3vw,26px)', fontWeight: 400, color: '#ece8e1', lineHeight: 1.15, marginBottom: 6 }}>
-                Dorcel Club
-              </div>
-              <div style={{ fontSize: 13, color: 'rgba(236,232,225,0.5)', lineHeight: 1.5 }}>
-                Europe&apos;s most prestigious adult studio — exclusive HD films, series &amp; live shows.
-              </div>
-            </div>
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
-              fontSize: 13, fontWeight: 700, color: '#fff',
-              background: 'linear-gradient(90deg, #c0001a, #8b000f)',
-              borderRadius: 10, padding: '9px 18px', flexShrink: 0,
-            }}>
-              Visit store <i className="ti ti-arrow-right" />
-            </span>
-          </a>
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+                fontSize: 13, fontWeight: 700, color: '#fff',
+                background: 'linear-gradient(90deg, #c0001a, #8b000f)',
+                borderRadius: 10, padding: '9px 18px', flexShrink: 0,
+              }}>
+                Visit store <i className="ti ti-arrow-right" />
+              </span>
+            </a>
+          )}
 
-          <ProductGrid products={allProducts} />
+          <ProductGrid products={allProducts} basePath={standalone ? '/p' : '/shop'} />
 
           {/* Partner boutiques — lingerie & adult fashion, data in app/data/shops.ts */}
           <div style={{ margin: '3rem -1.5rem 0' }}>
@@ -189,7 +174,7 @@ export default async function ShopPage() {
           </div>
 
           {/* VENDOR CTA */}
-          {allProducts.length > 0 && (
+          {!standalone && allProducts.length > 0 && (
             <div style={{
               marginTop: '4rem',
               padding: '2.5rem',
@@ -219,22 +204,7 @@ export default async function ShopPage() {
           )}
         </div>
 
-        {/* FOOTER */}
-        <footer style={{ borderTop: '0.5px solid var(--b)', background: 'var(--bg1)', padding: '2rem 1.5rem', textAlign: 'center' }}>
-          <Link href="/" style={{ fontFamily: 'var(--serif)', fontSize: '20px', color: 'var(--gold)', textDecoration: 'none', display: 'block', marginBottom: '0.5rem' }}>
-            Secret<em style={{ fontStyle: 'italic', fontWeight: 300 }}>Xperience</em>
-          </Link>
-          <p style={{ fontSize: '12px', color: 'var(--t3)' }}>
-            Adults only (18+) ·{' '}
-            <Link href="/regulations" style={{ color: 'var(--t3)', textDecoration: 'none' }}>Regulations</Link>
-            {' '}·{' '}
-            <Link href="/medical" style={{ color: 'var(--t3)', textDecoration: 'none' }}>Medical Info</Link>
-            {' '}·{' '}
-            <Link href="/terms" style={{ color: 'var(--t3)', textDecoration: 'none' }}>Terms</Link>
-            {' '}·{' '}
-            <Link href="/privacy" style={{ color: 'var(--t3)', textDecoration: 'none' }}>Privacy</Link>
-          </p>
-        </footer>
+        <ShopFooter standalone={standalone} />
       </div>
     </>
   )

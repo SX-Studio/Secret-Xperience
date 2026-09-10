@@ -31,7 +31,7 @@ const ESCORT_TYPES = [
 const COUNTRIES = [
   'Belgium', 'Netherlands', 'France', 'Germany',
   'Luxembourg', 'United Kingdom', 'Switzerland', 'Austria',
-  'Spain', 'Italy', 'Worldwide', 'Other',
+  'Spain', 'Italy', 'Other',
 ]
 
 const MEET_TYPES = [

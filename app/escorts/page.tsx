@@ -63,7 +63,7 @@ const MEET_TYPES = [
 const ETHNICITY_FILTER = [...ETHNICITIES, 'Any']
 const HAIR_COLORS = [...HAIR_COLOURS, 'Any']
 const BUILDS_FILTER = [...BUILDS, 'Any']
-const CITIES      = ['Brussels', 'Antwerp', 'Ghent', 'Grimbergen', 'Amsterdam', 'Berlin', 'Paris', 'Cologne', 'Rotterdam', '🌍 Worldwide', 'All Cities']
+const CITIES      = ['Brussels', 'Antwerp', 'Ghent', 'Grimbergen', 'Amsterdam', 'Berlin', 'Paris', 'Cologne', 'Rotterdam', 'All Cities']
 
 const SERVICES_LIST = ['69','Anal','BDSM','Body Massage','Couples','Cum on Body','Cum on Face','Deep Throat','Doggy Style','Domina','Duo','Erotic Massage','Facesitting','Fetish','Foot Worship','French Kissing','GFE','Golden Shower','Handjob','Kissing','Lap Dance','Massage','Mistress','Oral','Prostate Massage','Rimming','Roleplay','Spanking','Squirting','Strap-on','Striptease','Tantra','Thai Massage','Threesome','Toys']
 
@@ -302,8 +302,7 @@ export default function EscortsPage() {
       // primary category OR one of the ad's up-to-3 extra categories
       .or('category.in.(escorts,companionship,domination,experiences,massage),extra_categories.ov.{escorts,companionship,domination,experiences,massage}')
 
-    if (city === '🌍 Worldwide') q = q.eq('country', 'Worldwide')
-    else if (city !== 'All Cities') q = q.eq('city', city)
+    if (city !== 'All Cities') q = q.eq('city', city)
     if (verifiedOnly) q = q.eq('verified', true)
     if (meetType !== 'all') q = q.eq('meet_type', meetType)
     if (priceMin > 0) q = q.gte('price_from', priceMin)

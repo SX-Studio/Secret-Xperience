@@ -31,7 +31,7 @@ const ESCORT_TYPES = [
 const COUNTRIES = [
   'Belgium', 'Netherlands', 'France', 'Germany',
   'Luxembourg', 'United Kingdom', 'Switzerland', 'Austria',
-  'Spain', 'Italy', 'Other',
+  'Spain', 'Italy', 'Worldwide', 'Other',
 ]
 
 const MEET_TYPES = [
@@ -62,6 +62,7 @@ const WH_DAY_LABELS     = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
 interface FormState {
   category:    string
+  extra_categories: string[]
   subcategory: string
   title:       string
   description: string
@@ -186,6 +187,7 @@ export default function CreateListingPage() {
   const [form, setForm] = useState<FormState>({
     tier:        'basic',
     category:    '',
+    extra_categories: [],
     subcategory: '',
     title:       '',
     description: '',
@@ -546,6 +548,7 @@ export default function CreateListingPage() {
       title:           form.title,
       description:     form.description || null,
       category:        form.category,
+      extra_categories: form.extra_categories.filter(c => c && c !== form.category).slice(0, 2),
       subcategory:     form.subcategory || null,
       price_from:      form.price_from ? parseInt(form.price_from) : null,
       price_to:        form.price_to   ? parseInt(form.price_to)   : null,
@@ -1084,7 +1087,7 @@ export default function CreateListingPage() {
                   <div
                     key={cat.value}
                     className={`cl-category-card${form.category === cat.value ? ' selected' : ''}`}
-                    onClick={() => set('category', cat.value)}
+                    onClick={() => setForm(f => ({ ...f, category: cat.value, extra_categories: f.extra_categories.filter(x => x !== cat.value) }))}
                   >
                     <span
                       className="cl-cat-icon"
@@ -1120,6 +1123,45 @@ export default function CreateListingPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Extra categories — an ad can appear in up to 3 categories total */}
+              {form.category && (
+                <div style={{ marginBottom: '2rem' }}>
+                  <label style={label}>Also list in (optional — up to 2 more)</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                    {CATEGORIES.filter(c => c.value !== form.category).map(c => {
+                      const on = form.extra_categories.includes(c.value)
+                      const full = form.extra_categories.length >= 2
+                      return (
+                        <button
+                          type="button"
+                          key={c.value}
+                          disabled={!on && full}
+                          onClick={() => setForm(f => ({
+                            ...f,
+                            extra_categories: on
+                              ? f.extra_categories.filter(x => x !== c.value)
+                              : (f.extra_categories.length >= 2 ? f.extra_categories : [...f.extra_categories, c.value]),
+                          }))}
+                          style={{
+                            padding: '7px 14px', borderRadius: '20px', fontSize: '12px', fontFamily: 'var(--sans)',
+                            cursor: (!on && full) ? 'not-allowed' : 'pointer',
+                            border: on ? '1px solid var(--gold, #c5a05a)' : '0.5px solid var(--b2, rgba(255,255,255,0.12))',
+                            background: on ? 'var(--gbg, rgba(197,160,90,0.12))' : 'transparent',
+                            color: on ? 'var(--gold, #c5a05a)' : 'var(--t2, rgba(255,255,255,0.6))',
+                            opacity: (!on && full) ? 0.4 : 1,
+                          }}
+                        >
+                          {c.icon} {c.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <p style={{ fontSize: '11px', color: 'var(--t3)', marginTop: '8px' }}>
+                    Your ad also shows on these category pages · {form.extra_categories.length}/2 selected
+                  </p>
+                </div>
+              )}
 
               {/* Subcategory for escorts */}
               {form.category === 'escorts' && (

@@ -328,7 +328,8 @@ export default function PrivateReceptionPage() {
       .from('listings')
       .select('id,title,description,category,subcategory,city,country,price_from,price_to,currency,meet_type,images,image_focus,verified,premium,rating,review_count,tags,created_at,featured_until,age')
       .eq('active', true)
-      .in('category', cats)
+      // primary category OR one of the ad's up-to-3 extra categories
+      .or(`category.in.(${cats.join(',')}),extra_categories.ov.{${cats.join(',')}}`)
 
     if (city !== 'All Cities') q = q.eq('city', city)
     if (verifiedOnly) q = q.eq('verified', true)

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { isOwnHost } from '../lib/domains'
 
 // First-touch attribution. On the first landing that carries UTM params (or an
 // external referrer), capture them into a cookie + localStorage and never
@@ -32,7 +33,7 @@ export default function AttributionTracker() {
       if (referrer) {
         try {
           const host = new URL(referrer).hostname
-          if (host && !host.endsWith('secretxperience.eu')) externalReferrer = referrer
+          if (host && !isOwnHost(host)) externalReferrer = referrer
         } catch { /* ignore malformed referrer */ }
       }
 

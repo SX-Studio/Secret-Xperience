@@ -11,6 +11,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
 import { siteUrl } from '../../../lib/site'
+import { SHOP_ORIGIN, isShopHost } from '../../../lib/domains'
 
 const SITE = siteUrl()
 
@@ -31,6 +32,7 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Please log in to purchase.' }, { status: 401 })
 
   const { productId } = await req.json()
+  const onShop = isShopHost(req.headers.get('host'))
   if (!productId) return NextResponse.json({ error: 'productId required' }, { status: 400 })
 
   const admin = createClient(
@@ -74,8 +76,11 @@ export async function POST(req: NextRequest) {
       quantity: 1,
     }],
     metadata: { order_id: order?.id || '', product_id: product.id, buyer_id: session.user.id },
-    success_url: `${SITE}/shop?order=success`,
-    cancel_url: `${SITE}/shop?order=cancelled`,
+    // Stripe return URLs are per-session, not registered in a panel and not
+    // signed (unlike Verotel's), so they can safely follow the host. A buyer
+    // on the storefront must come back to the storefront, not the marketplace.
+    success_url: onShop ? `${SHOP_ORIGIN}/?order=success` : `${SITE}/shop?order=success`,
+    cancel_url: onShop ? `${SHOP_ORIGIN}/?order=cancelled` : `${SITE}/shop?order=cancelled`,
   })
 
   if (order?.id) {

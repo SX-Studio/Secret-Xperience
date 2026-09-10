@@ -63,7 +63,9 @@ export default function LoginPage() {
       } else {
         // Advertisers/venues/creators with no listings → onboard them straight to create
         const nextUrl = new URLSearchParams(window.location.search).get('next')
-        if (nextUrl && nextUrl.startsWith('/')) {
+        // Relative paths only. A bare startsWith('/') also admits '//evil.com',
+        // which the browser treats as protocol-relative and navigates off-site.
+        if (nextUrl && nextUrl.startsWith('/') && !nextUrl.startsWith('//')) {
           window.location.href = nextUrl
           return
         }
@@ -112,9 +114,15 @@ export default function LoginPage() {
     const supabase = createClient()
     // Only pass role when signing up — on login the role already exists in the DB
     // and must not be overwritten (e.g. an advertiser logging in via Google).
-    const callbackUrl = mode === 'signup'
-      ? `${window.location.origin}/auth/callback?role=${encodeURIComponent(role)}`
-      : `${window.location.origin}/auth/callback`
+    // Carry `next` through OAuth so a login started mid-flow (e.g. the
+    // cross-domain session bridge at /sso/start) resumes where it left off
+    // instead of dropping the user on /dashboard.
+    const nextParam = new URLSearchParams(window.location.search).get('next')
+    const safeNext = nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : null
+    const cb = new URL('/auth/callback', window.location.origin)
+    if (mode === 'signup') cb.searchParams.set('role', role)
+    if (safeNext) cb.searchParams.set('next', safeNext)
+    const callbackUrl = cb.toString()
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: callbackUrl },

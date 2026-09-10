@@ -39,14 +39,14 @@ function price(p: Product) {
   return `${sym}${(p.price_cents / 100).toFixed(2)}`
 }
 
-function ProductCard({ p, idx }: { p: Product; idx: number }) {
+function ProductCard({ p, idx, basePath }: { p: Product; idx: number; basePath: string }) {
   const monogram = (p.brand || p.name || 'Sx').slice(0, 2).toUpperCase()
   const grad = GRADS[idx % GRADS.length]
   const isAffiliate = p.fulfillment === 'affiliate'
 
   return (
     <div style={{ position: 'relative' }}>
-      <Link href={`/shop/${p.id}`} className="shop-card" style={{ display: 'block', textDecoration: 'none', background: 'var(--bg1)', border: '0.5px solid var(--b)', borderRadius: '12px', overflow: 'hidden', transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.15s' }}>
+      <Link href={`${basePath}/${p.id}`} className="shop-card" style={{ display: 'block', textDecoration: 'none', background: 'var(--bg1)', border: '0.5px solid var(--b)', borderRadius: '12px', overflow: 'hidden', transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.15s' }}>
         <div style={{ height: '200px', background: grad, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {p.images?.[0] ? (
             <img src={p.images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
@@ -73,7 +73,9 @@ function ProductCard({ p, idx }: { p: Product; idx: number }) {
   )
 }
 
-export default function ProductGrid({ products }: { products: Product[] }) {
+// basePath differs per domain: products are /shop/<id> on the marketplace and
+// /p/<id> on the standalone storefront, where the shop is the whole site.
+export default function ProductGrid({ products, basePath = '/shop' }: { products: Product[]; basePath?: string }) {
   const [filter, setFilter] = useState('all')
   const filtered = products.filter(p => filter === 'all' || (p.category ?? '').toLowerCase() === filter)
 
@@ -99,7 +101,7 @@ export default function ProductGrid({ products }: { products: Product[] }) {
         <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--t3)' }}>No products match this filter</div>
       ) : (
         <div className="shop-grid">
-          {filtered.map((p, i) => <ProductCard key={p.id} p={p} idx={i} />)}
+          {filtered.map((p, i) => <ProductCard key={p.id} p={p} idx={i} basePath={basePath} />)}
         </div>
       )}
     </>

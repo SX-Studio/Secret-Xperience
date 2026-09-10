@@ -341,7 +341,7 @@ export default function PrivateReceptionPage() {
     else if (sortBy === 'city') q = q.order('city', { ascending: true, nullsFirst: false })
     else q = q.order('created_at', { ascending: false })
 
-    q = q.limit(60)
+    q = q.limit(sortBy === 'city' ? 1000 : 60) // load full set for the per-municipality directory
 
     const { data } = await q
     let results = data ?? []

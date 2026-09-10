@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import AccountLink from './AccountLink'
 
 /**
  * Header and footer for the boutique.
@@ -41,6 +42,7 @@ export function ShopHeader({ standalone, back }: { standalone: boolean; back?: {
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           {standalone ? (
             <>
+              <AccountLink />
               <Link href="/shipping" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Shipping</Link>
               <Link href="/returns" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Returns</Link>
             </>

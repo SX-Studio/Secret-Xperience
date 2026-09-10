@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import Link from 'next/link'
 import HotelsGrid from './HotelsGrid'
 import BookingSearch from './BookingSearch'
+import LastminuteSearch from './LastminuteSearch'
 import HolidayDeals from './HolidayDeals'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
 
@@ -125,6 +126,7 @@ export default async function HotelsPage() {
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2.5rem 1.5rem 6rem' }}>
 
           <BookingSearch />
+          <LastminuteSearch />
           <HolidayDeals />
 
           <PremiumBanner placement="section" category="hotels" />

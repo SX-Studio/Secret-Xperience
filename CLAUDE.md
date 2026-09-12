@@ -23,6 +23,7 @@ Premium adult services marketplace for the EU (BE/NL/DE/FR/LU primary).
 Live at **secretxperience.eu** (and www.secretxperience.eu). Owner email: heyokanaga@gmail.com.
 
 ## Stack
+- **Three domains, ONE deployment** — `secretxperience.eu` (marketplace, canonical), `secretxperience.nl` (full mirror → canonical .eu), `secretxperience.shop` (**storefront only**, canonical for shop content). `middleware.ts` reads `Host:` and gates per domain; `app/lib/domains.ts` is the single source of truth (`isOwnHost` / `isMirrorHost` / `isShopHost`).
 - **Next.js 13.5.1** App Router, TypeScript, deployed on **Vercel** (NOT 14 — important for cookie API behavior)
   - Team: `team_8bUh79wAVTN5pyFKcCQGIXEy`
   - Project: `prj_uE7mmweTEj1NwLhddYWXiI1Pbw1T`
@@ -40,6 +41,27 @@ Live at **secretxperience.eu** (and www.secretxperience.eu). Owner email: heyoka
 - The CategoryAnimations mount point (`#catAnimsMount`) MUST sit OUTSIDE `<main class="main">` and BEFORE `<div class="layout">` so it's full-width above the sidebar/listings split.
 - Static HTML in `dangerouslySetInnerHTML` is built at compile time — any `${var}` reference inside it must use variables that exist at JSX render scope, NOT inside useEffect-only scope. Heart buttons (`data-fav-lid`) go in the dynamic `renderCards` useEffect, NOT in the static template.
 - Provider/listing card category routes: `escorts → /escorts`, `companions → /companionship`, `nightlife → /nightlife`, `creators → /creators`, `rentals → /rentals`, `hotels → /hotels`, `events → /events`, `shop → /shop`.
+
+## ⚡ Next Session — Resume Here (2026-09-10)
+Last thing completed: **Multi-domain rollout** — PR #15 merged to `main` as `7acbfc2` (merge commit; 3 commits `d855fb3` `.nl` mirror, `acc74cf` `.shop` storefront, `60aa8d1` cross-domain session bridge). LIVE VERIFICATION: **VERIFIED LIVE 2026-09-10 (post-deploy `7acbfc2`, real domains, real status codes via `curl -w`):** `www.secretxperience.shop/` 200 = boutique, canonical `https://secretxperience.shop/`, **no `<a>` into the marketplace**; `/escorts` `/nightlife` `/discover` `/tokens` `/dashboard` `/partners` all **307 → `/`**; `/p/<id>` 200 with product `<title>` + `/p/<id>` canonical; `/terms` = shop Terms of Sale; own robots + sitemap (13 URLs, 8 products, 0 `.eu`); `/sso/land` 200; `/sso/start?return=evil` 400; no-session bridge → `/login?next=…` on the shop domain. `.nl` `/` `/terms` `/partners` `/discover` `/escorts` all carry `.eu` canonicals (the ~60-page gap is closed). `.eu/shop` canonical → `.shop`, Dorcel banner still on `.eu/shop`, `.eu` sitemap has 0 `/shop`, `.eu/dashboard` 307 → `/login`. Cosmetic leftover: storefront `twitter:image` inherits `https://www.secretxperience.eu/og-image.jpg` from root `metadataBase` (image asset, not a link) — shop page sets `openGraph` but not `twitter`/`openGraph.images`, so share previews use the marketplace artwork. **Apex `secretxperience.shop` still DNS-split** (4 tries: Vercel, hcdn, hcdn, Vercel) — user must delete the Hostinger `A` record.
+
+**How `.shop` serves only the shop (no separate deploy):** on the `.shop` host middleware rewrites `/`→`/shop`, `/p/<id>`→`/shop/<id>`, `/terms|privacy|shipping|returns`→`/shop/legal/<doc>`, passes `/login` `/reset-password` `/auth/*` `/sso/*`, and **307s every other path to `/`** — the escort marketplace is unreachable on that hostname by design. `ShopChrome` `standalone` mode carries no link into the marketplace (no `/`-home, Events, Advertise, vendor CTA; Dorcel Club affiliate banner hidden on `.shop`, kept on `.eu/shop`). This is the compliance boundary from `docs/data-handling-policy.md`: a processor reviewing `.shop` must see e-commerce, not one click of an escort directory. **Do not add a marketplace link to the standalone chrome, and any NEW page that should exist on `.shop` must be allow-listed in `middleware.ts` `shopRewrite`/`shopPassthrough` or it will bounce to `/`.**
+
+**Payments stay separate — card vs tokens:** `.shop` is card-only (Stripe `mode:'payment'`, `payment_method_types:['card']`); zero wallet/token references in shop or checkout code; `/tokens` on `.shop` bounces to `/`. Tokens = advertising credits, marketplace only. The shared account shares *identity*, never *payment method*. Do not make tokens spendable in the shop — it re-entangles the domains exactly where a processor looks.
+
+**Cross-domain session bridge** (`app/sso/start/route.ts`, `app/sso/land/page.tsx`): cookies don't cross registrable domains and `/api/shop/checkout` is 401 without a session. `/sso/start?return=<https own-host URL>` verifies the caller via `getUser()`, mints a single-use magic-link token via `admin.generateLink`, 302s to `<origin>/sso/land#th=…&r=<path>`; `/sso/land` redeems via `verifyOtp({token_hash,type:'magiclink'})` → cookies on that domain. Token rides in the URL fragment. `return` must be https on an own host; resume paths relative-only, `//` refused. Uses existing `SUPABASE_SERVICE_ROLE_KEY` — **no new env var, no migration.** Happy-path redeem is human-only to test (needs a real session): sign in on `.eu`, open `https://www.secretxperience.eu/sso/start?return=https://secretxperience.shop/`.
+
+**Canonicals (all via `Link:` HTTP header in middleware — ~60/68 pages have no metadata):** `.nl/*` → `.eu` twin; `.eu|.nl /shop` → `https://secretxperience.shop/`; `/shop/<id>` → `…/p/<id>`; `.shop` self-canonical on the **apex** (`SHOP_ORIGIN`). `/shop` removed from `.eu` sitemap; `.shop` has its own host-aware robots + sitemap.
+
+**STILL TO DO (user-side):**
+- **Hostinger DNS: delete the leftover apex `A` record `2.57.91.91`** for `secretxperience.shop` — apex currently round-robins Hostinger parked page ↔ Vercel and blocks the apex cert. `www` is clean (Vercel only). Then in Vercel set the **apex as primary**, `www` → redirect.
+- **Trader identity: 9 × `[TO COMPLETE]`** in `app/shop/legal/[doc]/page.tsx` (legal name, address, registration, VAT, billing descriptor, governing law, support email). Required under 2011/83/EU Art. 6 before taking an order. Not recorded anywhere in the repo — never guess it.
+- Human-only bridge test (above).
+- Follow-ups (not built): shop-skinned `/login` on `.shop`; shop "my orders" page; "Open the Boutique" button on the `.eu` dashboard as the bridge trigger.
+
+**Correction — do not re-propagate:** an old `middleware.ts` comment claimed the Supabase publishable key is "origin-restricted" (`Host not in allowlist`). **Tested false** against the live REST API with the real key: an unrelated `Origin` is served identically. No allowlist exists; the comment has been rewritten. Supabase Auth **Redirect URLs** (Dashboard → Auth → URL Configuration) DO matter — `.nl` and `.shop` entries added by user 2026-09-10.
+
+---
 
 ## ⚡ Next Session — Resume Here (2026-06-05)
 Last thing completed: **Mobile horizontal-overflow fix** (commit `6c114d1` on `main`) — CONFIRMED working by user.
@@ -69,6 +91,7 @@ What's next (user hasn't asked for these yet, don't do proactively):
 ---
 
 ## Done (recent work, don't redo)
+- **Multi-domain (2026-09-10, PR #15 → `7acbfc2`)** — `.nl` mirror with canonical headers; `.shop` standalone storefront (`app/shop/ShopChrome.tsx`, `app/shop/legal/[doc]`, host-aware `robots.ts`/`sitemap.ts`, product page split into server wrapper + `ProductDetail.tsx`); cross-domain session bridge (`app/sso/*`); `next` survives Google OAuth; pre-existing `//evil.com` open redirect in both `next` readers fixed; Stripe checkout return URLs follow the host (Verotel's stay pinned to `.eu` in `lib/site.ts` — its signature covers them). See the 2026-09-10 resume section.
 - **Crypto token rail — NOWPayments (built, NOT yet deployed/verified)** — parallel payment rail to Verotel for buying tokens (advertising credits; compliant — tokens ≠ escort booking). Mirrors the Verotel flow exactly. Files: `app/lib/nowpayments.ts` (config → `configured:false` until both env vars set, `createInvoice` via `api.nowpayments.io/v1/invoice`, `verifyIpn` = HMAC-SHA512 of key-sorted JSON vs `x-nowpayments-sig`), `app/api/nowpayments/charge/route.ts` (auth → pending `payment_orders` row with `advertiser:'nowpayments'` → hosted invoice → `{ url }`; graceful `{configured:false}` HTTP 200 → tokens page shows the same "coming soon" modal), `app/api/nowpayments/webhook/route.ts` (verify IPN sig → credit only on `payment_status:'finished'`, ledger-based idempotency identical to the Verotel webhook). UI: `app/tokens/page.tsx` gained a `payWithCrypto()` handler + a subtle "◎ Pay with crypto" button under each package's "Buy now". **To activate:** set `NOWPAYMENTS_API_KEY` + `NOWPAYMENTS_IPN_SECRET` in Vercel, redeploy, and register the IPN callback `https://www.secretxperience.eu/api/nowpayments/webhook` in the NOWPayments store settings. Built on branch `claude/investment-plan-sx-content24-i3z6i0`, NOT merged to `main` — untested payment change, needs review + a Vercel preview build before merge.
 - **`/creators` COLLABS banner (`app/creators/CollabsPromo.tsx`) — FIXED LAYOUT, do not swap without asking**: two cells. **Large left (hero) cell = the 3s COLLABS logo flash** (`/promos/collabs-promo-3s.mp4`, `VIDEO_FLASH`). **Narrow right "PROMO" cell = the original 40s vertical COLLABS fashion promo** (`/promos/collabs-promo-original.mp4`, `VIDEO_PROMO`; has a "VEED" watermark top-right — left as-is on purpose). Both autoplay/muted/loop, `object-fit:cover`, link to collabs-photography.com. Other promo files kept: `collabs-promo.mp4` (10s flash), `collabs.jpg` (old green wordmark, unused).
 - **OnlyFans creator directory (2026-07-05)** — `app/data/onlyfans.ts` (36 creators, country groups BE/DE/RO/ES/int'l) rendered by `OnlyFansShowcase` on the homepage (portal → `#onlyfansShowcaseMount`, above the partners band) and on `/creators` (inline). Creators with `featured: true` + a photo at `public/onlyfans/<handle>.jpg` get a large clickable 160px photo card in the "✦ Featured" row; photos are 200×200 crops with the creator's name baked onto the image (made via headless-Chromium screenshot). 9 featured so far. Others render as chips with initials-monogram avatars that auto-upgrade when a photo file appears. Referral params (`?rec=`) on baddiemi + lisawildlove must be preserved. NOTE: photos sent mid-turn in chat are NOT persisted to the transcript — ask the user to resend one per message, waiting for confirmation between each. — partner data extracted to `app/data/partners.ts` (single source of truth); new `PartnersShowcase` component renders the full directory as compact chips above the homepage footer (portal → `#partnersShowcaseMount`, first 4 categories visible, "Show all" expands). Fixed on `/partners`: `premium-content` section (Dorcel Club, the one live affiliate) was missing from `industryIds` so it never rendered; `Official Partner` badge had no style. Edit partners in `app/data/partners.ts` — both pages update.
@@ -139,6 +162,8 @@ What's next (user hasn't asked for these yet, don't do proactively):
   - Next.js version confirmed as **13.5.1** — `cookies()` is synchronous (no `await`), important for all server code
 
 ## Pending
+- **`.shop` apex DNS split** — remove Hostinger `A` `2.57.91.91`; set apex primary in Vercel. (User-side; see 2026-09-10 resume.)
+- **`.shop` trader identity** — fill 9 × `[TO COMPLETE]` in `app/shop/legal/[doc]/page.tsx` before accepting orders.
 - **Apply `20260616_reports.sql`** — SAFETY/COMPLIANCE. Creates the `reports` table (was written by `app/report/page.tsx` but had NO migration — submissions were failing silently). Idempotent (`create table if not exists`), safe to run even if the table was created manually. Adds RLS: anon/authenticated can INSERT (file a report), admins can SELECT/UPDATE (triage). Until applied, the new Admin → Reports tab will read an empty/missing table and the report form shows a graceful error instead of a false "submitted". Run the file in the Supabase SQL editor.
 - **Apply `20260616_events_table.sql`** — Backfills the `events` table schema into version control (the live project already has it; this is idempotent and a no-op there, but reproduces the schema on a fresh environment). Only needed if standing up a new Supabase project.
 - **Apply `20260604_verification_gate.sql`** — COMPLIANCE (Verotel). Adds a RESTRICTIVE RLS policy so only `profiles.verified = true` (or admin) users can INSERT listings, and adds `consent_given`/`consent_at` columns to `identity_verifications`. Until applied: the client gate + consent checkbox still work and the submit API falls back gracefully (logs a warning, skips consent columns), but the **server-side publish gate is NOT enforced** and consent isn't recorded. Run in Supabase SQL editor:
@@ -175,6 +200,9 @@ What's next (user hasn't asked for these yet, don't do proactively):
 - Consider a post-booking satisfaction survey flow in dashboard
 
 ## Critical patterns (don't break these)
+- **Domain gate lives in `middleware.ts`.** New page meant for `.shop` → add to `shopRewrite`/`shopPassthrough` or it 307s to `/`. Never render a marketplace link in `ShopChrome` when `standalone`. Shop content is canonical on the `.shop` **apex**.
+- **`.shop` is card-only.** No wallet/token code in `app/shop` or `app/api/shop`.
+- **`/sso/start` `return` must stay https + own-host (`isOwnHost`)**, resume paths relative-only and `//` refused — that check is the only thing between the bridge and an open-redirect/account-takeover.
 - `cookies()` from `next/headers` is **synchronous** in Next.js 13.5.1 — NEVER `await cookies()`
 - Supabase SSR cookie adapter MUST use `{ cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }` — never the old `{ cookies: { get: (n) => ... } }` pattern
 - Admin client (service_role) MUST include `{ auth: { autoRefreshToken: false, persistSession: false } }` 
@@ -190,6 +218,11 @@ What's next (user hasn't asked for these yet, don't do proactively):
 - **Data-handling policy** (`docs/data-handling-policy.md`): PII (ID docs, real names, phone/WhatsApp, messages, meetup details) stays in Supabase. External connectors get aggregate/marketing/ops data ONLY — never customer/provider identity. Stripe = clean verticals only (rentals/hotels/events/shop), NEVER escort/companionship/massage. Read that file before connecting any new external service.
 
 ## Useful files
+- `app/lib/domains.ts` — the three domains; `isOwnHost` / `isMirrorHost` / `isShopHost` / `SHOP_ORIGIN`
+- `middleware.ts` — per-host routing gate + canonical `Link:` headers + auth gate
+- `app/shop/ShopChrome.tsx` — host-aware shop header/footer (`standalone` = `.shop`)
+- `app/shop/legal/[doc]/page.tsx` — shop Terms/Privacy/Shipping/Returns (trader identity `[TO COMPLETE]`)
+- `app/sso/start/route.ts`, `app/sso/land/page.tsx` — cross-domain session bridge
 - `app/page.tsx` — homepage (huge, mixed JSX + dangerouslySetInnerHTML)
 - `app/lib/supabase.ts` — browser client
 - `middleware.ts` — uses publishable key

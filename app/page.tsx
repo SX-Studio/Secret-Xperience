@@ -2231,7 +2231,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
         <p class="t-eyebrow-gold" style="margin-bottom:1rem;">EU · DISCREET · VERIFIED</p>
         <h1 style="font-family:var(--serif);font-size:56px;font-weight:500;line-height:1.04;letter-spacing:-0.005em;margin:0 0 1.25rem;">
           Where the night begins<br>
-          <em style="font-style:italic;background:var(--grad-gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;">with someone discreet</em>
+          <em style="font-style:italic;background:var(--grad-gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;">Europe's discreet adult lifestyle marketplace</em>
         </h1>
         <p class="t-body" style="color:var(--t2);max-width:480px;margin-bottom:1.5rem;">A members-only marketplace for escorts, companions, nightlife, creators, rentals, and the after-hours.</p>
         <div style="position:relative;max-width:480px;margin-bottom:1.5rem;">

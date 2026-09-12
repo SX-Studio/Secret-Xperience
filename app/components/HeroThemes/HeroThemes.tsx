@@ -59,7 +59,7 @@ function Headline({ accent, size = 56 }: { accent: string; size?: number }) {
     <>
       <div style={{ fontSize: 12, letterSpacing: '.28em', color: accent, marginBottom: 18 }}>EU · DISCREET · VERIFIED</div>
       <h1 style={{ fontFamily: serif, fontWeight: 400, fontSize: size, lineHeight: 1.08, color: '#fff', margin: 0 }}>Where the night begins</h1>
-      <h1 style={{ fontFamily: serif, fontWeight: 400, fontStyle: 'italic', fontSize: size - 4, lineHeight: 1.2, color: accent, margin: '0 0 20px' }}>with someone discreet</h1>
+      <h1 style={{ fontFamily: serif, fontWeight: 400, fontStyle: 'italic', fontSize: size - 4, lineHeight: 1.2, color: accent, margin: '0 0 20px' }}>Europe&apos;s discreet adult lifestyle marketplace</h1>
       <p style={{ color: '#b7a8b3', fontSize: 15, lineHeight: 1.7, maxWidth: 430, marginBottom: 26 }}>
         A members-only marketplace for escorts, companions, nightlife, creators, rentals, and the after-hours.
       </p>
@@ -244,7 +244,7 @@ function Orbit() {
       <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto' }}>
         <div style={{ display: 'inline-block', background: 'rgba(232,201,126,.12)', border: '1px solid rgba(232,201,126,.4)', borderRadius: 999, padding: '8px 20px', fontSize: 12, letterSpacing: '.2em', color: '#e8c97e', marginBottom: 24 }}>EU · DISCREET · VERIFIED</div>
         <h1 style={{ fontFamily: serif, fontWeight: 400, fontSize: 'clamp(34px,5vw,60px)', lineHeight: 1.08, color: '#fff', margin: 0 }}>
-          Where the night begins <em style={{ fontStyle: 'italic', background: 'linear-gradient(90deg,#e8c97e,#ff8fb0)', WebkitBackgroundClip: 'text', color: 'transparent' }}>with someone discreet</em>
+          Where the night begins <em style={{ fontStyle: 'italic', background: 'linear-gradient(90deg,#e8c97e,#ff8fb0)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Europe&apos;s discreet adult lifestyle marketplace</em>
         </h1>
         <p style={{ color: '#b7a8b3', fontSize: 15.5, lineHeight: 1.7, margin: '22px auto 28px', maxWidth: 460 }}>A members-only marketplace for escorts, companions, nightlife, creators, rentals, and the after-hours.</p>
         <div onClick={goSearch} style={{ display: 'flex', alignItems: 'center', background: '#fff', borderRadius: 999, padding: '8px 8px 8px 26px', maxWidth: 520, margin: '0 auto', boxShadow: '0 24px 60px rgba(0,0,0,.45)', cursor: 'pointer' }}>
@@ -339,7 +339,7 @@ function AppStyle() {
         <div style={{ maxWidth: 620 }}>
           <div style={{ fontSize: 12, letterSpacing: '.28em', color: '#ff8fa8', marginBottom: 14 }}>EU · DISCREET · VERIFIED</div>
           <h1 style={{ fontFamily: serif, fontWeight: 400, fontSize: 'clamp(30px,4vw,50px)', lineHeight: 1.12, color: '#fff', margin: 0 }}>
-            Where the night begins <em style={{ fontStyle: 'italic', color: '#ff8fa8' }}>with someone discreet</em>
+            Where the night begins <em style={{ fontStyle: 'italic', color: '#ff8fa8' }}>Europe&apos;s discreet adult lifestyle marketplace</em>
           </h1>
         </div>
         <Stats color="#ff8fa8" />

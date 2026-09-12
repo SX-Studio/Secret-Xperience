@@ -52,6 +52,11 @@ const SERVICE_TAGS: Record<string, string[]> = {
 const ETHNICITY_OPTIONS = ETHNICITIES
 const BUILD_OPTIONS     = BUILDS
 const HAIR_OPTIONS      = HAIR_COLOURS
+const GENDER_OPTIONS    = ['Woman', 'Man', 'Trans woman', 'Trans man', 'Non-binary', 'Couple']
+const EYE_OPTIONS       = ['Brown', 'Blue', 'Green', 'Hazel', 'Grey', 'Amber']
+const CUP_OPTIONS       = ['A', 'B', 'C', 'D', 'DD', 'E', 'F+']
+const HAIRSTYLE_OPTIONS = ['Shaved', 'Trimmed', 'Natural']
+const YESNO_OPTIONS     = ['Yes', 'No']
 
 const STATS_CATEGORIES  = ['escorts', 'companionship', 'massage', 'domination']
 const WH_CATEGORIES     = ['escorts', 'companionship', 'massage', 'domination', 'nightlife', 'adult']
@@ -62,6 +67,7 @@ const WH_DAY_LABELS     = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
 interface FormState {
   category:    string
+  extra_categories: string[]
   subcategory: string
   title:       string
   description: string
@@ -79,6 +85,13 @@ interface FormState {
   ethnicity:   string
   build:       string
   hair:        string
+  gender:      string
+  eyes:        string
+  cup:         string
+  hairstyle:   string
+  tattoos:     string
+  piercings:   string
+  smoker:      string
   tier:        string
   website:     string
   contact_phone:  string
@@ -186,6 +199,7 @@ export default function CreateListingPage() {
   const [form, setForm] = useState<FormState>({
     tier:        'basic',
     category:    '',
+    extra_categories: [],
     subcategory: '',
     title:       '',
     description: '',
@@ -203,6 +217,13 @@ export default function CreateListingPage() {
     ethnicity:   '',
     build:       '',
     hair:        '',
+    gender:      '',
+    eyes:        '',
+    cup:         '',
+    hairstyle:   '',
+    tattoos:     '',
+    piercings:   '',
+    smoker:      '',
     website:        '',
     contact_phone:  '',
     whatsapp_optin: false,
@@ -527,6 +548,13 @@ export default function CreateListingPage() {
       if (form.ethnicity) statTags.push(`Ethnicity: ${form.ethnicity}`)
       if (form.build)     statTags.push(`Build: ${form.build}`)
       if (form.hair)      statTags.push(`Hair: ${form.hair}`)
+      if (form.gender)    statTags.push(`Gender: ${form.gender}`)
+      if (form.eyes)      statTags.push(`Eyes: ${form.eyes}`)
+      if (form.cup)       statTags.push(`Cup: ${form.cup}`)
+      if (form.hairstyle) statTags.push(`Hairstyle: ${form.hairstyle}`)
+      if (form.tattoos)   statTags.push(`Tattoos: ${form.tattoos}`)
+      if (form.piercings) statTags.push(`Piercings: ${form.piercings}`)
+      if (form.smoker)    statTags.push(`Smoker: ${form.smoker}`)
     }
     const whTags: string[] = []
     if (WH_CATEGORIES.includes(form.category)) {
@@ -546,6 +574,7 @@ export default function CreateListingPage() {
       title:           form.title,
       description:     form.description || null,
       category:        form.category,
+      extra_categories: form.extra_categories.filter(c => c && c !== form.category).slice(0, 2),
       subcategory:     form.subcategory || null,
       price_from:      form.price_from ? parseInt(form.price_from) : null,
       price_to:        form.price_to   ? parseInt(form.price_to)   : null,
@@ -1084,7 +1113,7 @@ export default function CreateListingPage() {
                   <div
                     key={cat.value}
                     className={`cl-category-card${form.category === cat.value ? ' selected' : ''}`}
-                    onClick={() => set('category', cat.value)}
+                    onClick={() => setForm(f => ({ ...f, category: cat.value, extra_categories: f.extra_categories.filter(x => x !== cat.value) }))}
                   >
                     <span
                       className="cl-cat-icon"
@@ -1120,6 +1149,45 @@ export default function CreateListingPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Extra categories — an ad can appear in up to 3 categories total */}
+              {form.category && (
+                <div style={{ marginBottom: '2rem' }}>
+                  <label style={label}>Also list in (optional — up to 2 more)</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                    {CATEGORIES.filter(c => c.value !== form.category).map(c => {
+                      const on = form.extra_categories.includes(c.value)
+                      const full = form.extra_categories.length >= 2
+                      return (
+                        <button
+                          type="button"
+                          key={c.value}
+                          disabled={!on && full}
+                          onClick={() => setForm(f => ({
+                            ...f,
+                            extra_categories: on
+                              ? f.extra_categories.filter(x => x !== c.value)
+                              : (f.extra_categories.length >= 2 ? f.extra_categories : [...f.extra_categories, c.value]),
+                          }))}
+                          style={{
+                            padding: '7px 14px', borderRadius: '20px', fontSize: '12px', fontFamily: 'var(--sans)',
+                            cursor: (!on && full) ? 'not-allowed' : 'pointer',
+                            border: on ? '1px solid var(--gold, #c5a05a)' : '0.5px solid var(--b2, rgba(255,255,255,0.12))',
+                            background: on ? 'var(--gbg, rgba(197,160,90,0.12))' : 'transparent',
+                            color: on ? 'var(--gold, #c5a05a)' : 'var(--t2, rgba(255,255,255,0.6))',
+                            opacity: (!on && full) ? 0.4 : 1,
+                          }}
+                        >
+                          {c.icon} {c.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <p style={{ fontSize: '11px', color: 'var(--t3)', marginTop: '8px' }}>
+                    Your ad also shows on these category pages · {form.extra_categories.length}/2 selected
+                  </p>
+                </div>
+              )}
 
               {/* Subcategory for escorts */}
               {form.category === 'escorts' && (
@@ -1365,6 +1433,59 @@ export default function CreateListingPage() {
                       >
                         <option value="">Select…</option>
                         {HAIR_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Extra escort profile details */}
+                  <div className="cl-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '10px' }}>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Gender</label>
+                      <select className="cl-inp" style={inpField} value={form.gender} onChange={e => set('gender', e.target.value)}>
+                        <option value="">Select…</option>
+                        {GENDER_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Eye color</label>
+                      <select className="cl-inp" style={inpField} value={form.eyes} onChange={e => set('eyes', e.target.value)}>
+                        <option value="">Select…</option>
+                        {EYE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Cup size</label>
+                      <select className="cl-inp" style={inpField} value={form.cup} onChange={e => set('cup', e.target.value)}>
+                        <option value="">Select…</option>
+                        {CUP_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Intimate hairstyle</label>
+                      <select className="cl-inp" style={inpField} value={form.hairstyle} onChange={e => set('hairstyle', e.target.value)}>
+                        <option value="">Select…</option>
+                        {HAIRSTYLE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Tattoo(s)</label>
+                      <select className="cl-inp" style={inpField} value={form.tattoos} onChange={e => set('tattoos', e.target.value)}>
+                        <option value="">Select…</option>
+                        {YESNO_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Piercing(s)</label>
+                      <select className="cl-inp" style={inpField} value={form.piercings} onChange={e => set('piercings', e.target.value)}>
+                        <option value="">Select…</option>
+                        {YESNO_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Smoker</label>
+                      <select className="cl-inp" style={inpField} value={form.smoker} onChange={e => set('smoker', e.target.value)}>
+                        <option value="">Select…</option>
+                        {YESNO_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
                     </div>
                   </div>

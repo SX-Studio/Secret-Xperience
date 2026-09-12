@@ -299,7 +299,8 @@ export default function EscortsPage() {
       .from('listings')
       .select('id,profile_id,title,description,category,subcategory,city,country,price_from,price_to,currency,meet_type,images,image_focus,verified,premium,tags,created_at,featured_until,age')
       .eq('active', true)
-      .in('category', ['escorts', 'companionship', 'domination', 'experiences', 'massage'])
+      // primary category OR one of the ad's up-to-3 extra categories
+      .or('category.in.(escorts,companionship,domination,experiences,massage),extra_categories.ov.{escorts,companionship,domination,experiences,massage}')
 
     if (city !== 'All Cities') q = q.eq('city', city)
     if (verifiedOnly) q = q.eq('verified', true)

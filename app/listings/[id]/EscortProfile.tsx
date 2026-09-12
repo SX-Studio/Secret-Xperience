@@ -111,16 +111,27 @@ function classifyTags(tags: string[]) {
   const nationality = getField(/^nationality:\s*/i, NATIONALITY_SET)
   const languages  = lower.filter(t => LANG_SET.has(t))
 
+  // Extra prefixed profile fields (from create form)
+  const readPrefix = (re: RegExp) => { const t = tags.find(x => re.test(x)); return t ? t.replace(re, '').trim() : null }
+  const gender     = readPrefix(/^gender:\s*/i)
+  const eyes       = readPrefix(/^eyes?:\s*/i)
+  const cup        = readPrefix(/^cup:\s*/i)
+  const hairstyle  = readPrefix(/^hairstyle:\s*/i)
+  const tattoos    = readPrefix(/^tattoos?:\s*/i)
+  const piercings  = readPrefix(/^piercings?:\s*/i)
+  const smoker     = readPrefix(/^smoker:\s*/i)
+  const EXTRA_PREFIX_RE = /^(gender|eyes?|cup|hairstyle|tattoos?|piercings?|smoker):\s*/i
+
   const services = tags.filter(t => {
     const l = t.toLowerCase().trim()
     return !HEIGHT_RE.test(l) && !WEIGHT_RE.test(l) && !AGE_RE.test(l) &&
       !HAIR_SET.has(l) && !BUILD_SET.has(l) && !ETHNIC_SET.has(l) &&
       !NATIONALITY_SET.has(l) && !LANG_SET.has(l) &&
       !l.startsWith('type:') && !l.startsWith('orientation:') && !l.startsWith('wh:') &&
-      !/^(hair|build|ethnicity|nationality):\s*/i.test(l)
+      !/^(hair|build|ethnicity|nationality):\s*/i.test(l) && !EXTRA_PREFIX_RE.test(l)
   })
 
-  return { height, weight, age: ageMatch, hair, build, ethnicity, nationality, languages, services, escortType, orientation, workingHours }
+  return { height, weight, age: ageMatch, hair, build, ethnicity, nationality, languages, services, escortType, orientation, workingHours, gender, eyes, cup, hairstyle, tattoos, piercings, smoker }
 }
 
 // Rates are shown as-set by the advertiser only — no fabricated multipliers.
@@ -182,7 +193,7 @@ export default function EscortProfile({
   const images  = (listing.images ?? []).filter(Boolean)
   const videos  = (listing.videos ?? []).filter(Boolean)
   const tags    = listing.tags ?? []
-  const { height, weight, age, hair, build, ethnicity, nationality, languages, services, escortType, orientation, workingHours } = classifyTags(tags)
+  const { height, weight, age, hair, build, ethnicity, nationality, languages, services, escortType, orientation, workingHours, gender, eyes, cup, hairstyle, tattoos, piercings, smoker } = classifyTags(tags)
   // Structured Possibilities (new): grouped checklist from listing.services.
   // Falls back to the legacy flat tag-derived services for older listings.
   const possibilityGroups = groupSelected(listing.services ?? [])
@@ -608,6 +619,12 @@ export default function EscortProfile({
                 <span className="rl-detail-val">{cap(orientation)}</span>
               </div>
             )}
+            {gender && (
+              <div className="rl-detail-row">
+                <span className="rl-detail-label">Gender</span>
+                <span className="rl-detail-val">{cap(gender)}</span>
+              </div>
+            )}
             {age && (
               <div className="rl-detail-row">
                 <span className="rl-detail-label">Age</span>
@@ -654,6 +671,42 @@ export default function EscortProfile({
               <div className="rl-detail-row">
                 <span className="rl-detail-label">Weight</span>
                 <span className="rl-detail-val">{weight} kg</span>
+              </div>
+            )}
+            {eyes && (
+              <div className="rl-detail-row">
+                <span className="rl-detail-label">Eye color</span>
+                <span className="rl-detail-val">{cap(eyes)}</span>
+              </div>
+            )}
+            {cup && (
+              <div className="rl-detail-row">
+                <span className="rl-detail-label">Cup size</span>
+                <span className="rl-detail-val">{cup.toUpperCase()}</span>
+              </div>
+            )}
+            {hairstyle && (
+              <div className="rl-detail-row">
+                <span className="rl-detail-label">Intimate hairstyle</span>
+                <span className="rl-detail-val">{cap(hairstyle)}</span>
+              </div>
+            )}
+            {tattoos && (
+              <div className="rl-detail-row">
+                <span className="rl-detail-label">Tattoo(s)</span>
+                <span className="rl-detail-val">{cap(tattoos)}</span>
+              </div>
+            )}
+            {piercings && (
+              <div className="rl-detail-row">
+                <span className="rl-detail-label">Piercing(s)</span>
+                <span className="rl-detail-val">{cap(piercings)}</span>
+              </div>
+            )}
+            {smoker && (
+              <div className="rl-detail-row">
+                <span className="rl-detail-label">Smoker</span>
+                <span className="rl-detail-val">{cap(smoker)}</span>
               </div>
             )}
             <div className="rl-detail-row">

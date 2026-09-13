@@ -91,6 +91,17 @@ What's next (user hasn't asked for these yet, don't do proactively):
 ---
 
 ## Done (recent work, don't redo)
+- **Email senders centralised (2026-09-13)** — `app/lib/mail-from.ts` is now the single
+  source of truth. Three addresses had drifted across 9 send sites (`hello@`,
+  `noreply@`, `no-reply@`), so the platform reached people under three identities.
+  All now use `MAIL_FROM` (default `SecretXperience <no-reply@secretxperience.eu>`,
+  overridable with `EMAIL_FROM`) plus `reply_to: MAIL_REPLY_TO` (default
+  `support@secretxperience.eu`, overridable with `EMAIL_REPLY_TO`) — people reply to
+  no-reply addresses anyway, so those replies now land in a mailbox that is read.
+  ⚠️ `app/api/contact/route.ts` deliberately KEEPS `reply_to: email` (the visitor's
+  address) so support can reply to the sender — only its `from` changed. Verified:
+  `secretxperience.eu` already has Resend DKIM + SPF records live, so no domain setup
+  was needed. Add a new sender by changing the env var, not the routes.
 - **Multi-domain (2026-09-10, PR #15 → `7acbfc2`)** — `.nl` mirror with canonical headers; `.shop` standalone storefront (`app/shop/ShopChrome.tsx`, `app/shop/legal/[doc]`, host-aware `robots.ts`/`sitemap.ts`, product page split into server wrapper + `ProductDetail.tsx`); cross-domain session bridge (`app/sso/*`); `next` survives Google OAuth; pre-existing `//evil.com` open redirect in both `next` readers fixed; Stripe checkout return URLs follow the host (Verotel's stay pinned to `.eu` in `lib/site.ts` — its signature covers them). See the 2026-09-10 resume section.
 - **Crypto token rail — NOWPayments (built, NOT yet deployed/verified)** — parallel payment rail to Verotel for buying tokens (advertising credits; compliant — tokens ≠ escort booking). Mirrors the Verotel flow exactly. Files: `app/lib/nowpayments.ts` (config → `configured:false` until both env vars set, `createInvoice` via `api.nowpayments.io/v1/invoice`, `verifyIpn` = HMAC-SHA512 of key-sorted JSON vs `x-nowpayments-sig`), `app/api/nowpayments/charge/route.ts` (auth → pending `payment_orders` row with `advertiser:'nowpayments'` → hosted invoice → `{ url }`; graceful `{configured:false}` HTTP 200 → tokens page shows the same "coming soon" modal), `app/api/nowpayments/webhook/route.ts` (verify IPN sig → credit only on `payment_status:'finished'`, ledger-based idempotency identical to the Verotel webhook). UI: `app/tokens/page.tsx` gained a `payWithCrypto()` handler + a subtle "◎ Pay with crypto" button under each package's "Buy now". **To activate:** set `NOWPAYMENTS_API_KEY` + `NOWPAYMENTS_IPN_SECRET` in Vercel, redeploy, and register the IPN callback `https://www.secretxperience.eu/api/nowpayments/webhook` in the NOWPayments store settings. Built on branch `claude/investment-plan-sx-content24-i3z6i0`, NOT merged to `main` — untested payment change, needs review + a Vercel preview build before merge.
 - **`/creators` COLLABS banner (`app/creators/CollabsPromo.tsx`) — FIXED LAYOUT, do not swap without asking**: two cells. **Large left (hero) cell = the 3s COLLABS logo flash** (`/promos/collabs-promo-3s.mp4`, `VIDEO_FLASH`). **Narrow right "PROMO" cell = the original 40s vertical COLLABS fashion promo** (`/promos/collabs-promo-original.mp4`, `VIDEO_PROMO`; has a "VEED" watermark top-right — left as-is on purpose). Both autoplay/muted/loop, `object-fit:cover`, link to collabs-photography.com. Other promo files kept: `collabs-promo.mp4` (10s flash), `collabs.jpg` (old green wordmark, unused).

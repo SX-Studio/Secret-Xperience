@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { rateLimit } from '../../lib/ratelimit'
+import { MAIL_FROM, MAIL_REPLY_TO } from '../../lib/mail-from'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -97,7 +98,7 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'SecretXperience <hello@secretxperience.eu>',
+        from: MAIL_FROM, reply_to: MAIL_REPLY_TO,
         to: normalised,
         subject: 'Welcome in — your invitation to SecretXperience',
         html: memberWelcomeHtml,

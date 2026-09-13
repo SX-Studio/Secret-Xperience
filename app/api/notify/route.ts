@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { siteUrl as canonicalSiteUrl } from '../../lib/site'
+import { MAIL_FROM, MAIL_REPLY_TO } from '../../lib/mail-from'
 
 // Simple email notification via Supabase's built-in SMTP (or logs for now)
 // Set RESEND_API_KEY env var to enable real email sending
@@ -74,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     if (type === 'booking_created' && advertiser?.email) {
       emails.push({
-        from: 'SecretXperience <noreply@secretxperience.eu>',
+        from: MAIL_FROM, reply_to: MAIL_REPLY_TO,
         to: [advertiser.email],
         subject: `New booking request — ${listing?.title}`,
         html: `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${emailStyle}</style></head><body>
@@ -95,7 +96,7 @@ export async function POST(req: NextRequest) {
 
     if (type === 'booking_confirmed' && client?.email) {
       emails.push({
-        from: 'SecretXperience <noreply@secretxperience.eu>',
+        from: MAIL_FROM, reply_to: MAIL_REPLY_TO,
         to: [client.email],
         subject: `Booking confirmed — ${listing?.title}`,
         html: `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${emailStyle}</style></head><body>
@@ -126,7 +127,7 @@ export async function POST(req: NextRequest) {
       const boostProfile = (boostListing as any)?.profile
       if (boostProfile?.email) {
         emails.push({
-          from: 'SecretXperience <noreply@secretxperience.eu>',
+          from: MAIL_FROM, reply_to: MAIL_REPLY_TO,
           to: [boostProfile.email],
           subject: `✦ Your listing is now featured — ${boostListing?.title}`,
           html: `<!DOCTYPE html><html><head><meta charset="utf-8"><style>${emailStyle}</style></head><body>

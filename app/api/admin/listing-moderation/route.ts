@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { siteUrl } from '../../../lib/site'
+import { MAIL_FROM, MAIL_REPLY_TO } from '../../../lib/mail-from'
 
 const SITE = siteUrl()
 
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
     await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from: 'SecretXperience <hello@secretxperience.eu>', to: [ownerEmail], subject, html }),
+      body: JSON.stringify({ from: MAIL_FROM, reply_to: MAIL_REPLY_TO, to: [ownerEmail], subject, html }),
     })
   }
 

@@ -90,13 +90,14 @@ export async function POST(req: NextRequest) {
       package_id:     pkg.id,
       tokens_granted: totalTokens,
       amount_eur:     pkg.price_eur,
-      advertiser:       'verotel',
+      provider:         'verotel',
       status:         'pending',
     })
     .select('id')
     .single()
 
   if (orderErr || !order) {
+    console.error('[payment_orders] insert failed:', orderErr?.message ?? orderErr)
     return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
   }
 

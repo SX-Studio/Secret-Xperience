@@ -137,6 +137,9 @@ export default function TokensPage() {
   const [selected, setSelected] = useState<string | null>(null)
   const [cryptoId, setCryptoId] = useState<string | null>(null)
   const [showPayModal, setShowPayModal] = useState(false)
+  // null = the rail is genuinely not configured yet ("coming soon"). A string = the
+  // rail IS configured and the attempt failed, so say so instead of pretending.
+  const [payError, setPayError] = useState<string | null>(null)
   const [status,   setStatus]   = useState<'idle' | 'success' | 'cancel'>('idle')
   const [role,     setRole]     = useState<string>('Member')
 
@@ -180,9 +183,10 @@ export default function TokensPage() {
       })
       const data = await res.json()
       if (data.url) { window.location.href = data.url; return }
-      // Not configured / error → graceful modal, never a raw error page.
+      setPayError(data.configured === false ? null : (data.error || `Checkout failed (${res.status}).`))
       setShowPayModal(true)
-    } catch {
+    } catch (e) {
+      setPayError((e as Error).message || 'Could not reach checkout.')
       setShowPayModal(true)
     } finally {
       setLoading(false)
@@ -202,8 +206,10 @@ export default function TokensPage() {
       })
       const data = await res.json()
       if (data.url) { window.location.href = data.url; return }
+      setPayError(data.configured === false ? null : (data.error || `Checkout failed (${res.status}).`))
       setShowPayModal(true)
-    } catch {
+    } catch (e) {
+      setPayError((e as Error).message || 'Could not reach checkout.')
       setShowPayModal(true)
     } finally {
       setCryptoId(null)
@@ -1038,10 +1044,12 @@ export default function TokensPage() {
               <i className="ti ti-lock" style={{ fontSize: 24, color: '#e8c97a' }} />
             </div>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 400, color: '#ece8e1', marginBottom: 10 }}>
-              Payment coming soon
+              {payError ? 'Checkout could not start' : 'Payment coming soon'}
             </div>
             <p style={{ fontSize: 14, color: 'rgba(236,232,225,0.55)', lineHeight: 1.6, marginBottom: 24 }}>
-              Secure token checkout is being finalised. To purchase tokens or enquire about early access, contact us directly.
+              {payError
+                ? `${payError} Please try again, or contact us and we'll sort it out.`
+                : 'Secure token checkout is being finalised. To purchase tokens or enquire about early access, contact us directly.'}
             </p>
             <a
               href="mailto:support@secretxperience.eu"
@@ -1051,7 +1059,7 @@ export default function TokensPage() {
             </a>
             <div style={{ marginTop: 8 }}>
               <button
-                onClick={() => { setShowPayModal(false); setSelected(null) }}
+                onClick={() => { setShowPayModal(false); setSelected(null); setPayError(null) }}
                 style={{ background: 'none', border: 'none', color: 'rgba(236,232,225,0.35)', fontSize: 12, cursor: 'pointer', padding: '6px 12px' }}
               >
                 Close

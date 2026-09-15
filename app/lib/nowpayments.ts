@@ -45,9 +45,18 @@ export async function createInvoice(opts: {
       cancel_url: `${origin}/tokens?status=cancel`,
     }),
   })
-  if (!res.ok) return null
+  // Carry NOWPayments' own words into the log. A bare null tells you nothing, which
+  // is what turns a one-line config mistake into a debugging session. Never echo the key.
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '')
+    console.error(`[nowpayments] invoice failed (${res.status})${detail ? `: ${detail.slice(0, 300)}` : ''}`)
+    return null
+  }
   const j = (await res.json()) as { id?: string | number; invoice_url?: string }
-  if (!j.invoice_url) return null
+  if (!j.invoice_url) {
+    console.error('[nowpayments] invoice response carried no invoice_url')
+    return null
+  }
   return { url: j.invoice_url, id: String(j.id ?? '') }
 }
 

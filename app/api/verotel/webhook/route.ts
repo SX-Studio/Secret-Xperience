@@ -192,7 +192,7 @@ async function handle(req: NextRequest) {
   // step failed before reaching this point.
   await admin.from('payment_orders').update({
     status:              'completed',
-    advertiser_order_id: saleId,
+    provider_order_id: saleId,
     webhook_payload:     params,
     completed_at:        new Date().toISOString(),
   }).eq('id', orderId)

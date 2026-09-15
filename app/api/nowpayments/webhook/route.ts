@@ -63,18 +63,6 @@ export async function POST(req: NextRequest) {
 
   const userId = order.user_id
 
-  // Idempotency guard via the ledger (not order.status) — same reasoning as the
-  // Verotel webhook: a crash after status=completed but before credit must still
-  // credit on retry.
-  const { data: existingLedger } = await admin
-    .from('token_ledger')
-    .select('id')
-    .eq('reference_id', orderId)
-    .eq('type', 'purchase')
-    .maybeSingle()
-
-  if (existingLedger) return new NextResponse('OK', { status: 200 })
-
   await admin.from('user_wallets').upsert(
     { user_id: userId, balance: 0, total_purchased: 0, total_spent: 0 },
     { onConflict: 'user_id', ignoreDuplicates: true }
@@ -89,17 +77,11 @@ export async function POST(req: NextRequest) {
   const newBalance     = (wallet?.balance ?? 0) + order.tokens_granted
   const newTotalBought = (wallet?.total_purchased ?? 0) + order.tokens_granted
 
-  const { error: walletErr } = await admin.from('user_wallets').update({
-    balance:         newBalance,
-    total_purchased: newTotalBought,
-    updated_at:      new Date().toISOString(),
-  }).eq('user_id', userId)
-
-  if (walletErr) {
-    console.error('NOWPayments webhook: wallet credit failed', walletErr)
-    return new NextResponse('Wallet update failed', { status: 500 })
-  }
-
+  // The ledger row IS the idempotency lock, taken BEFORE the money moves. A unique
+  // index on (reference_id) where type='purchase' makes that atomic, so overlapping
+  // IPN retries cannot both pass. Selecting first and inserting last — the previous
+  // shape — is a read-then-write race: two retries both saw no row and both credited,
+  // and a ledger insert that failed after the credit was re-credited on every retry.
   const { error: ledgerErr } = await admin.from('token_ledger').insert({
     user_id:       userId,
     amount:        order.tokens_granted,
@@ -110,7 +92,26 @@ export async function POST(req: NextRequest) {
   })
 
   if (ledgerErr) {
+    // 23505 = unique violation: this order was already credited. Not an error.
+    if ((ledgerErr as { code?: string }).code === '23505') {
+      return new NextResponse('OK', { status: 200 })
+    }
     console.error('NOWPayments webhook: ledger insert failed', ledgerErr)
+    return new NextResponse('Ledger insert failed', { status: 500 })
+  }
+
+  const { error: walletErr } = await admin.from('user_wallets').update({
+    balance:         newBalance,
+    total_purchased: newTotalBought,
+    updated_at:      new Date().toISOString(),
+  }).eq('user_id', userId)
+
+  if (walletErr) {
+    // Release the lock so the retry can credit cleanly, rather than leaving a ledger
+    // row that says paid against a balance that never moved.
+    console.error('NOWPayments webhook: wallet credit failed, reverting ledger', walletErr)
+    await admin.from('token_ledger').delete().eq('reference_id', orderId).eq('type', 'purchase')
+    return new NextResponse('Wallet update failed', { status: 500 })
   }
 
   await admin.from('payment_orders').update({

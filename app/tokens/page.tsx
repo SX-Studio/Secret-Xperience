@@ -2,6 +2,15 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '../lib/supabase'
 
+// Verotel is still "New — Testing mode" (website #136440), so a real buyer's real card
+// cannot complete a purchase there. Until it is authorised, crypto is the only rail that
+// actually takes money, so it becomes the buy button and cards are labelled coming soon.
+//
+// TO TURN CARDS BACK ON: set NEXT_PUBLIC_CARD_PAYMENTS_LIVE=true in Vercel and redeploy.
+// That is the whole switch — the card CTA, the crypto CTA and the notice all read it.
+// (NEXT_PUBLIC_* is inlined at build time, so it needs a redeploy, not just a var change.)
+const CARDS_LIVE = process.env.NEXT_PUBLIC_CARD_PAYMENTS_LIVE === 'true'
+
 interface Package {
   id: string
   name: string
@@ -338,6 +347,22 @@ export default function TokensPage() {
         .tok-crypto-btn:hover { color: #c5a05a; border-color: rgba(197,160,90,0.4); background: rgba(197,160,90,0.04); }
         .tok-crypto-btn:disabled { opacity: 0.45; cursor: default; }
 
+        .tok-crypto-notice {
+          display: flex;
+          gap: 12px;
+          align-items: flex-start;
+          margin-bottom: 2rem;
+          padding: 14px 16px;
+          border-radius: 12px;
+          background: rgba(197,160,90,0.06);
+          border: 0.5px solid rgba(197,160,90,0.28);
+          font: 300 13px/1.6 'Poppins', sans-serif;
+          color: rgba(236,232,225,0.72);
+        }
+        .tok-crypto-notice i { font-size: 18px; color: #c5a05a; flex-shrink: 0; margin-top: 1px; }
+        .tok-crypto-notice strong { color: #ece8e1; font-weight: 600; }
+        .tok-crypto-notice em { font-style: normal; color: #c5a05a; }
+
         .tok-section-rule {
           height: 0.5px;
           background: linear-gradient(90deg, rgba(197,160,90,0.3) 0%, transparent 70%);
@@ -634,6 +659,17 @@ export default function TokensPage() {
             Single purchase · no auto-renew
           </p>
 
+          {!CARDS_LIVE && (
+            <div className="tok-crypto-notice">
+              <i className="ti ti-currency-bitcoin" aria-hidden />
+              <div>
+                <strong>Card payments aren’t live yet.</strong> Buy tokens with crypto in the
+                meantime — pick a package below and choose <em>Pay with crypto</em>. You can pay
+                by card on the checkout page if your country supports it.
+              </div>
+            </div>
+          )}
+
           <div
             className="tok-pkg-grid"
             style={{
@@ -773,21 +809,40 @@ export default function TokensPage() {
                       </ul>
                     )}
 
-                    {/* CTA */}
-                    <button
-                      className={`tok-cta-btn ${isFeatured ? 'primary' : 'secondary'}`}
-                      onClick={() => handlePurchase(pkg as any)}
-                      disabled={loading && selected === pkg.id}
-                    >
-                      {loading && selected === pkg.id ? 'Redirecting…' : 'Buy now'}
-                    </button>
-                    <button
-                      className="tok-crypto-btn"
-                      onClick={() => payWithCrypto(pkg as any)}
-                      disabled={cryptoId === pkg.id}
-                    >
-                      {cryptoId === pkg.id ? 'Redirecting…' : <><span aria-hidden>◎</span> Pay with crypto</>}
-                    </button>
+                    {/* CTA — while cards are not live, crypto IS the buy button. Leaving
+                        "Buy now" as the primary action would send real buyers to a
+                        payment page that cannot take their card. */}
+                    {CARDS_LIVE ? (
+                      <>
+                        <button
+                          className={`tok-cta-btn ${isFeatured ? 'primary' : 'secondary'}`}
+                          onClick={() => handlePurchase(pkg as any)}
+                          disabled={loading && selected === pkg.id}
+                        >
+                          {loading && selected === pkg.id ? 'Redirecting…' : 'Buy now'}
+                        </button>
+                        <button
+                          className="tok-crypto-btn"
+                          onClick={() => payWithCrypto(pkg as any)}
+                          disabled={cryptoId === pkg.id}
+                        >
+                          {cryptoId === pkg.id ? 'Redirecting…' : <><span aria-hidden>◎</span> Pay with crypto</>}
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className={`tok-cta-btn ${isFeatured ? 'primary' : 'secondary'}`}
+                          onClick={() => payWithCrypto(pkg as any)}
+                          disabled={cryptoId === pkg.id}
+                        >
+                          {cryptoId === pkg.id ? 'Redirecting…' : <><span aria-hidden>◎</span> Pay with crypto</>}
+                        </button>
+                        <button className="tok-crypto-btn" onClick={() => setShowPayModal(true)}>
+                          Card · coming soon
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               )
@@ -1044,12 +1099,14 @@ export default function TokensPage() {
               <i className="ti ti-lock" style={{ fontSize: 24, color: '#e8c97a' }} />
             </div>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 400, color: '#ece8e1', marginBottom: 10 }}>
-              {payError ? 'Checkout could not start' : 'Payment coming soon'}
+              {payError ? 'Checkout could not start' : 'Card payments coming soon'}
             </div>
             <p style={{ fontSize: 14, color: 'rgba(236,232,225,0.55)', lineHeight: 1.6, marginBottom: 24 }}>
               {payError
                 ? `${payError} Please try again, or contact us and we'll sort it out.`
-                : 'Secure token checkout is being finalised. To purchase tokens or enquire about early access, contact us directly.'}
+                : 'Card checkout is still being finalised. You can buy tokens right now with ' +
+                  '“Pay with crypto” — the checkout page also accepts a card in many countries. ' +
+                  'Prefer to wait, or need a hand? Contact us.'}
             </p>
             <a
               href="mailto:support@secretxperience.eu"

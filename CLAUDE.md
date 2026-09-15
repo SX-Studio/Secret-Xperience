@@ -117,6 +117,23 @@ What's next (user hasn't asked for these yet, don't do proactively):
   - **Not fixed here:** `app/api/ccbill/*` carries the same `advertiser` /
     `advertiser_order_id` bug. Those routes are dead and unwired — left alone rather
     than widening the diff. Fix them if CCBill is ever revived; better, delete them.
+- **Tokens page steers to crypto while Verotel is in test mode (2026-09-15)** —
+  Verotel website #136440 is still "New — Testing mode", so a real buyer's real card
+  cannot complete a purchase there. Leaving **Buy now** as the primary CTA sent people
+  to a payment page that could not take their money.
+  - **One switch: `NEXT_PUBLIC_CARD_PAYMENTS_LIVE`** (`app/tokens/page.tsx`, top of file
+    as `CARDS_LIVE`). Unset/false → **crypto becomes the buy button** on every package,
+    the card button becomes a muted `Card · coming soon` that opens the modal, and a
+    notice sits above the package grid. Set it to `true` in Vercel **and redeploy** to
+    put cards back exactly as they were — the CTA pair, the notice and the modal copy all
+    read the same constant. ⚠️ `NEXT_PUBLIC_*` is resolved at build time, so changing the
+    var alone does nothing without a redeploy.
+  - The card button does **not** call `/api/verotel/charge` while cards are off — there is
+    no point redirecting to a test-mode page. It opens the modal, whose copy now points
+    at crypto instead of only offering "contact us".
+  - ⚠️ **When Verotel authorises, flip the flag — do not re-edit the JSX.** Both CTA
+    arrangements are in the file behind the one ternary.
+
 - **Email senders centralised (2026-09-13)** — `app/lib/mail-from.ts` is now the single
   source of truth. Three addresses had drifted across 9 send sites (`hello@`,
   `noreply@`, `no-reply@`), so the platform reached people under three identities.

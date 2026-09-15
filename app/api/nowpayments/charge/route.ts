@@ -79,7 +79,10 @@ export async function POST(req: NextRequest) {
     orderId:     order.id,
     description: `${totalTokens} tokens - SecretXperience`, // ASCII only
   })
-  if (!inv) return NextResponse.json({ error: 'Could not start crypto checkout' }, { status: 502 })
+  if (!inv.ok) {
+    console.error('[nowpayments/charge]', inv.reason)
+    return NextResponse.json({ error: 'Could not start crypto checkout' }, { status: 502 })
+  }
 
   return NextResponse.json({ url: inv.url, orderId: order.id })
 }

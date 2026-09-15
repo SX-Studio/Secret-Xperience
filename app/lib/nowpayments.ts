@@ -30,8 +30,15 @@ export async function createInvoice(opts: {
   priceEur: number
   orderId: string
   description: string // ASCII, slash-free (keeps IPN signature parity simple)
-}): Promise<{ url: string; id: string } | null> {
+}): Promise<{ ok: true; url: string; id: string } | { ok: false; reason: string }> {
   const origin = siteUrl()
+  // siteUrl() falls back to the canonical .eu domain and rejects vercel.app, so it
+  // cannot be localhost — but a typo'd NEXT_PUBLIC_SITE_URL would still send the IPN
+  // callback somewhere NOWPayments cannot reach, and a paid invoice would then never
+  // credit the wallet. Refuse rather than take money we cannot deliver against.
+  if (!/^https:\/\//i.test(origin) || /localhost|127\.0\.0\.1/i.test(origin)) {
+    return { ok: false, reason: `NEXT_PUBLIC_SITE_URL is not a public https origin (got "${origin}") — the IPN callback would be unreachable` }
+  }
   const res = await fetch(`${API}/invoice`, {
     method: 'POST',
     headers: { 'x-api-key': opts.apiKey, 'Content-Type': 'application/json' },
@@ -45,10 +52,15 @@ export async function createInvoice(opts: {
       cancel_url: `${origin}/tokens?status=cancel`,
     }),
   })
-  if (!res.ok) return null
-  const j = (await res.json()) as { id?: string | number; invoice_url?: string }
-  if (!j.invoice_url) return null
-  return { url: j.invoice_url, id: String(j.id ?? '') }
+  // Carry NOWPayments' own words out. Swallowing the provider's reason is what cost
+  // this project two debugging rounds on Bird. The API key is never echoed.
+  if (!res.ok) {
+    const detail = await res.text().catch(() => '')
+    return { ok: false, reason: `NOWPayments invoice failed (${res.status})${detail ? `: ${detail.slice(0, 300)}` : ''}` }
+  }
+  const j = (await res.json().catch(() => null)) as { id?: string | number; invoice_url?: string } | null
+  if (!j?.invoice_url) return { ok: false, reason: 'NOWPayments returned no invoice_url' }
+  return { ok: true, url: j.invoice_url, id: String(j.id ?? '') }
 }
 
 // IPN signature: HMAC-SHA512 of the JSON body with keys sorted alphabetically,

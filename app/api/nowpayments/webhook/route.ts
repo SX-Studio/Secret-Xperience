@@ -115,7 +115,7 @@ export async function POST(req: NextRequest) {
 
   await admin.from('payment_orders').update({
     status:              'completed',
-    advertiser_order_id: paymentId,
+    provider_order_id: paymentId,
     webhook_payload:     body,
     completed_at:        new Date().toISOString(),
   }).eq('id', orderId)

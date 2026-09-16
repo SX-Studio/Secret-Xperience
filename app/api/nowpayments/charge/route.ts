@@ -3,7 +3,7 @@
  *
  * Flow:
  *   1. Client POSTs { packageId }
- *   2. We create a pending payment_order in Supabase (advertiser = 'nowpayments')
+ *   2. We create a pending payment_order in Supabase (provider = 'nowpayments')
  *   3. We create a NOWPayments hosted invoice (buyer picks the coin there)
  *   4. Return { url } — client redirects to the hosted checkout
  *   5. After settlement NOWPayments hits /api/nowpayments/webhook (IPN) → wallet credited
@@ -63,13 +63,14 @@ export async function POST(req: NextRequest) {
       package_id:     pkg.id,
       tokens_granted: totalTokens,
       amount_eur:     pkg.price_eur,
-      advertiser:     'nowpayments',
+      provider:       'nowpayments',
       status:         'pending',
     })
     .select('id')
     .single()
 
   if (orderErr || !order) {
+    console.error('[payment_orders] insert failed:', orderErr?.message ?? orderErr)
     return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
   }
 

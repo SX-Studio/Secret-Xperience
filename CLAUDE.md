@@ -91,6 +91,49 @@ What's next (user hasn't asked for these yet, don't do proactively):
 ---
 
 ## Done (recent work, don't redo)
+- **🔴 Token purchases were dead for 3 months — `payment_orders.advertiser` (2026-09-15)** —
+  every token purchase on SX, Verotel **and** NOWPayments, had been failing since
+  **2026-06-05**. Proof: the last row ever written to `payment_orders` is the Verotel
+  test of `2026-06-04 13:11`; zero rows since.
+  - **Root cause:** the live column is **`provider`** (default `'ccbill'`) and
+    **`provider_order_id`**. The 2026-06-05 *"provider" → "advertiser"* terminology
+    rename (the one that also did admin role labels and "View listing" → "View
+    advertisement") swept the **DB column keys** along with the UI copy. PostgREST
+    rejects an insert naming a column that doesn't exist → `orderErr` → HTTP 500.
+    The Verotel test on 06-04 passed because it predated the rename by one day.
+  - ⚠️ **`payment_orders` columns are `provider` / `provider_order_id`. Never
+    `advertiser`.** The product calls that role an *advertiser*; the database does
+    not. Do not let a global rename touch `.insert({...})` / `.update({...})` keys.
+    Note `verotel/webhook` line 113 was already correct and line 195 was not — the
+    rename hit some lines and not others, so grep, don't assume.
+  - **Why nobody noticed:** `handlePurchase` and `payWithCrypto` in
+    `app/tokens/page.tsx` showed the "Payment coming soon" modal on *any* non-`url`
+    response, so a 500 was indistinguishable from "not configured yet". Both now
+    show the real error and reserve the coming-soon copy for `configured === false`.
+    Same lesson as the Bird/OTP debugging rounds: **the provider's reason existed and
+    was simply unreachable.** Also added: `console.error` on the failing
+    `payment_orders` insert in both charge routes, and NOWPayments' own status + body
+    logged in `createInvoice` (never the API key).
+  - **Not fixed here:** `app/api/ccbill/*` carries the same `advertiser` /
+    `advertiser_order_id` bug. Those routes are dead and unwired — left alone rather
+    than widening the diff. Fix them if CCBill is ever revived; better, delete them.
+- **Tokens page steers to crypto while Verotel is in test mode (2026-09-15)** —
+  Verotel website #136440 is still "New — Testing mode", so a real buyer's real card
+  cannot complete a purchase there. Leaving **Buy now** as the primary CTA sent people
+  to a payment page that could not take their money.
+  - **One switch: `NEXT_PUBLIC_CARD_PAYMENTS_LIVE`** (`app/tokens/page.tsx`, top of file
+    as `CARDS_LIVE`). Unset/false → **crypto becomes the buy button** on every package,
+    the card button becomes a muted `Card · coming soon` that opens the modal, and a
+    notice sits above the package grid. Set it to `true` in Vercel **and redeploy** to
+    put cards back exactly as they were — the CTA pair, the notice and the modal copy all
+    read the same constant. ⚠️ `NEXT_PUBLIC_*` is resolved at build time, so changing the
+    var alone does nothing without a redeploy.
+  - The card button does **not** call `/api/verotel/charge` while cards are off — there is
+    no point redirecting to a test-mode page. It opens the modal, whose copy now points
+    at crypto instead of only offering "contact us".
+  - ⚠️ **When Verotel authorises, flip the flag — do not re-edit the JSX.** Both CTA
+    arrangements are in the file behind the one ternary.
+
 - **Email senders centralised (2026-09-13)** — `app/lib/mail-from.ts` is now the single
   source of truth. Three addresses had drifted across 9 send sites (`hello@`,
   `noreply@`, `no-reply@`), so the platform reached people under three identities.
@@ -103,7 +146,7 @@ What's next (user hasn't asked for these yet, don't do proactively):
   `secretxperience.eu` already has Resend DKIM + SPF records live, so no domain setup
   was needed. Add a new sender by changing the env var, not the routes.
 - **Multi-domain (2026-09-10, PR #15 → `7acbfc2`)** — `.nl` mirror with canonical headers; `.shop` standalone storefront (`app/shop/ShopChrome.tsx`, `app/shop/legal/[doc]`, host-aware `robots.ts`/`sitemap.ts`, product page split into server wrapper + `ProductDetail.tsx`); cross-domain session bridge (`app/sso/*`); `next` survives Google OAuth; pre-existing `//evil.com` open redirect in both `next` readers fixed; Stripe checkout return URLs follow the host (Verotel's stay pinned to `.eu` in `lib/site.ts` — its signature covers them). See the 2026-09-10 resume section.
-- **Crypto token rail — NOWPayments (built, NOT yet deployed/verified)** — parallel payment rail to Verotel for buying tokens (advertising credits; compliant — tokens ≠ escort booking). Mirrors the Verotel flow exactly. Files: `app/lib/nowpayments.ts` (config → `configured:false` until both env vars set, `createInvoice` via `api.nowpayments.io/v1/invoice`, `verifyIpn` = HMAC-SHA512 of key-sorted JSON vs `x-nowpayments-sig`), `app/api/nowpayments/charge/route.ts` (auth → pending `payment_orders` row with `advertiser:'nowpayments'` → hosted invoice → `{ url }`; graceful `{configured:false}` HTTP 200 → tokens page shows the same "coming soon" modal), `app/api/nowpayments/webhook/route.ts` (verify IPN sig → credit only on `payment_status:'finished'`, ledger-based idempotency identical to the Verotel webhook). UI: `app/tokens/page.tsx` gained a `payWithCrypto()` handler + a subtle "◎ Pay with crypto" button under each package's "Buy now". **To activate:** set `NOWPAYMENTS_API_KEY` + `NOWPAYMENTS_IPN_SECRET` in Vercel, redeploy, and register the IPN callback `https://www.secretxperience.eu/api/nowpayments/webhook` in the NOWPayments store settings. Built on branch `claude/investment-plan-sx-content24-i3z6i0`, NOT merged to `main` — untested payment change, needs review + a Vercel preview build before merge.
+- **Crypto token rail — NOWPayments (ON `main`, env set 2026-09-15)** — parallel payment rail to Verotel for buying tokens (advertising credits; compliant — tokens ≠ escort booking). Mirrors the Verotel flow exactly. Files: `app/lib/nowpayments.ts` (config → `configured:false` until both env vars set, `createInvoice` via `api.nowpayments.io/v1/invoice`, `verifyIpn` = HMAC-SHA512 of key-sorted JSON vs `x-nowpayments-sig`), `app/api/nowpayments/charge/route.ts` (auth → pending `payment_orders` row with `provider:'nowpayments'` → hosted invoice → `{ url }`; graceful `{configured:false}` HTTP 200 → tokens page shows the "coming soon" modal), `app/api/nowpayments/webhook/route.ts` (verify IPN sig → credit only on `payment_status:'finished'`, ledger-based idempotency identical to the Verotel webhook). UI: `app/tokens/page.tsx` gained a `payWithCrypto()` handler + a subtle "◎ Pay with crypto" button under each package's "Buy now". The code is **on `main`** (an earlier note here claiming it sat unmerged on `claude/investment-plan-sx-content24-i3z6i0` was wrong). Env vars set in Vercel 2026-09-15.
 - **`/creators` COLLABS banner (`app/creators/CollabsPromo.tsx`) — FIXED LAYOUT, do not swap without asking**: two cells. **Large left (hero) cell = the 3s COLLABS logo flash** (`/promos/collabs-promo-3s.mp4`, `VIDEO_FLASH`). **Narrow right "PROMO" cell = the original 40s vertical COLLABS fashion promo** (`/promos/collabs-promo-original.mp4`, `VIDEO_PROMO`; has a "VEED" watermark top-right — left as-is on purpose). Both autoplay/muted/loop, `object-fit:cover`, link to collabs-photography.com. Other promo files kept: `collabs-promo.mp4` (10s flash), `collabs.jpg` (old green wordmark, unused).
 - **OnlyFans creator directory (2026-07-05)** — `app/data/onlyfans.ts` (36 creators, country groups BE/DE/RO/ES/int'l) rendered by `OnlyFansShowcase` on the homepage (portal → `#onlyfansShowcaseMount`, above the partners band) and on `/creators` (inline). Creators with `featured: true` + a photo at `public/onlyfans/<handle>.jpg` get a large clickable 160px photo card in the "✦ Featured" row; photos are 200×200 crops with the creator's name baked onto the image (made via headless-Chromium screenshot). 9 featured so far. Others render as chips with initials-monogram avatars that auto-upgrade when a photo file appears. Referral params (`?rec=`) on baddiemi + lisawildlove must be preserved. NOTE: photos sent mid-turn in chat are NOT persisted to the transcript — ask the user to resend one per message, waiting for confirmation between each. — partner data extracted to `app/data/partners.ts` (single source of truth); new `PartnersShowcase` component renders the full directory as compact chips above the homepage footer (portal → `#partnersShowcaseMount`, first 4 categories visible, "Show all" expands). Fixed on `/partners`: `premium-content` section (Dorcel Club, the one live affiliate) was missing from `industryIds` so it never rendered; `Official Partner` badge had no style. Edit partners in `app/data/partners.ts` — both pages update.
 - **Verotel FlexPay payment integration (2026-06-04) — LIVE IN TEST MODE, full flow verified** — token purchases now go through **Verotel FlexPay** (hosted payment page), replacing the dead CCBill path. Website #136440, status "New - Testing mode". Files: `app/api/verotel/charge/route.ts` (builds signed `startorder` URL → redirect) and `app/api/verotel/webhook/route.ts` (verifies postback signature → credits wallet, mirrors old CCBill wallet logic). Signature = `lowercase(sha256(SIGNATURE_KEY + ":key=value" sorted case-insensitively, excluding signature))`. **Gotchas learned:** (1) do NOT pass `successURL`/`declineURL` as request params — they break the signature; configure them in Verotel panel → FlexPay options instead. (2) Description must be ASCII (no em dash). (3) `.trim()` the key (env paste whitespace). Env vars in Vercel: `VEROTEL_SHOP_ID=136440`, `VEROTEL_SIGNATURE_KEY=<secret>`. Panel URLs set: Success `…/tokens?status=success`, Decline `…/tokens?status=cancel`, Postback `…/api/verotel/webhook`. `tokens/page.tsx` `handlePurchase` calls `/api/verotel/charge`; if it returns `configured:false` (env missing) it shows a graceful "Payment coming soon" modal instead of a 503. Test card `9999994707596217` confirmed crediting wallet end-to-end. **Next: click "Request authorization" in Verotel to move test → live compliance review.** CCBill routes (`app/api/ccbill/*`) are now dead/unused — kept but not wired.
@@ -265,7 +308,7 @@ What's next (user hasn't asked for these yet, don't do proactively):
 - `INTERNAL_SECRET` AND `NEXT_PUBLIC_INTERNAL_SECRET` — must match, used for internal API calls (moderation, notify)
 - `RESEND_API_KEY` — email sending (optional, logs to console if absent)
 - `ANTHROPIC_API_KEY` — AI moderation (auto-approves listings if absent)
-- `NOWPAYMENTS_API_KEY`, `NOWPAYMENTS_IPN_SECRET` — crypto token rail. While either is unset, `/api/nowpayments/charge` returns `{configured:false}` and the "Pay with crypto" button falls back to the coming-soon modal. Register IPN callback `https://www.secretxperience.eu/api/nowpayments/webhook` in NOWPayments store settings.
+- `NOWPAYMENTS_API_KEY`, `NOWPAYMENTS_IPN_SECRET` — crypto token rail. While either is unset, `/api/nowpayments/charge` returns `{configured:false}` and the "Pay with crypto" button falls back to the coming-soon modal. **Nothing to register in the NOWPayments dashboard** — `ipn_callback_url` is sent on every invoice, built from `siteUrl()` (pinned to `https://www.secretxperience.eu`, so there is no `APP_ORIGIN`-style localhost hazard here). For the **card** on-ramp (buyer pays by card, Guardarian converts, we receive crypto): NOWPayments → Settings → Coins Settings → enable EUR. No code change; EUR then appears in the invoice's "Pay currency" selector.
 
 ## How to verify a change shipped
 1. `git push -u origin main` (auto-deploys on Vercel)

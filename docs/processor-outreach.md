@@ -184,3 +184,39 @@ support@secretxperience.eu · secretxperience.eu
   platform actually enforces today.
 - **Repeats the entity and number**, so it can go straight to underwriting without
   another round trip.
+
+---
+
+## Verotel thread — content24market.space as a second website (2026-09-14 → 2026-09-27)
+
+### Our email (sent 2026-09-14 from support@secretxperience.eu)
+Asked Mathilda (Verotel CES) to add **content24market.space** ("Content Box") to the
+account as a second, single-vertical website (content creation / pics & clips): creators
+publish into invite-only boxes, members buy tokens (€10 = 1000) and unlock an item for
+24h, creators earn a revenue share paid at a €50 threshold. Stated explicitly: no escort,
+massage, nightlife, rentals, hotels or events; separate domain, database and product from
+secretxperience.eu. Six questions: second website yes/no, own shop ID + key, rates and
+settlement, rolling reserve, creator payouts, compliance documentation.
+
+### Their reply (Mathilda, Verotel CES, ticket #11894813, received 2026-09-27) — quoted
+- *"your merchant account with ID 9804000001383305 and website #136440 was canceled on
+  August 10th. Please register for a new account with the new URL and send me premium
+  test credentials to browse around with as a paid user (with sufficient tokens to make
+  purchases with). You should have at least 10 complete demo profiles with content for
+  sale. It should look like how it's intended to look so that we can experience it as an
+  end user."*
+- Own shop ID and signature key: *"Yes."*
+- Rates/settlement: *"15.5% (+1.5% for rebills). Daily payouts with 8 day lag to a
+  Yoursafe Business account in the name of your company."*
+- Rolling reserve: *"10% for 26 weeks."*
+- Creator payouts: *"Outside the platform. We offer mass payouts with Yoursafe through
+  upload of a CSV file or API"* (https://integrations.yoursafe.com/en/payment-services).
+- Documentation: *"The list of required documents can be found on the Yoursafe business
+  application form. This is sent to you once you register for a Yoursafe account through
+  your merchant portal."*
+
+**What this means (interpretation, not their words):** the SX Verotel integration is
+dead and cannot be revived without a new registration. For content24 the answer is a
+conditional yes: register, build a reviewable demo, then compliance review. The demo
+requirements and engineering gaps are tracked in `content-box/docs/verotel-review.md`,
+together with the reply draft.

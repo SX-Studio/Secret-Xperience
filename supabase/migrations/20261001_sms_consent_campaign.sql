@@ -20,6 +20,7 @@ create table if not exists public.sms_campaign_messages (
   id                  uuid primary key default gen_random_uuid(),
   campaign_id         uuid not null references public.sms_campaigns(id) on delete cascade,
   listing_id          uuid references public.listings(id) on delete set null,
+  listing_ids         uuid[] not null default '{}',       -- every listing sharing this number
   phone               text not null,                      -- E.164
   provider_message_id text,                               -- Bird message id
   status              text not null default 'queued',     -- queued | sent | delivered | failed

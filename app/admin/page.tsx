@@ -493,6 +493,8 @@ export default function AdminPage() {
         .adm-action-btn { transition: opacity var(--t-fast, 0.15s); }
         .adm-action-btn:hover { opacity: 0.8; }
         .adm-tab-btn:hover { color: var(--gold, #c5a05a) !important; }
+        /* Boxed tables scroll sideways at every width (touch-friendly on mobile) */
+        .adm-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
         .adm-hamburger { display: none; }
         .adm-nav-overlay { display: none; }
         @media (max-width: 768px) {
@@ -1167,8 +1169,8 @@ export default function AdminPage() {
                     <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
                   </button>
                 </div>
-                <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                     <thead>
                       <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                         {['Email', 'Status', 'Subscribed'].map(h => (
@@ -1290,8 +1292,8 @@ export default function AdminPage() {
                       <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
                     </button>
                   </div>
-                  <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                       <thead>
                         <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                           {['Listing', 'Category', 'City', 'Country', 'Phone', 'Opted In'].map(h => (
@@ -1340,8 +1342,8 @@ export default function AdminPage() {
                       <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
                     </button>
                   </div>
-                  <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden', maxHeight: '560px', overflowY: 'auto' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden', maxHeight: '560px', overflowY: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                       <thead>
                         <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                           {['Listing', 'Category', 'City', 'Country', 'Phone', 'Consent'].map(h => (
@@ -1394,8 +1396,8 @@ export default function AdminPage() {
                       <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
                     </button>
                   </div>
-                  <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                       <thead>
                         <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                           {['Business', 'Contact', 'Email', 'Category', 'Location', 'Status', 'Submitted'].map(h => (
@@ -1465,8 +1467,8 @@ export default function AdminPage() {
                   <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
                 </button>
               </div>
-              <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                   <thead>
                     <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                       {['Source', 'Medium', 'Campaign', 'Signups', 'Last signup'].map(h => (
@@ -1552,8 +1554,8 @@ export default function AdminPage() {
               </div>
 
               {kwResults.length > 0 && (
-                <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                     <thead>
                       <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                         {['Keyword', 'Volume / mo', 'CPC', 'Competition', 'Difficulty'].map(h => (
@@ -1688,8 +1690,8 @@ export default function AdminPage() {
           })()}
 
           {tab === 'Bookings' && (
-            <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                 <thead>
                   <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                     {['Listing', 'Client', 'Date', 'Duration', 'Amount', 'Status'].map(h => (

@@ -329,7 +329,7 @@ export default function EscortsPage() {
         if (escortType === 'women') return !tags.some((t: string) => tagMatchesType(t, 'men') || t.includes('trans') || tagMatchesType(t, 'couples') || tagMatchesType(t, 'non-binary'))
         if (escortType === 'men') return sub.includes('gigolo') || sub.includes('male')
         if (escortType === 'couples') return sub.includes('couple')
-        if (escortType === 'fetish') return l.category === 'domination'
+        if (escortType === 'fetish') return l.category === 'domination' || sub.includes('fetish')
         return false
       })
     }

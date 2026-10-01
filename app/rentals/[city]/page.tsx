@@ -62,7 +62,7 @@ export default async function RentalsCityPage({ params }: { params: { city: stri
     .from('listings')
     .select('id, title, category, city, price_from, images, verified, premium, tags')
     .eq('active', true)
-    .in('category', ['rentals', 'rental', 'private-reception', 'studio'])
+    .in('category', ['rentals'])
     .ilike('city', `%${cityName}%`)
     .order('premium', { ascending: false })
     .limit(48)

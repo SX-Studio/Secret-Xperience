@@ -151,7 +151,6 @@ export default function LoginPage() {
     <>
       <style>{`
         
-        @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

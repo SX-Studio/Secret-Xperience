@@ -3,6 +3,10 @@
 -- KEEP (consent + claim the listing) or REMOVE (delete + cease contact). Replies
 -- arrive via the Bird inbound webhook. Phone numbers are PII and stay in these
 -- tables only — never exported; Bird receives the number solely to deliver the SMS.
+--
+-- Applied live to duwuzaelmggldhkgoebn on 2026-10-01, statement by statement. Kept
+-- free of foreign keys to listings/profiles so the DDL never waits on locks held by
+-- live traffic; the admin routes own referential integrity.
 
 create table if not exists public.sms_campaigns (
   id             uuid primary key default gen_random_uuid(),
@@ -11,15 +15,15 @@ create table if not exists public.sms_campaigns (
   audience       text not null default 'all_with_phone', -- all_with_phone | not_consented
   no_reply_days  int  not null default 30,               -- silence ≠ consent: unpublish after
   status         text not null default 'draft',          -- draft | sending | sent
-  created_by     uuid references public.profiles(id) on delete set null,
+  created_by     uuid,
   created_at     timestamptz not null default now(),
   sent_at        timestamptz
 );
 
 create table if not exists public.sms_campaign_messages (
   id                  uuid primary key default gen_random_uuid(),
-  campaign_id         uuid not null references public.sms_campaigns(id) on delete cascade,
-  listing_id          uuid references public.listings(id) on delete set null,
+  campaign_id         uuid not null,
+  listing_id          uuid,
   listing_ids         uuid[] not null default '{}',       -- every listing sharing this number
   phone               text not null,                      -- E.164
   provider_message_id text,                               -- Bird message id
@@ -47,7 +51,7 @@ create table if not exists public.sms_optouts (
 alter table public.listings
   add column if not exists consent_status      text,        -- pending | consented | removed
   add column if not exists consent_at          timestamptz,
-  add column if not exists consent_campaign_id uuid references public.sms_campaigns(id) on delete set null;
+  add column if not exists consent_campaign_id uuid;
 create index if not exists listings_consent_status_idx on public.listings (consent_status);
 
 -- RLS: these tables hold PII. Only service_role (admin server routes) may touch them.

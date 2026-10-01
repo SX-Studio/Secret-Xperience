@@ -18,6 +18,7 @@ const CATEGORIES = [
   { value: 'nightlife',     label: 'Nightlife',      icon: '◐' },
   { value: 'experiences',   label: 'Experiences',    icon: '◆' },
   { value: 'rentals',       label: 'Rentals',        icon: '□' },
+  { value: 'hotels',        label: 'Hotels',         icon: '⌂' },
   { value: 'events',        label: 'Event Spaces',   icon: '◳' },
   { value: 'photo',         label: 'Photo / Video',  icon: '◑' },
   { value: 'memberships',   label: 'Memberships',    icon: '◈' },
@@ -548,7 +549,12 @@ export default function CreateListingPage() {
       if (form.ethnicity) statTags.push(`Ethnicity: ${form.ethnicity}`)
       if (form.build)     statTags.push(`Build: ${form.build}`)
       if (form.hair)      statTags.push(`Hair: ${form.hair}`)
-      if (form.gender)    statTags.push(`Gender: ${form.gender}`)
+      if (form.gender) {
+        statTags.push(`Gender: ${form.gender}`)
+        // Same `type:` tag the dashboard editor writes, so the escorts/pride/discover filters match new adverts.
+        const typeTag: Record<string, string> = { 'Woman': 'women', 'Man': 'men', 'Trans woman': 'trans woman', 'Trans man': 'trans man', 'Non-binary': 'non-binary', 'Couple': 'couples' }
+        if (typeTag[form.gender]) statTags.push(`type:${typeTag[form.gender]}`)
+      }
       if (form.eyes)      statTags.push(`Eyes: ${form.eyes}`)
       if (form.cup)       statTags.push(`Cup: ${form.cup}`)
       if (form.hairstyle) statTags.push(`Hairstyle: ${form.hairstyle}`)

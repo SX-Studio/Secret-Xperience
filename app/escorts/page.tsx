@@ -328,7 +328,9 @@ export default function EscortsPage() {
         // Category / subcategory fallbacks for listings without an explicit type tag
         if (escortType === 'women') return !tags.some((t: string) => tagMatchesType(t, 'men') || t.includes('trans') || tagMatchesType(t, 'couples') || tagMatchesType(t, 'non-binary'))
         if (escortType === 'men') return sub.includes('gigolo') || sub.includes('male')
-        if (escortType === 'couples') return sub.includes('couple')
+        if (escortType === 'couples') return sub.includes('couple') || sub.includes('duo')
+        if (escortType === 'trans-woman' || escortType === 'trans-man') return sub.includes('trans')
+        if (escortType === 'non-binary') return sub.includes('non-binary') || sub.includes('nonbinary')
         if (escortType === 'fetish') return l.category === 'domination' || sub.includes('fetish')
         return false
       })

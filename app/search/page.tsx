@@ -14,6 +14,7 @@ const CATEGORIES = [
   { value: 'domination',    label: 'Domination',       icon: 'ti-crown' },
   { value: 'experiences',   label: 'Experiences',      icon: 'ti-sparkles' },
   { value: 'rentals',       label: 'Rentals',          icon: 'ti-home' },
+  { value: 'hotels',        label: 'Hotels',           icon: 'ti-bed' },
 ]
 
 const CITIES = ['All cities', 'Brussels', 'Antwerp', 'Ghent', 'Amsterdam', 'Berlin', 'Paris', 'Barcelona', 'London']

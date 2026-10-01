@@ -28,7 +28,7 @@ const LS_KEY = (t: Tab) => `sx_admin_seen_${t.toLowerCase()}`
 // Categories an admin can reassign a listing to (value must match the live category routes).
 const ADMIN_CATEGORIES = [
   'escorts', 'massage', 'companionship', 'domination', 'adult',
-  'creators', 'nightlife', 'experiences', 'rentals', 'hotels', 'events', 'shop',
+  'creators', 'nightlife', 'experiences', 'rentals', 'hotels', 'events', 'shop', 'photo',
 ]
 
 function exportCsv(rows: any[], filename: string) {
@@ -1253,11 +1253,14 @@ export default function AdminPage() {
                     style={{ height: '44px', padding: '0 10px', background: 'var(--bg3, #111)', border: '0.5px solid var(--b2, rgba(255,255,255,0.08))', borderRadius: 'var(--r, 8px)', color: 'var(--t, #ece8e1)', font: '400 13px/1 var(--sans)', outline: 'none' }}
                   >
                     <option value="">All categories</option>
-                    <option value="escort_agency">Escort agency</option>
-                    <option value="venue">Venue</option>
-                    <option value="nightlife">Nightlife</option>
-                    <option value="massage">Massage</option>
-                    <option value="other">Other</option>
+                    <optgroup label="Listings">
+                      {ADMIN_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </optgroup>
+                    <optgroup label="B2B leads">
+                      <option value="escort_agency">Escort agency</option>
+                      <option value="venue">Venue</option>
+                      <option value="other">Other</option>
+                    </optgroup>
                   </select>
                   <select
                     value={contactFilter.status}
@@ -1622,7 +1625,7 @@ export default function AdminPage() {
                       </div>
                       <p style={{ color: 'var(--t, #ece8e1)', fontSize: '13px', lineHeight: 1.7, margin: '0 0 12px', whiteSpace: 'pre-wrap' }}>{r.detail}</p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '12px', color: 'var(--t2, #8c8880)', marginBottom: '14px' }}>
-                        <span><i className="ti ti-link" style={{ marginRight: 5 }} /><a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gold, #c5a05a)', textDecoration: 'none' }}>{r.url.length > 60 ? r.url.slice(0, 60) + '…' : r.url}</a></span>
+                        {r.url && <span><i className="ti ti-link" style={{ marginRight: 5 }} /><a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gold, #c5a05a)', textDecoration: 'none' }}>{r.url.length > 60 ? r.url.slice(0, 60) + '…' : r.url}</a></span>}
                         {r.listing_id && <a href={`/listings/${r.listing_id}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--t2, #8c8880)', textDecoration: 'none' }}><i className="ti ti-eye" style={{ marginRight: 5 }} />View listing</a>}
                         {r.email && <span><i className="ti ti-mail" style={{ marginRight: 5 }} /><a href={`mailto:${r.email}`} style={{ color: 'var(--t2, #8c8880)', textDecoration: 'none' }}>{r.email}</a></span>}
                       </div>
@@ -1718,6 +1721,7 @@ export default function AdminPage() {
                             <button
                               className="adm-action-icon-btn adm-action-btn"
                               onClick={async () => {
+                                if (!confirm(`Cancel this booking for "${b.listings?.title || 'listing'}"?`)) return
                                 const supabase = createClient()
                                 await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', b.id)
                                 setBookings(prev => prev.map(x => x.id === b.id ? { ...x, status: 'cancelled' } : x))

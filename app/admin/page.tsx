@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '../lib/supabase'
 import { detectFocalPoint, imageFromUrl } from '../lib/imageFocus'
 import CampaignsTab from './CampaignsTab'
+import EventsTab from './EventsTab'
 
-const TABS = ['Listings', 'Users', 'Verification', 'Reports', 'Bookings', 'Payouts', 'Newsletter', 'Contacts', 'Acquisition', 'Keywords', 'Campaigns', 'Tools'] as const
+const TABS = ['Listings', 'Users', 'Verification', 'Reports', 'Bookings', 'Payouts', 'Newsletter', 'Contacts', 'Acquisition', 'Keywords', 'Campaigns', 'Events', 'Tools'] as const
 type Tab = typeof TABS[number]
 
 const TAB_ICONS: Record<Tab, string> = {
@@ -20,6 +21,7 @@ const TAB_ICONS: Record<Tab, string> = {
   Acquisition: 'chart-arrows-vertical',
   Keywords: 'search',
   Campaigns: 'send',
+  Events: 'calendar-star',
   Tools: 'tool',
 }
 
@@ -52,7 +54,7 @@ export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('Listings')
-  const [badges, setBadges] = useState<Record<Tab, number>>({ Listings: 0, Users: 0, Verification: 0, Reports: 0, Bookings: 0, Payouts: 0, Newsletter: 0, Contacts: 0, Acquisition: 0, Keywords: 0, Campaigns: 0, Tools: 0 })
+  const [badges, setBadges] = useState<Record<Tab, number>>({ Listings: 0, Users: 0, Verification: 0, Reports: 0, Bookings: 0, Payouts: 0, Newsletter: 0, Contacts: 0, Acquisition: 0, Keywords: 0, Campaigns: 0, Events: 0, Tools: 0 })
   const [reports, setReports] = useState<any[]>([])
   const [reportWorking, setReportWorking] = useState<string | null>(null)
   const [payouts, setPayouts] = useState<any[]>([])
@@ -192,6 +194,7 @@ export default function AdminPage() {
         Acquisition:  0,
         Keywords:     0,
         Campaigns:    0,
+        Events:       0,
         Tools:        0,
       })
       // Mark the initial active tab as seen immediately
@@ -1742,6 +1745,7 @@ export default function AdminPage() {
             </div>
           )}
           {tab === 'Campaigns' && <CampaignsTab />}
+          {tab === 'Events' && <EventsTab />}
 
           {tab === 'Tools' && (
             <div>

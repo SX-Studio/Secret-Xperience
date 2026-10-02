@@ -100,7 +100,11 @@ export default function EventsPage() {
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.from('events').select('*').eq('active', true).order('featured', { ascending: false }).order('date_start', { ascending: true })
+    supabase.from('events').select('*').eq('active', true)
+      // Hide events whose dates have passed (recurring ones stay); the daily cron
+      // also deactivates them, this just keeps the page honest in between runs.
+      .or(`date_end.gte.${new Date().toISOString().slice(0, 10)},and(date_end.is.null,date_start.gte.${new Date().toISOString().slice(0, 10)}),and(recurring.not.is.null,recurring.neq.one-time)`)
+      .order('featured', { ascending: false }).order('date_start', { ascending: true })
       .then(({ data }) => { setEvents(data || []); setFiltered(data || []); setLoading(false) }, () => setLoading(false))
   }, [])
 

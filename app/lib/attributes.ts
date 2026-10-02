@@ -135,7 +135,8 @@ const TYPE_SYNONYMS: Record<string, string[]> = {
 /** Does a listing tag denote this profile type? Handles prefixed `type:x` and bare `x`. */
 export function tagMatchesType(tag: string, filterKey: string): boolean {
   const raw = tag.toLowerCase().trim()
-  const bare = raw.startsWith('type:') ? raw.slice(5).trim() : raw
+  // The create form stores the same fact as `Gender: Trans woman`; treat both prefixes alike.
+  const bare = raw.startsWith('type:') ? raw.slice(5).trim() : raw.startsWith('gender:') ? raw.slice(7).trim() : raw
   const syn = TYPE_SYNONYMS[filterKey] ?? [filterKey]
   return syn.includes(bare)
 }

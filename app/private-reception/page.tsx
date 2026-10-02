@@ -45,6 +45,7 @@ const HOST_TYPES = [
 ]
 
 const CATEGORIES = [
+  { value: 'escorts',       label: 'Escorts' },
   { value: 'companionship', label: 'Companionship' },
   { value: 'massage',       label: 'Massage' },
   { value: 'domination',    label: 'Domination' },
@@ -320,16 +321,15 @@ export default function PrivateReceptionPage() {
 
   const fetchListings = useCallback(async () => {
     setLoading(true)
-    const cats = category === 'all'
-      ? ['companionship', 'massage', 'domination', 'experiences']
-      : [category]
-
+    // "Private reception" is a venue type carried on the listing's subcategory, not a
+    // category of its own — 269 of the 281 tagged ads are escorts, so filter on the
+    // tag across every category instead of a category whitelist.
     let q = supabase
       .from('listings')
       .select('id,title,description,category,subcategory,city,country,price_from,price_to,currency,meet_type,images,image_focus,verified,premium,rating,review_count,tags,created_at,featured_until,age')
       .eq('active', true)
-      // primary category OR one of the ad's up-to-3 extra categories
-      .or(`category.in.(${cats.join(',')}),extra_categories.ov.{${cats.join(',')}}`)
+      .ilike('subcategory', 'private reception%')
+    if (category !== 'all') q = q.eq('category', category)
 
     if (city !== 'All Cities') q = q.eq('city', city)
     if (verifiedOnly) q = q.eq('verified', true)

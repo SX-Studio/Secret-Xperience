@@ -18,7 +18,6 @@ export default function PartnersPage() {
     <div style={{ minHeight: '100vh', background: '#080608', color: '#ece8e1' }}>
       <style>{`
         
-        @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         .cat-pill { height: 32px; padding: 0 13px; border-radius: 20px; border: 0.5px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: rgba(255,255,255,0.4); font: 500 11px 'Poppins', sans-serif; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; transition: all .15s; flex-shrink: 0; }
         .cat-pill:hover { border-color: rgba(197,160,90,0.4); background: rgba(197,160,90,0.07); color: #c5a05a; }

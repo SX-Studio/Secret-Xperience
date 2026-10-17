@@ -2348,6 +2348,25 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 ` }} />
       <CategoryAnimations />
 
+      {/* MOAN SPEAK — bondage-gear shop banner */}
+      <div style={{ maxWidth: 1400, margin: '2.75rem auto 0', padding: '0 1rem' }}>
+        <a
+          href="/shop"
+          title="MOAN SPEAK — bondage gear. Shop the collection."
+          aria-label="MOAN SPEAK — leather, latex and lust. Shop the collection."
+          style={{
+            display: 'block', borderRadius: 18, overflow: 'hidden',
+            border: '0.5px solid rgba(197,160,90,0.35)', boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
+          }}
+        >
+          <img
+            src="/promos/moanspeak-banner.webp"
+            alt="MOAN SPEAK — leer, latex en lust. Bondage-gear met karakter. Shop de collectie."
+            style={{ display: 'block', width: '100%', height: 'auto' }}
+          />
+        </a>
+      </div>
+
       {/* Curated partners — uniform banner grid */}
       <div style={{ maxWidth: 1400, margin: '2.75rem auto 0.5rem', padding: '0 1rem' }}>
           <div style={{ textAlign: 'center', marginBottom: '1.1rem' }}>

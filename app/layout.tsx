@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
+import { Analytics } from '@vercel/analytics/next'
 import CookieBanner from './components/CookieBanner'
 import AttributionTracker from './components/AttributionTracker'
 import PageviewTracker from './components/PageviewTracker'
@@ -391,6 +392,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PageviewTracker />
         <PrideMode />
         <BackToTop />
+        <Analytics />
       </body>
     </html>
   )

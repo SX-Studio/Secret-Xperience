@@ -1,6 +1,12 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '../lib/supabase'
+import { CANONICAL_ORIGIN } from '../lib/domains'
+
+// This page is served on secretxperience.store (middleware redirects /tokens on
+// the marketplace here). Tokens bought here land in the same wallet the
+// marketplace reads, and are spent only on live-show tips there.
+const LIVE_SHOWS_URL = `${CANONICAL_ORIGIN}/livestreams`
 
 // Verotel is still "New — Testing mode" (website #136440), so a real buyer's real card
 // cannot complete a purchase there. Until it is authorised, crypto is the only rail that
@@ -36,21 +42,6 @@ interface LedgerEntry {
   balance_after: number
 }
 
-const TIER_COSTS = [
-  { tier: 'basic',    label: 'Basic Listing',     tokens: 0,    days: 0,  desc: 'Standard grid listing — free and always on.' },
-  { tier: 'featured', label: 'Featured Advertisement',  tokens: 50,   days: 7,  desc: 'Gold-bordered card, priority placement in category grid.' },
-  { tier: 'slider',   label: 'Slider Ad',         tokens: 200,  days: 7,  desc: 'Rotating slideshow ad on the home page and section pages — high visibility.' },
-  { tier: 'section',  label: 'Section Premium',   tokens: 240,  days: 7,  desc: 'Full-width premium banner across your whole category section.' },
-  { tier: 'premium',  label: 'Premium Listing',   tokens: 300,  days: 30, desc: 'Top of category for 30 days, larger card, premium badge.' },
-  { tier: 'homepage', label: 'Homepage Premium',  tokens: 1100, days: 30, desc: 'Full-width banner on the homepage — our most-visited page. Maximum exposure.' },
-]
-
-const ADD_ONS = [
-  { label: 'Photo gallery add-on',   tokens: 15  },
-  { label: 'Verification badge',     tokens: 25  },
-  { label: 'Top boost (24 h)',        tokens: 75  },
-]
-
 const FALLBACK_PACKAGES = [
   {
     id: 'starter',
@@ -61,7 +52,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 2.50,
     popular: false,
     rate: '€0.10/token',
-    perks: ['Tip a creator', 'One 6-hour flash boost'],
+    perks: ['A couple of small tips'],
   },
   {
     id: 'basic',
@@ -72,7 +63,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 5,
     popular: false,
     rate: '€0.10/token',
-    perks: ['One Featured advertisement (7 days)', 'Two flash boosts'],
+    perks: ['Five 10-token tips'],
   },
   {
     id: 'standard',
@@ -83,7 +74,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 15,
     popular: false,
     rate: '€0.10/token',
-    perks: ['One Premium listing (30 days)', 'or Featured + Slider for a week'],
+    perks: ['Six 25-token tips'],
   },
   {
     id: 'popular',
@@ -94,7 +85,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 20,
     popular: true,
     rate: '€0.095/token · +10 bonus',
-    perks: ['Featured advertisement for 7 days', 'Flash boost × 5', 'Slider ad for 7 days'],
+    perks: ['Four 50-token tips', '+10 bonus tokens'],
   },
   {
     id: 'pro',
@@ -105,7 +96,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 35,
     popular: false,
     rate: '€0.093/token · +25 bonus',
-    perks: ['Slider ad for 30 days', 'Featured advertisement × 3', 'Priority placement'],
+    perks: ['Three 100-token tips', '+25 bonus tokens'],
   },
   {
     id: 'business',
@@ -116,7 +107,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 50,
     popular: false,
     rate: '€0.091/token · +50 bonus',
-    perks: ['Premium listing for 30 days', 'Flash boost × 10', 'Concierge support'],
+    perks: ['Two 250-token tips', '+50 bonus tokens'],
   },
   {
     id: 'elite',
@@ -127,7 +118,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 75,
     popular: false,
     rate: '€0.088/token · +100 bonus',
-    perks: ['2+ months premium listing', 'Unlimited flash boosts × 3', 'Personal account manager'],
+    perks: ['Three 250-token tips', '+100 bonus tokens'],
   },
 ]
 
@@ -431,10 +422,9 @@ export default function TokensPage() {
         </a>
 
         <nav className="tok-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <a href="/" className="tok-nav-link">Browse</a>
-          <a href="/discover" className="tok-nav-link">Discover</a>
-          <a href="/dashboard?tab=messages" className="tok-nav-link">Messages</a>
+          <a href="/" className="tok-nav-link">Boutique</a>
           <a href="/tokens" className="tok-nav-link active">Wallet</a>
+          <a href={LIVE_SHOWS_URL} className="tok-nav-link">Live shows</a>
         </nav>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
@@ -454,7 +444,7 @@ export default function TokensPage() {
               </span>
             </div>
           )}
-          <a href="/dashboard" style={{
+          <a href={LIVE_SHOWS_URL} style={{
             fontSize: 12,
             color: 'rgba(236,232,225,0.4)',
             textDecoration: 'none',
@@ -464,7 +454,7 @@ export default function TokensPage() {
             gap: 5,
           }}>
             <i className="ti ti-arrow-left" style={{ fontSize: 13 }} />
-            Back
+            Back to live shows
           </a>
         </div>
       </header>
@@ -766,20 +756,6 @@ export default function TokensPage() {
                       {rate}
                     </p>
 
-                    {/* Days of visibility at basic rate (3 tok/day) */}
-                    <p style={{
-                      fontSize: 10,
-                      color: 'rgba(236,232,225,0.3)',
-                      fontWeight: 300,
-                      marginBottom: perks.length ? '1rem' : '1.25rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}>
-                      <i className="ti ti-calendar" style={{ fontSize: 10 }} />
-                      ≈ {Math.floor(total / 3)} days visibility at basic tier
-                    </p>
-
                     {/* Perks */}
                     {perks.length > 0 && (
                       <ul style={{
@@ -969,7 +945,7 @@ export default function TokensPage() {
           </div>
         </div>
 
-        {/* ── LISTING TIERS ── */}
+        {/* ── HOW TOKENS WORK ── */}
         <div style={{ marginBottom: '3.5rem' }}>
           <p style={{
             fontSize: 10,
@@ -989,71 +965,26 @@ export default function TokensPage() {
             lineHeight: 1.15,
             marginBottom: '0.1rem',
           }}>
-            Listing <em style={{ fontStyle: 'italic', color: '#c5a05a' }}>tiers</em>
+            How <em style={{ fontStyle: 'italic', color: '#c5a05a' }}>tokens</em> work
           </h2>
           <div className="tok-section-rule" />
-          <p style={{
-            fontSize: 12,
-            color: 'rgba(236,232,225,0.35)',
-            fontWeight: 300,
-            marginBottom: '1.5rem',
-          }}>
-            Tiers stack — extend any time by spending more tokens
-          </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
-            {TIER_COSTS.map(t => (
-              <div key={t.tier} style={{
+            {[
+              { icon: 'ti-coins', title: 'Buy here', desc: 'Tokens are sold on this page only. They land in your account straight away once the payment settles.' },
+              { icon: 'ti-broadcast', title: 'Watch a live show', desc: 'Your balance is the same on SecretXperience — sign in there and open any live show.' },
+              { icon: 'ti-heart', title: 'Tip the performer', desc: 'Tips of 10 to 250 tokens go to the performer and appear in the show chat. Tokens have no other use.' },
+            ].map(step => (
+              <div key={step.title} style={{
                 background: 'rgba(255,255,255,0.025)',
                 border: '0.5px solid rgba(255,255,255,0.07)',
                 borderRadius: 12,
                 padding: '1.25rem',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#ece8e1' }}>{t.label}</span>
-                  <span style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: '#c5a05a',
-                    background: 'rgba(197,160,90,0.1)',
-                    borderRadius: 6,
-                    padding: '2px 8px',
-                  }}>
-                    {t.tokens === 0 ? 'Free' : `${t.tokens} ◈`}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '0.6rem' }}>
+                  <i className={`ti ${step.icon}`} style={{ fontSize: 16, color: '#c5a05a' }} />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#ece8e1' }}>{step.title}</span>
                 </div>
-                <p style={{ fontSize: 12, color: 'rgba(236,232,225,0.45)', lineHeight: 1.6, marginBottom: '0.5rem', fontWeight: 300 }}>{t.desc}</p>
-                <p style={{ fontSize: 11, color: 'rgba(236,232,225,0.25)' }}>
-                  {t.days === 0 ? 'Always on' : `Duration: ${t.days} days`}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── ADD-ONS ── */}
-        <div style={{ marginBottom: '3.5rem' }}>
-          <h2 style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 'clamp(22px, 3vw, 30px)',
-            fontWeight: 400,
-            color: '#ece8e1',
-            marginBottom: '1.25rem',
-          }}>
-            Add‑ons
-          </h2>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-            {ADD_ONS.map(a => (
-              <div key={a.label} style={{
-                background: 'rgba(255,255,255,0.025)',
-                border: '0.5px solid rgba(255,255,255,0.07)',
-                borderRadius: 10,
-                padding: '0.75rem 1.25rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-              }}>
-                <span style={{ fontSize: 13, color: '#ece8e1' }}>{a.label}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#c5a05a' }}>{a.tokens} ◈</span>
+                <p style={{ fontSize: 12, color: 'rgba(236,232,225,0.45)', lineHeight: 1.6, fontWeight: 300 }}>{step.desc}</p>
               </div>
             ))}
           </div>
@@ -1065,7 +996,7 @@ export default function TokensPage() {
             Accepted payment methods
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: '1.5rem' }}>
-            {['Visa', 'Mastercard', 'Cryptocurrency', 'Bank Transfer'].map(m => (
+            {(CARDS_LIVE ? ['Visa', 'Mastercard', 'Cryptocurrency'] : ['Cryptocurrency']).map(m => (
               <span key={m} style={{
                 fontSize: 11,
                 color: 'rgba(236,232,225,0.4)',
@@ -1080,7 +1011,7 @@ export default function TokensPage() {
           </div>
           <p style={{ fontSize: 12, color: 'rgba(236,232,225,0.28)', lineHeight: 1.8, maxWidth: 640, fontWeight: 300 }}>
             Payments are processed securely via an adult-friendly payment processor. All transactions are encrypted. Tokens are non-refundable except as required by applicable Belgian consumer law (14-day withdrawal right). Token purchases appear discreetly on your statement. By purchasing you agree to our{' '}
-            <a href="/terms" style={{ color: 'rgba(197,160,90,0.6)', textDecoration: 'none' }}>Terms of Use</a>.
+            <a href="/terms" style={{ color: 'rgba(197,160,90,0.6)', textDecoration: 'none' }}>Terms of Sale</a>.
           </p>
         </div>
       </main>
@@ -1128,16 +1059,12 @@ export default function TokensPage() {
 
       <footer style={{ borderTop: '0.5px solid rgba(197,160,90,0.1)', padding: '2rem 24px', textAlign: 'center' }}>
         <p style={{ fontSize: 11, color: 'rgba(236,232,225,0.25)', fontWeight: 300 }}>
-          © 2026 SecretXperience.eu ·{' '}
-          <a href="/regulations" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Regulations</a>
-          {' '}·{' '}
-          <a href="/medical" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Medical Info</a>
-          {' '}·{' '}
-          <a href="/terms" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Terms</a>
+          © 2026 SecretXperience ·{' '}
+          <a href="/terms" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Terms of Sale</a>
           {' '}·{' '}
           <a href="/privacy" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Privacy</a>
           {' '}·{' '}
-          <a href="/contact" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Support</a>
+          <a href="mailto:support@secretxperience.eu" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Support</a>
         </p>
       </footer>
     </div>

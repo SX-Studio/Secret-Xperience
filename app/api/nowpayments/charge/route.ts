@@ -17,6 +17,7 @@ import { createServerClient } from '@supabase/ssr'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { nowpaymentsConfig, createInvoice } from '../../../lib/nowpayments'
+import { SHOP_ORIGIN, isShopHost } from '../../../lib/domains'
 
 export async function POST(req: NextRequest) {
   const cookieStore = cookies()
@@ -25,6 +26,11 @@ export async function POST(req: NextRequest) {
     (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!,
     { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
   )
+
+  // Tokens are only sold on the storefront domain — the one a processor reviews.
+  if (!isShopHost(req.headers.get('host'))) {
+    return NextResponse.json({ error: `Tokens are sold on ${SHOP_ORIGIN}/tokens` }, { status: 403 })
+  }
 
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

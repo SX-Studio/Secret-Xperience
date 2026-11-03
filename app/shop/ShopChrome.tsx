@@ -5,7 +5,7 @@ import AccountLink from './AccountLink'
  * Header and footer for the boutique.
  *
  * `standalone` is true when the page is being served from
- * secretxperience.shop. In that mode the chrome carries no route into the
+ * secretxperience.store. In that mode the chrome carries no route into the
  * adult marketplace — no logo link home, no Events, no "List your shop", and
  * shop-scoped legal pages instead of the marketplace's. A processor or a
  * customer landing on the storefront should be able to browse the whole domain
@@ -43,6 +43,7 @@ export function ShopHeader({ standalone, back }: { standalone: boolean; back?: {
           {standalone ? (
             <>
               <AccountLink />
+              <a href="/tokens" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Tokens</a>
               <Link href="/shipping" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Shipping</Link>
               <Link href="/returns" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Returns</Link>
             </>

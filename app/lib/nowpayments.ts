@@ -13,7 +13,7 @@
  *   NOWPAYMENTS_IPN_SECRET  — Store settings → IPN secret (signs the webhook)
  */
 import { createHmac, timingSafeEqual } from 'crypto'
-import { siteUrl } from './site'
+import { SHOP_ORIGIN } from './domains'
 
 const API = 'https://api.nowpayments.io/v1'
 
@@ -24,21 +24,16 @@ export function nowpaymentsConfig() {
 }
 
 // Create a hosted invoice; the buyer picks the coin on NOWPayments' page and is
-// returned to /tokens afterwards. Wallet credit happens later via the IPN webhook.
+// returned to the storefront's /tokens afterwards. Wallet credit happens later via the IPN webhook.
 export async function createInvoice(opts: {
   apiKey: string
   priceEur: number
   orderId: string
   description: string // ASCII, slash-free (keeps IPN signature parity simple)
 }): Promise<{ ok: true; url: string; id: string } | { ok: false; reason: string }> {
-  const origin = siteUrl()
-  // siteUrl() falls back to the canonical .eu domain and rejects vercel.app, so it
-  // cannot be localhost — but a typo'd NEXT_PUBLIC_SITE_URL would still send the IPN
-  // callback somewhere NOWPayments cannot reach, and a paid invoice would then never
-  // credit the wallet. Refuse rather than take money we cannot deliver against.
-  if (!/^https:\/\//i.test(origin) || /localhost|127\.0\.0\.1/i.test(origin)) {
-    return { ok: false, reason: `NEXT_PUBLIC_SITE_URL is not a public https origin (got "${origin}") — the IPN callback would be unreachable` }
-  }
+  // Tokens are sold on the storefront, so the buyer returns there and the IPN is
+  // addressed there too: the processor sees one domain end to end. SHOP_ORIGIN is
+  // a fixed https constant, so the old NEXT_PUBLIC_SITE_URL sanity check is moot.
   const res = await fetch(`${API}/invoice`, {
     method: 'POST',
     headers: { 'x-api-key': opts.apiKey, 'Content-Type': 'application/json' },
@@ -47,9 +42,9 @@ export async function createInvoice(opts: {
       price_currency: 'eur',
       order_id: opts.orderId,
       order_description: opts.description,
-      ipn_callback_url: `${origin}/api/nowpayments/webhook`,
-      success_url: `${origin}/tokens?status=success`,
-      cancel_url: `${origin}/tokens?status=cancel`,
+      ipn_callback_url: `${SHOP_ORIGIN}/api/nowpayments/webhook`,
+      success_url: `${SHOP_ORIGIN}/tokens?status=success`,
+      cancel_url: `${SHOP_ORIGIN}/tokens?status=cancel`,
     }),
   })
   // Carry NOWPayments' own words out. Swallowing the provider's reason is what cost

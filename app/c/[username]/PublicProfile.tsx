@@ -18,6 +18,10 @@ const fmtDate = (iso: string) => { try { return new Date(iso).toLocaleDateString
 // Port of the Studio theme engine → the public page's CSS variables, so a creator's
 // Appearance choices (background, text colour, size) render on their public profile.
 // Returns null when no theme is set, keeping the default velvet look.
+// Tokens are spent only on live-show tips, so memberships and gifts are off.
+const TOKEN_EXTRAS_ENABLED = false
+const TOKEN_EXTRAS_OFF_NOTE = 'Memberships and gifts are paused — tokens are for live shows.'
+
 function hexToRgb(hex: string) { hex = (hex || '#000000').replace('#', ''); if (hex.length === 3) hex = hex.split('').map(c => c + c).join(''); const n = parseInt(hex, 16); return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 } }
 function rgbToHex(r: number, g: number, b: number) { return '#' + [r, g, b].map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('') }
 function mixHex(a: string, b: string, t: number) { const x = hexToRgb(a), y = hexToRgb(b); return rgbToHex(x.r + (y.r - x.r) * t, x.g + (y.g - x.g) * t, x.b + (y.b - x.b) * t) }
@@ -58,7 +62,7 @@ export default function PublicProfile({ creator, viewer, draft = false }: { crea
   const accent = (cfg.theme && typeof cfg.theme.accent === 'string' && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(cfg.theme.accent)) ? cfg.theme.accent : '#c5a05a'
   const sections = cfg.sections || {}
   const show = (k: string) => sections[k] === undefined ? true : sections[k] !== false
-  const giftsOn = cfg.giftsEnabled !== false && show('gifts')
+  const giftsOn = TOKEN_EXTRAS_ENABLED && cfg.giftsEnabled !== false && show('gifts')
 
   const [following, setFollowing] = useState(viewer.isFollowing)
   const [followerCount, setFollowerCount] = useState(creator.followerCount)
@@ -125,7 +129,7 @@ export default function PublicProfile({ creator, viewer, draft = false }: { crea
         )}
       </div>
     ),
-    pricing: show('pricing') && tiersList.length > 0 && (
+    pricing: TOKEN_EXTRAS_ENABLED && show('pricing') && tiersList.length > 0 && (
       <div className="cp-section" key="pricing">
         <h2 className="cp-h">Membership</h2>
         <p className="cp-hsub">Subscribe with tokens to unlock members-only content. Renews monthly — cancel anytime.</p>
@@ -201,12 +205,14 @@ export default function PublicProfile({ creator, viewer, draft = false }: { crea
   }
 
   function openGift() {
+    if (!TOKEN_EXTRAS_ENABLED) { notify(TOKEN_EXTRAS_OFF_NOTE); return }
     if (!viewer.loggedIn) { window.location.href = `/login?next=/c/${creator.username}`; return }
     if (viewer.isSelf) { notify('You cannot gift yourself'); return }
     setGiftOpen(true)
   }
 
   function startSubscribe(tier: any) {
+    if (!TOKEN_EXTRAS_ENABLED) { notify(TOKEN_EXTRAS_OFF_NOTE); return }
     if (!viewer.loggedIn) { window.location.href = `/login?next=/c/${creator.username}`; return }
     if (viewer.isSelf) { notify('This is your own profile'); return }
     setSubTier(tier)

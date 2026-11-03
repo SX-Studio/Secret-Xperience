@@ -1659,12 +1659,6 @@ export default function DashboardPage() {
                             {activatingListing === listing.id ? '…' : 'Set live'}
                           </button>
                         )}
-                        <a
-                          href={`/boost?listing=${listing.id}`}
-                          style={{ padding: '5px 12px', borderRadius: 'var(--r, 8px)', border: '0.5px solid var(--gbrd, rgba(197,160,90,0.4))', background: 'transparent', color: 'var(--gold, #c5a05a)', cursor: 'pointer', fontSize: '12px', fontWeight: 500, letterSpacing: '0.04em', transition: 'all .15s', textDecoration: 'none', display: 'inline-block' }}
-                          onMouseOver={e => { (e.currentTarget as HTMLElement).style.background = 'var(--gbg, rgba(197,160,90,0.1))' }}
-                          onMouseOut={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
-                        >✦ Feature</a>
                         <button
                           className="db-icon-btn"
                           title="Edit photos"

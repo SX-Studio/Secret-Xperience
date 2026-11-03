@@ -101,14 +101,6 @@ interface FormState {
   wh_fri: string; wh_sat: string; wh_sun: string
 }
 
-const LISTING_TIERS = [
-  { id: 'basic',    label: 'Basic',            tokens: 0,    days: 1,  desc: 'Standard grid listing — free, always on',          color: '#ffffff44' },
-  { id: 'featured', label: 'Featured',         tokens: 50,   days: 7,  desc: 'Gold-border, priority in category grid',           color: '#c5a05a' },
-  { id: 'slider',   label: 'Slider Ad',        tokens: 200,  days: 7,  desc: 'Rotating slideshow ad — site-wide visibility',     color: '#7a8aee' },
-  { id: 'section',  label: 'Section Premium',  tokens: 240,  days: 7,  desc: 'Full-width banner across your category page',      color: '#5ec8c0' },
-  { id: 'premium',  label: 'Premium',          tokens: 300,  days: 30, desc: 'Top of category for 30 days, premium badge',       color: '#e0a0c8' },
-  { id: 'homepage', label: 'Homepage Premium', tokens: 1100, days: 30, desc: 'Full-width banner on the homepage — max exposure', color: '#e8c97a' },
-]
 
 interface UploadingImage {
   id:       string
@@ -193,7 +185,6 @@ export default function CreateListingPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError]     = useState('')
-  const [wallet, setWallet]   = useState<{ balance: number } | null>(null)
   // Identity-verification gate: 'loading' until checked, then verified / pending / rejected / none.
   const [verifGate, setVerifGate] = useState<'loading' | 'verified' | 'pending' | 'rejected' | 'none'>('loading')
 
@@ -308,10 +299,6 @@ export default function CreateListingPage() {
           : verif?.status === 'rejected' ? 'rejected'
           : 'none')
       }
-      // Load token wallet
-      const { data: w } = await supabase
-        .from('user_wallets').select('balance').eq('user_id', session.user.id).maybeSingle()
-      setWallet(w)
       // Check for saved draft. If one exists, hold autosave until the user
       // resumes or dismisses it; otherwise enable autosave right away.
       try {
@@ -537,7 +524,7 @@ export default function CreateListingPage() {
         .gte('created_at', since)
         .limit(1)
       if (recent && recent.length > 0) {
-        setError('Basic listings are limited to one per 24 hours. Upgrade to Featured, Slider Ad, or Premium to list more.')
+        setError('Listings are limited to one per 24 hours. Please try again tomorrow.')
         setLoading(false)
         return
       }
@@ -617,37 +604,6 @@ export default function CreateListingPage() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.NEXT_PUBLIC_INTERNAL_SECRET || 'sx-internal'}` },
         body: JSON.stringify({ listingId: newListing.id, title: form.title, description: form.description, category: form.category }),
       }).catch(() => {})
-    }
-
-    // Spend tokens for the chosen tier — must succeed before continuing
-    if (newListing?.id && form.tier !== 'basic') {
-      try {
-        const spendRes = await fetch('/api/tokens/spend', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ listingId: newListing.id, tier: form.tier }),
-        })
-        const spendData = await spendRes.json().catch(() => ({}))
-        if (!spendRes.ok) {
-          // Downgrade to basic if token spend fails (insufficient balance etc.)
-          await supabase.from('listings').update({ tier: 'basic', tier_expires_at: null }).eq('id', newListing.id)
-          if (spendRes.status === 402) {
-            setError('Insufficient tokens — listing saved as basic. Top up your wallet to upgrade.')
-          } else {
-            setError(spendData.error || 'Token spend failed — listing saved as basic tier.')
-          }
-          setLoading(false)
-          return
-        }
-        if (spendData.warning) {
-          setError(spendData.warning)
-        }
-      } catch (e) {
-        await supabase.from('listings').update({ tier: 'basic', tier_expires_at: null }).eq('id', newListing.id)
-        setError('Could not process token payment — listing saved as basic tier.')
-        setLoading(false)
-        return
-      }
     }
 
     // Check if advertiser has Stripe connected
@@ -1971,51 +1927,6 @@ export default function CreateListingPage() {
           {step === 5 && (
             <div>
               <h2 className="cl-section-heading">Review &amp; Publish</h2>
-
-              {/* ── Tier picker ── */}
-              <div style={{ marginBottom:'2rem' }}>
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.75rem' }}>
-                  <p style={{ fontSize:13, fontWeight:600, color:'var(--t,#ece8e1)', letterSpacing:'0.04em' }}>Choose your advertisement tier</p>
-                  {wallet ? (
-                    <a href="/tokens" target="_blank" rel="noopener" style={{ fontSize:12, color:'var(--gold,#c5a05a)', textDecoration:'none' }}>
-                      ◈ {wallet.balance} tokens available
-                    </a>
-                  ) : (
-                    <a href="/tokens" target="_blank" rel="noopener" style={{ fontSize:12, color:'var(--gold,#c5a05a)', textDecoration:'none' }}>Buy tokens →</a>
-                  )}
-                </div>
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))', gap:10 }}>
-                  {LISTING_TIERS.map(t => {
-                    const active = form.tier === t.id
-                    const canAfford = !wallet || wallet.balance >= t.tokens || t.id === 'basic'
-                    return (
-                      <button key={t.id} type="button"
-                        onClick={() => setForm(f => ({ ...f, tier: t.id }))}
-                        style={{
-                          background: active ? `${t.color}18` : 'var(--bg2,rgba(255,255,255,0.02))',
-                          border: `0.5px solid ${active ? t.color : 'rgba(255,255,255,0.08)'}`,
-                          borderRadius:12, padding:'1rem', textAlign:'left', cursor:'pointer',
-                          transition:'all .15s', opacity: canAfford ? 1 : 0.45,
-                        }}>
-                        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.4rem' }}>
-                          <span style={{ fontSize:13, fontWeight:600, color: active ? t.color : 'var(--t,#ece8e1)' }}>{t.label}</span>
-                          <span style={{ fontSize:11, fontWeight:700, color:t.color, background:`${t.color}18`, borderRadius:6, padding:'2px 7px' }}>
-                            {t.id === 'basic' ? 'Free' : `${t.tokens} ◈`}
-                          </span>
-                        </div>
-                        <p style={{ fontSize:11, color:'var(--t3,rgba(255,255,255,0.25))', lineHeight:1.5, marginBottom:'0.3rem' }}>{t.desc}</p>
-                        <p style={{ fontSize:10, color:'var(--t3,rgba(255,255,255,0.2))' }}>{t.id === 'basic' ? 'Always on' : `${t.days} days`}</p>
-                      </button>
-                    )
-                  })}
-                </div>
-                {form.tier !== 'basic' && wallet && wallet.balance < (LISTING_TIERS.find(t => t.id === form.tier)?.tokens ?? 0) && (
-                  <p style={{ fontSize:12, color:'#e05a5a', marginTop:'0.5rem' }}>
-                    Insufficient tokens for this tier.{' '}
-                    <a href="/tokens" target="_blank" rel="noopener" style={{ color:'var(--gold,#c5a05a)' }}>Buy tokens →</a>
-                  </p>
-                )}
-              </div>
 
               {/* Review card */}
               <div style={{

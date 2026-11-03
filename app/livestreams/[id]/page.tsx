@@ -5,6 +5,8 @@ import { createClient } from '../../lib/supabase'
 
 interface ChatMsg { id: string; username: string; body: string; is_tip?: boolean; tip_amount?: number | null }
 
+const TIP_AMOUNTS = [10, 25, 50, 100, 250]
+
 export default function WatchPage({ params }: { params: { id: string } }) {
   const streamId = params.id
   const [phase, setPhase] = useState<'loading' | 'live' | 'ended' | 'error'>('loading')
@@ -15,6 +17,9 @@ export default function WatchPage({ params }: { params: { id: string } }) {
   const [me, setMe] = useState<{ id: string; name: string } | null>(null)
   const [ageOk, setAgeOk] = useState(false)
   const [muted, setMuted] = useState(true)
+  const [balance, setBalance] = useState<number | null>(null)
+  const [tipping, setTipping] = useState<number | null>(null)
+  const [tipError, setTipError] = useState<string | null>(null)
 
   const videoRef        = useRef<HTMLVideoElement>(null)
   const roomRef         = useRef<any>(null)
@@ -39,6 +44,8 @@ export default function WatchPage({ params }: { params: { id: string } }) {
       if (session) {
         const { data: p } = await supabase.from('profiles').select('full_name, username').eq('id', session.user.id).maybeSingle()
         setMe({ id: session.user.id, name: p?.full_name || p?.username || 'Guest' })
+        const { data: w } = await supabase.from('user_wallets').select('balance').eq('user_id', session.user.id).maybeSingle()
+        setBalance(w?.balance ?? 0)
       }
       if (s.status !== 'live') { setPhase('ended'); return }
     })()
@@ -141,6 +148,24 @@ export default function WatchPage({ params }: { params: { id: string } }) {
     await supabase.from('live_chat_messages').insert({ stream_id: streamId, user_id: me.id, username: me.name, body })
   }
 
+  async function sendTip(amount: number) {
+    if (!me) { window.location.href = `/login?next=/livestreams/${streamId}`; return }
+    setTipError(null)
+    setTipping(amount)
+    try {
+      const res = await fetch('/api/live/tip', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ streamId, amount, message: chatInput.trim() }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) { setTipError(data.error || 'Tip failed.'); return }
+      setBalance(data.balance)
+      setChatInput('')
+    } finally {
+      setTipping(null)
+    }
+  }
+
   function confirmAge() { try { localStorage.setItem('sx_age_ok', '1') } catch {}; setAgeOk(true) }
 
   async function enableSound() {
@@ -221,6 +246,26 @@ export default function WatchPage({ params }: { params: { id: string } }) {
             ))}
             <div ref={chatEndRef} />
           </div>
+          {me && stream?.provider_id !== me.id && (
+            <div className="wp-tips">
+              <div className="wp-tips-head">
+                <span><i className="ti ti-coins" /> Tip the host</span>
+                <span className="wp-tips-bal">{balance ?? '…'} tokens</span>
+              </div>
+              <div className="wp-tips-row">
+                {TIP_AMOUNTS.map(a => (
+                  <button key={a} onClick={() => sendTip(a)} disabled={tipping !== null || (balance !== null && balance < a)}>
+                    {tipping === a ? '…' : a}
+                  </button>
+                ))}
+              </div>
+              {tipError && (
+                <div className="wp-tips-err">
+                  {tipError}{tipError.startsWith('Not enough') && <> <a href="/tokens">Buy tokens</a></>}
+                </div>
+              )}
+            </div>
+          )}
           <div className="wp-chat-input">
             <input value={chatInput} onChange={e => setChatInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && sendChat()} placeholder={me ? 'Say something…' : 'Log in to chat'} maxLength={300} />
             <button onClick={sendChat}><i className="ti ti-send" /></button>
@@ -273,6 +318,15 @@ const styles = `
 .wp-msg-body{color:#d8d4cc}
 .wp-msg-tip{background:rgba(197,160,90,.1);border-radius:8px;padding:6px 8px}
 .wp-msg-tipamt{color:#e8cc88;font-weight:700;margin-right:6px}
+.wp-tips{padding:12px;border-top:0.5px solid rgba(255,255,255,.06)}
+.wp-tips-head{display:flex;justify-content:space-between;align-items:center;font:600 12px 'Poppins';color:#e8cc88;margin-bottom:8px}
+.wp-tips-bal{color:#8c8880;font-weight:400}
+.wp-tips-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.wp-tips-row button{background:rgba(197,160,90,.12);border:0.5px solid rgba(197,160,90,.35);border-radius:8px;color:#e8cc88;padding:8px 0;font:700 13px 'Poppins';cursor:pointer}
+.wp-tips-row button:hover:not(:disabled){background:rgba(197,160,90,.22)}
+.wp-tips-row button:disabled{opacity:.4;cursor:not-allowed}
+.wp-tips-err{margin-top:8px;font:400 12px 'Poppins';color:#f87171}
+.wp-tips-err a{color:#e8cc88}
 .wp-chat-input{display:flex;gap:8px;padding:12px;border-top:0.5px solid rgba(255,255,255,.06)}
 .wp-chat-input input{flex:1;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.1);border-radius:9px;color:#ece8e1;padding:9px 12px;font:400 13px 'Poppins';outline:none}
 .wp-chat-input button{background:#c5a05a;border:none;border-radius:9px;color:#050505;width:40px;cursor:pointer;font-size:15px}

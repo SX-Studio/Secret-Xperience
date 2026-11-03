@@ -12,7 +12,7 @@ const CITY_CATEGORIES = ['escorts', 'private-reception', 'nightlife', 'hotels', 
 const COUNTRY_CATEGORIES = ['escorts', 'private-reception']
 
 /**
- * The storefront gets its own sitemap listing only shop URLs on the .shop
+ * The storefront gets its own sitemap listing only shop URLs on the .store
  * origin — those are the canonical URLs for shop content, so they are the ones
  * Google should be given.
  */
@@ -42,7 +42,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Static + city routes never depend on the DB — always emitted even if Supabase fails.
   const staticRoutes = ['/', '/events', '/advertise', '/search', '/discover', '/live', '/nightlife', '/venues', '/swingers', '/fetish', '/jobs', '/pride', '/gifts', '/terms', '/privacy', '/login', '/partners', '/creator-platforms', '/regulations', '/medical', '/refer', '/creators', '/how-it-works', '/why-secretxperience'].map(path => ({ url: BASE + path, lastModified: new Date(), changeFrequency: path === '/' ? 'daily' as const : 'weekly' as const, priority: path === '/' ? 1 : path === '/why-secretxperience' ? 0.95 : ['/search', '/discover', '/nightlife', '/events', '/advertise', '/regulations', '/medical', '/swingers', '/fetish', '/jobs', '/pride'].includes(path) ? 0.8 : 0.7 }))
-  // 'shop' is deliberately absent: shop content is canonical on secretxperience.shop
+  // 'shop' is deliberately absent: shop content is canonical on secretxperience.store
   // and is listed in that domain's own sitemap.
   const categoryRoutes = ['escorts', 'private-reception', 'companionship', 'massage', 'domination', 'experiences', 'nightlife', 'creators', 'rentals', 'hotels', 'events'].map(cat => ({ url: `${BASE}/${cat}`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 0.9 }))
   const cityRoutes = CITY_CATEGORIES.flatMap(cat => CITIES.map(city => ({ url: `${BASE}/${cat}/${city}`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.85 })))

@@ -8,11 +8,11 @@ import { isOwnHost } from '../../lib/domains'
  * Cross-domain session bridge — the minting side.
  *
  * Cookies do not cross registrable domains, so a customer signed in on
- * secretxperience.eu arrives at secretxperience.shop signed out (and checkout
+ * secretxperience.eu arrives at secretxperience.store signed out (and checkout
  * there requires a session). This route lets the domain that HAS the session
  * hand it to the one that doesn't:
  *
- *   GET /sso/start?return=https://secretxperience.shop/p/<id>
+ *   GET /sso/start?return=https://www.secretxperience.store/p/<id>
  *     1. verify the caller's session on this domain (getUser — a network
  *        check, not a local JWT parse, because this mints a login elsewhere)
  *     2. generate a single-use magic-link token for THAT user
@@ -27,7 +27,7 @@ import { isOwnHost } from '../../lib/domains'
  * cannot be turned into an open redirect.
  *
  * Works in both directions: it reads whatever session the requesting host
- * holds, so the same route bridges .shop -> .eu as well.
+ * holds, so the same route bridges .store -> .eu as well.
  */
 export const dynamic = 'force-dynamic'
 

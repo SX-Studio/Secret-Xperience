@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
   // the .store domain, which is exactly what that domain exists to avoid.
   if (isShopHost(headers().get('host'))) {
     return {
-      rules: { userAgent: '*', allow: '/', disallow: ['/login', '/reset-password', '/auth/', '/sso/', '/api/'] },
+      rules: { userAgent: '*', allow: '/', disallow: ['/login', '/reset-password', '/auth/', '/sso/', '/go/', '/api/'] },
       sitemap: `${SHOP_ORIGIN}/sitemap.xml`,
     }
   }

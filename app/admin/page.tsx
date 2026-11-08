@@ -5,8 +5,9 @@ import { createClient } from '../lib/supabase'
 import { detectFocalPoint, imageFromUrl } from '../lib/imageFocus'
 import CampaignsTab from './CampaignsTab'
 import EventsTab from './EventsTab'
+import ShopTab from './ShopTab'
 
-const TABS = ['Listings', 'Users', 'Verification', 'Reports', 'Bookings', 'Payouts', 'Newsletter', 'Contacts', 'Acquisition', 'Keywords', 'Campaigns', 'Events', 'Tools'] as const
+const TABS = ['Listings', 'Users', 'Verification', 'Reports', 'Bookings', 'Payouts', 'Newsletter', 'Contacts', 'Acquisition', 'Keywords', 'Campaigns', 'Events', 'Shop', 'Tools'] as const
 type Tab = typeof TABS[number]
 
 const TAB_ICONS: Record<Tab, string> = {
@@ -22,6 +23,7 @@ const TAB_ICONS: Record<Tab, string> = {
   Keywords: 'search',
   Campaigns: 'send',
   Events: 'calendar-star',
+  Shop: 'building-store',
   Tools: 'tool',
 }
 
@@ -54,7 +56,7 @@ export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('Listings')
-  const [badges, setBadges] = useState<Record<Tab, number>>({ Listings: 0, Users: 0, Verification: 0, Reports: 0, Bookings: 0, Payouts: 0, Newsletter: 0, Contacts: 0, Acquisition: 0, Keywords: 0, Campaigns: 0, Events: 0, Tools: 0 })
+  const [badges, setBadges] = useState<Record<Tab, number>>({ Listings: 0, Users: 0, Verification: 0, Reports: 0, Bookings: 0, Payouts: 0, Newsletter: 0, Contacts: 0, Acquisition: 0, Keywords: 0, Campaigns: 0, Events: 0, Shop: 0, Tools: 0 })
   const [reports, setReports] = useState<any[]>([])
   const [reportWorking, setReportWorking] = useState<string | null>(null)
   const [payouts, setPayouts] = useState<any[]>([])
@@ -195,6 +197,7 @@ export default function AdminPage() {
         Keywords:     0,
         Campaigns:    0,
         Events:       0,
+        Shop:         0,
         Tools:        0,
       })
       // Mark the initial active tab as seen immediately
@@ -633,7 +636,7 @@ export default function AdminPage() {
             <div style={{ minWidth: 0 }}>
             <h1 style={{ fontFamily: 'var(--serif)', fontWeight: 500, fontSize: '36px', color: 'var(--t, #ece8e1)', margin: 0, lineHeight: 1.1 }}>{tab}</h1>
             <div style={{ font: '300 11px/1 var(--sans)', color: 'var(--t3, #4c4a47)', marginTop: '4px', letterSpacing: '0.04em' }}>
-              {tab === 'Listings' ? `${filteredListings.length} listings` : tab === 'Users' ? `${filteredUsers.length} users` : tab === 'Reports' ? `${reports.filter(r => r.status === 'open').length} open · ${reports.length} total` : tab === 'Payouts' ? `${payouts.filter(p => p.status === 'requested').length} pending · ${payouts.length} total` : tab === 'Newsletter' ? (search ? `${filteredNlSubs.length} of ${nlSubCount ?? '…'} subscribers` : `${nlSubCount ?? '…'} subscribers`) : tab === 'Contacts' ? `${listings.filter((l: any) => (l.contact_phone || '').trim()).length} advertiser contacts · ${optinContacts.length} opted-in · ${leads.length} leads` : tab === 'Acquisition' ? `${acqTotal} tracked signups · ${acq.length} sources` : tab === 'Keywords' ? `${kwResults.length ? `${kwResults.length} results` : 'SEO research'}` : tab === 'Tools' ? 'Admin tools' : `${filteredBookings.length} bookings`}
+              {tab === 'Listings' ? `${filteredListings.length} listings` : tab === 'Users' ? `${filteredUsers.length} users` : tab === 'Reports' ? `${reports.filter(r => r.status === 'open').length} open · ${reports.length} total` : tab === 'Payouts' ? `${payouts.filter(p => p.status === 'requested').length} pending · ${payouts.length} total` : tab === 'Newsletter' ? (search ? `${filteredNlSubs.length} of ${nlSubCount ?? '…'} subscribers` : `${nlSubCount ?? '…'} subscribers`) : tab === 'Contacts' ? `${listings.filter((l: any) => (l.contact_phone || '').trim()).length} advertiser contacts · ${optinContacts.length} opted-in · ${leads.length} leads` : tab === 'Acquisition' ? `${acqTotal} tracked signups · ${acq.length} sources` : tab === 'Keywords' ? `${kwResults.length ? `${kwResults.length} results` : 'SEO research'}` : tab === 'Tools' ? 'Admin tools' : tab === 'Shop' ? 'Brands & items on secretxperience.store' : tab === 'Events' ? 'Events' : `${filteredBookings.length} bookings`}
             </div>
             </div>
           </div>
@@ -1746,6 +1749,7 @@ export default function AdminPage() {
           )}
           {tab === 'Campaigns' && <CampaignsTab />}
           {tab === 'Events' && <EventsTab />}
+          {tab === 'Shop' && <ShopTab />}
 
           {tab === 'Tools' && (
             <div>

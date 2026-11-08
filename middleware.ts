@@ -18,6 +18,7 @@ function shopPassthrough(pathname: string): boolean {
     pathname === '/login' ||
     pathname === '/reset-password' ||
     pathname === '/tokens' ||
+    pathname.startsWith('/go/') ||
     pathname.startsWith('/auth/') ||
     pathname.startsWith('/sso/')
   )
@@ -29,6 +30,9 @@ function shopRewrite(pathname: string): { to: string; canonical: string } | null
 
   const product = pathname.match(/^\/p\/([^/]+)$/)
   if (product) return { to: `/shop/${product[1]}`, canonical: pathname }
+
+  const brand = pathname.match(/^\/b\/([a-z0-9-]+)$/)
+  if (brand) return { to: `/shop/brand/${brand[1]}`, canonical: pathname }
 
   const doc = pathname.match(/^\/(\w+)$/)
   if (doc && SHOP_LEGAL_DOCS.includes(doc[1])) {
@@ -51,6 +55,8 @@ function hasSessionCookie(request: NextRequest): boolean {
 function storeDestination(pathname: string): string | null {
   if (pathname === '/tokens') return '/tokens'
   if (pathname === '/shop') return '/'
+  const brand = pathname.match(/^\/shop\/brand\/([a-z0-9-]+)$/)
+  if (brand) return `/b/${brand[1]}`
   const legal = pathname.match(/^\/shop\/legal\/(\w+)$/)
   if (legal && SHOP_LEGAL_DOCS.includes(legal[1])) return `/${legal[1]}`
   const product = pathname.match(/^\/shop\/([^/]+)$/)

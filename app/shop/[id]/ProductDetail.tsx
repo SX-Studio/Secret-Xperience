@@ -3,13 +3,10 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '../../lib/supabase'
 import { ShopHeader } from '../ShopChrome'
+import { goProduct, productDestination } from '../../lib/shopLinks'
 
 const GRAD = 'linear-gradient(140deg, #2a0d18 0%, #1a0d14 50%, #080612 100%)'
 
-function validUrl(url: string | null | undefined): string | null {
-  if (!url) return null
-  try { const u = new URL(url.trim()); return (u.protocol === 'http:' || u.protocol === 'https:') && !/[^\x00-\x7F]/.test(u.hostname) ? u.href : null } catch { return null }
-}
 
 export default function ProductDetail({ params, standalone }: { params: { id: string }; standalone: boolean }) {
   const shopHome = standalone ? '/' : '/shop'
@@ -22,7 +19,7 @@ export default function ProductDetail({ params, standalone }: { params: { id: st
     (async () => {
       try {
         const supabase = createClient()
-        const { data } = await supabase.from('products').select('*').eq('id', params.id).eq('active', true).maybeSingle()
+        const { data } = await supabase.from('products').select('*, brands(slug, name, is_house, affiliate_url, website_url)').eq('id', params.id).eq('active', true).maybeSingle()
         setProduct(data)
       } catch { /* ignore */ } finally { setLoading(false) }
     })()
@@ -41,7 +38,10 @@ export default function ProductDetail({ params, standalone }: { params: { id: st
   const sym = product && (product.currency || 'EUR') === 'GBP' ? '£' : '€'
   const priceStr = product?.price_cents ? `${sym}${(product.price_cents / 100).toFixed(2)}` : null
   const isAffiliate = product?.fulfillment === 'affiliate'
-  const partnerUrl = validUrl(product?.external_url)
+  const brand = product?.brands && !Array.isArray(product.brands) ? product.brands : null
+  const brandName: string | null = brand?.name || product?.brand || null
+  const partnerUrl = product ? productDestination(product.external_url, brand) : null
+  const brandHref = brand?.slug ? `${standalone ? '/b' : '/shop/brand'}/${brand.slug}` : null
 
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh', color: 'var(--t)', fontFamily: 'var(--sans)' }}>
@@ -61,21 +61,23 @@ export default function ProductDetail({ params, standalone }: { params: { id: st
             {product.images?.[0] ? (
               <img src={product.images[0]} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
             ) : (
-              <span style={{ fontFamily: 'var(--serif)', fontSize: '120px', fontStyle: 'italic', color: 'rgba(197,160,90,0.18)' }}>{(product.brand || product.name || 'Sx').slice(0, 2).toUpperCase()}</span>
+              <span style={{ fontFamily: 'var(--serif)', fontSize: '120px', fontStyle: 'italic', color: 'rgba(197,160,90,0.18)' }}>{(brandName || product.name || 'Sx').slice(0, 2).toUpperCase()}</span>
             )}
           </div>
 
           {/* Info */}
           <div>
-            {product.brand && <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '10px' }}>{product.brand}</div>}
+            {brandName && (brandHref
+              ? <Link href={brandHref} style={{ display: 'inline-block', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '10px', textDecoration: 'none' }}>{brandName} →</Link>
+              : <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '10px' }}>{brandName}</div>)}
             <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(26px,4vw,36px)', fontWeight: 400, lineHeight: 1.15, margin: '0 0 1rem' }}>{product.name}</h1>
             {priceStr && <div style={{ fontFamily: 'var(--serif)', fontSize: '28px', color: 'var(--gold)', marginBottom: '1.25rem' }}>{priceStr}</div>}
             {product.description && <p style={{ fontSize: '14px', color: 'var(--t2)', lineHeight: 1.75, marginBottom: '1.75rem' }}>{product.description}</p>}
 
             {isAffiliate ? (
               partnerUrl ? (
-                <a href={partnerUrl} target="_blank" rel="noopener noreferrer sponsored" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '15px', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', borderRadius: 'var(--r)', color: '#0a0a0a', fontSize: '15px', fontWeight: 700, textDecoration: 'none', boxSizing: 'border-box' }}>
-                  <i className="ti ti-external-link" /> Shop at {product.brand || 'partner store'}
+                <a href={goProduct(product.id, 'product')} target="_blank" rel="noopener sponsored" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '15px', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', borderRadius: 'var(--r)', color: '#0a0a0a', fontSize: '15px', fontWeight: 700, textDecoration: 'none', boxSizing: 'border-box' }}>
+                  <i className="ti ti-external-link" /> Shop at {brandName || 'partner store'}
                 </a>
               ) : (
                 <div style={{ padding: '14px', background: 'var(--bg2)', borderRadius: 'var(--r)', fontSize: '13px', color: 'var(--t3)', textAlign: 'center' }}>Partner link unavailable</div>
@@ -90,8 +92,9 @@ export default function ProductDetail({ params, standalone }: { params: { id: st
             )}
 
             <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '12px', color: 'var(--t3)' }}>
-              <span>🚚 Discreet EU shipping · plain packaging</span>
-              <span>🔒 {isAffiliate ? 'Fulfilled by the partner store' : 'Secure checkout via Stripe'}</span>
+              {!isAffiliate && <span>🚚 Discreet EU shipping · plain packaging</span>}
+              <span>🔒 {isAffiliate ? `Sold and shipped by ${brandName || 'the partner store'}` : 'Secure checkout via Stripe'}</span>
+              {isAffiliate && <span>We may earn a commission when you buy through this link.</span>}
             </div>
           </div>
         </div>

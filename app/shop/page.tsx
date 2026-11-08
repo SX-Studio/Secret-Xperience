@@ -4,7 +4,8 @@ import { cookies, headers } from 'next/headers'
 import Link from 'next/link'
 import ProductGrid from './ProductGrid'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
-import ShopShowcase from '../components/ShopShowcase/ShopShowcase'
+import BrandRow from './BrandRow'
+import { BRAND_COLS, PRODUCT_COLS, type Brand } from './brands'
 import { ShopHeader, ShopFooter } from './ShopChrome'
 import { SHOP_ORIGIN, isShopHost } from '../lib/domains'
 
@@ -31,15 +32,31 @@ export default async function ShopPage() {
     { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
   )
 
-  const { data: products } = await supabase
-    .from('products')
-    .select('id, name, description, price_cents, currency, images, category, brand, fulfillment, external_url, featured, in_stock')
-    .eq('active', true)
-    .order('featured', { ascending: false })
-    .order('created_at', { ascending: false })
-    .limit(60)
+  const [{ data: products }, { data: brandRows }] = await Promise.all([
+    supabase
+      .from('products')
+      .select(PRODUCT_COLS)
+      .eq('active', true)
+      .order('featured', { ascending: false })
+      .order('sort')
+      .order('created_at', { ascending: false })
+      .limit(60),
+    supabase
+      .from('brands')
+      .select(BRAND_COLS)
+      .eq('active', true)
+      .eq('is_house', false)
+      .order('featured', { ascending: false })
+      .order('sort')
+      .order('name'),
+  ])
 
-  const allProducts = products || []
+  const allProducts = (products || []) as any[]
+  // The house label's own products get their own section above the partners'.
+  const houseProducts = allProducts.filter(p => p.brands?.is_house)
+  const partnerProducts = allProducts.filter(p => !p.brands?.is_house)
+  const brands = (brandRows || []) as Brand[]
+  const brandBase = standalone ? '/b' : '/shop/brand'
 
   return (
     <>
@@ -106,7 +123,7 @@ export default async function ShopPage() {
             </p>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '13px', color: 'var(--t3)' }}>
-                <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{allProducts.length}</span> products
+                <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{brands.length}</span> brands · <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{allProducts.length}</span> picks
               </span>
               <span style={{ width: '1px', height: '14px', background: 'var(--b3)', display: 'inline-block' }} />
               <span style={{ fontSize: '13px', color: 'var(--t3)' }}>🚚 Plain packaging · Free returns</span>
@@ -120,12 +137,30 @@ export default async function ShopPage() {
 
           <DorcelBanner />
 
-          <ProductGrid products={allProducts} basePath={standalone ? '/p' : '/shop'} />
+          {houseProducts.length > 0 && (
+            <section aria-label="The SecretXperience Collection" style={{ margin: '2.5rem 0 3rem' }}>
+              <p style={{ fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.6)', marginBottom: 8 }}>✦ House collection</p>
+              <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(22px,3vw,30px)', fontWeight: 400, margin: 0 }}>
+                The <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>SecretXperience</em> Collection
+              </h2>
+              <ProductGrid products={houseProducts} basePath={standalone ? '/p' : '/shop'} hideFilters />
+            </section>
+          )}
 
-          {/* Partner boutiques — lingerie & adult fashion, data in app/data/shops.ts */}
-          <div style={{ margin: '3rem -1.5rem 0' }}>
-            <ShopShowcase variant="large" />
-          </div>
+          {partnerProducts.length > 0 && (
+            <>
+              <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(22px,3vw,30px)', fontWeight: 400, margin: '2rem 0 1rem' }}>
+                Featured <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>picks</em>
+              </h2>
+              <ProductGrid products={partnerProducts} basePath={standalone ? '/p' : '/shop'} />
+            </>
+          )}
+
+          <BrandRow brands={brands} basePath={brandBase} />
+
+          <p style={{ fontSize: 11, color: 'var(--t3)', marginTop: '2rem', textAlign: 'center' }}>
+            Partner brands sell and ship their own products. We may earn a commission when you buy through links on this page.
+          </p>
 
           {/* VENDOR CTA */}
           {!standalone && allProducts.length > 0 && (

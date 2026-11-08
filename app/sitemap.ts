@@ -31,6 +31,13 @@ async function shopSitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     })))
+    const { data: brands } = await supabase.from('brands').select('slug, updated_at').eq('active', true)
+    routes.push(...(brands || []).map(b => ({
+      url: `${SHOP_ORIGIN}/b/${b.slug}`,
+      lastModified: new Date(b.updated_at),
+      changeFrequency: 'weekly' as const,
+      priority: 0.7,
+    })))
   } catch {
     // Best-effort — the storefront still gets a valid sitemap without products.
   }

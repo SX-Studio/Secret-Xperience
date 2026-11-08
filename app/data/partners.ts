@@ -49,7 +49,7 @@ export const PARTNER_SECTIONS: PartnerSection[] = [
       { name: 'Chaturbate', emoji: '📡', tagline: 'The world\'s largest free webcam community. Their affiliate programme (20% recurring) is one of the best in adult.', url: 'https://chaturbate.com', network: 'Direct affiliate', badge: 'Top Earner' },
       { name: 'LiveJasmin', emoji: '💎', tagline: 'Premium HD webcam platform. High-paying clientele. Affiliate via AWEmpire — solid recurring commissions.', url: 'https://www.livejasmin.com', network: 'AWEmpire', badge: 'Luxury' },
       { name: 'BongaCams', emoji: '🔴', tagline: 'EU-headquartered live cam site. Strong European audience. Good referral programme for sending models or viewers.', url: 'https://bongacams.com', network: 'Direct affiliate', badge: 'EU Favourite' },
-      { name: 'Stripchat', emoji: '🎬', tagline: 'Fast-growing cam platform with VR shows. Competitive model and viewer affiliate rates.', url: 'https://stripchat.com', network: 'Direct affiliate' },
+      { name: 'Stripchat', emoji: '🎬', tagline: 'Fast-growing cam platform with VR shows. Competitive model and viewer affiliate rates.', url: 'https://stripchat.com', network: 'Direct affiliate', badge: 'Official Partner' },
       { name: 'ManyVids', emoji: '🎞️', tagline: 'Creator marketplace for adult video content. Traffic affiliate programme + model referrals available.', url: 'https://www.manyvids.com', network: 'Direct affiliate' },
     ],
   },
@@ -61,6 +61,7 @@ export const PARTNER_SECTIONS: PartnerSection[] = [
     description: 'Award-winning adult studios and premium content platforms. High-converting affiliate programmes with quality European productions.',
     items: [
       { name: 'Dorcel Club', emoji: '🔴', tagline: 'Marc Dorcel\'s flagship premium paysite — Europe\'s most prestigious adult studio. Exclusive HD films, series and live shows. Approved affiliate partner.', url: 'https://www.dorcelclub.com/en?aff=8103', network: 'Dorcel Cash', badge: 'Official Partner' },
+      { name: 'AI Angels', emoji: '👼', tagline: 'Create your dream AI girlfriend — sweet, flirty & a little naughty. Chat free with 560+ AI girlfriends who send photos & videos. No credit card needed.', url: 'https://www.aiangels.io/?fpr=secretxperience', network: 'FirstPromoter', badge: 'Official Partner' },
     ],
   },
 

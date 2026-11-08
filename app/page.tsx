@@ -2216,6 +2216,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       </div>
     </div>
     <a class="sx-pill" href="/shop" style="background:linear-gradient(90deg,#e8c97e,#c5883f);color:#0a0a0a;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">🛍️ Webshop &amp; Brands</a>
+    <a class="sx-pill" href="/partners" style="background:linear-gradient(90deg,#c0001a,#7a1238);color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">🤝 Partners &amp; Links</a>
   </div>
   <style>
     #catBar::-webkit-scrollbar { display:none; }

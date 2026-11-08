@@ -10,6 +10,7 @@ import UpcomingEventBanner from './components/UpcomingEventBanner'
 import PartnersShowcase from './components/PartnersShowcase/PartnersShowcase'
 import VenuesShowcase from './components/VenuesShowcase'
 import OnlyFansShowcase from './components/OnlyFansShowcase/OnlyFansShowcase'
+import AIAngelsBanner from './components/AIAngelsBanner'
 import StripchatLive from './components/StripchatLive/StripchatLive'
 import HeroThemes from './components/HeroThemes/HeroThemes'
 import ShopShowcase from './components/ShopShowcase/ShopShowcase'
@@ -3178,6 +3179,9 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </a>
   </div>
 
+  <!-- ══ AI ANGELS affiliate banner (React portal — AIAngelsBanner) ══ -->
+  <div id="aiAngelsMount"></div>
+
   <!-- ══ ONLYFANS CREATORS (React portal — OnlyFansShowcase) ══ -->
   <div id="onlyfansShowcaseMount"></div>
 
@@ -3899,6 +3903,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       {/* GSAP slider ads — rendered as React portal anchored after #featuredBanner */}
       <SliderAds />
       {/* OnlyFans creator directory — portal into #onlyfansShowcaseMount above the partners band */}
+      <AIAngelsBanner portalTo="aiAngelsMount" />
       <OnlyFansShowcase portalTo="onlyfansShowcaseMount" />
       {/* Partner boutiques — portal between OnlyFans creators and Partners & Links */}
       <ShopShowcase variant="compact" portalTo="shopShowcaseMount" />

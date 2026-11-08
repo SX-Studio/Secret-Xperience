@@ -1,4 +1,5 @@
 import { createServerClient } from '@supabase/ssr'
+import DorcelBanner from '../components/DorcelBanner'
 import { cookies, headers } from 'next/headers'
 import Link from 'next/link'
 import ProductGrid from './ProductGrid'
@@ -59,9 +60,6 @@ export default async function ShopPage() {
         .sort-sel:focus { border-color: var(--gbrd); }
         @media(max-width:640px) { .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
         @media(max-width:380px) { .shop-grid { grid-template-columns: 1fr; } }
-        .dorcel-banner { transition: border-color .18s, box-shadow .18s; }
-        .dorcel-banner:hover { border-color: rgba(180,20,40,0.75) !important; box-shadow: 0 12px 40px rgba(0,0,0,0.55) !important; }
-        @media(max-width:560px) { .dorcel-banner { grid-template-columns: 1fr !important; gap: 1rem !important; } }
       `}</style>
 
       <div style={{ background: 'var(--bg)', minHeight: '100vh', color: 'var(--t)', fontFamily: 'var(--sans)' }}>
@@ -120,51 +118,7 @@ export default async function ShopPage() {
 
           <PremiumBanner placement="section" category="shop" />
 
-          {/* Dorcel Club is a porn-subscription affiliate, not a product this shop
-              ships. It stays on the marketplace but is kept off the standalone
-              storefront, whose whole purpose is to present as clean commerce to a
-              payment processor. Flip this condition to show it on both. */}
-          {!standalone && (
-            <a
-              href="https://www.dorcelclub.com/en?aff=8103"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="dorcel-banner"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr auto',
-                alignItems: 'center',
-                gap: '1.5rem',
-                background: 'linear-gradient(120deg, rgba(20,8,8,0.95) 0%, rgba(80,10,20,0.7) 100%)',
-                border: '0.5px solid rgba(180,20,40,0.4)',
-                borderRadius: 16,
-                padding: '1.4rem 1.8rem',
-                marginBottom: '2rem',
-                textDecoration: 'none',
-                boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
-              }}
-            >
-              <div>
-                <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 700, color: '#e02030', marginBottom: 8 }}>
-                  ✦ Official Partner · Premium Content
-                </div>
-                <div style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(18px,3vw,26px)', fontWeight: 400, color: '#ece8e1', lineHeight: 1.15, marginBottom: 6 }}>
-                  Dorcel Club
-                </div>
-                <div style={{ fontSize: 13, color: 'rgba(236,232,225,0.5)', lineHeight: 1.5 }}>
-                  Europe&apos;s most prestigious adult studio — exclusive HD films, series &amp; live shows.
-                </div>
-              </div>
-              <span style={{
-                display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
-                fontSize: 13, fontWeight: 700, color: '#fff',
-                background: 'linear-gradient(90deg, #c0001a, #8b000f)',
-                borderRadius: 10, padding: '9px 18px', flexShrink: 0,
-              }}>
-                Visit store <i className="ti ti-arrow-right" />
-              </span>
-            </a>
-          )}
+          <DorcelBanner />
 
           <ProductGrid products={allProducts} basePath={standalone ? '/p' : '/shop'} />
 

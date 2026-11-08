@@ -67,6 +67,10 @@ if (_ageOk > Date.now()) {
 function showRoleStep(){
   var box = gate ? gate.querySelector('.gate-box') : null;
   if (!box) { dismissGate(); return; }
+  // Past the age check the platform shows through behind the role card.
+  gate.style.background = 'rgba(6,4,12,0.35)';
+  gate.style.backdropFilter = 'none';
+  gate.style.webkitBackdropFilter = 'none';
   box.innerHTML = '<div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:200px;height:200px;background:radial-gradient(circle,rgba(197,160,90,0.15) 0%,transparent 70%);pointer-events:none;"></div>'
     + '<div style="font:600 11px/1 var(--sans);letter-spacing:0.32em;color:var(--gold);text-align:center;margin-bottom:1.25rem;text-transform:uppercase;position:relative;z-index:2;">Welcome</div>'
     + '<h2 style="font-family:var(--serif);font-size:24px;font-weight:400;text-align:center;margin:0 0 0.4rem;position:relative;z-index:2;">How would you like to explore?</h2>'
@@ -84,8 +88,8 @@ function showRoleStep(){
   var hov = function(b){ b.addEventListener('mouseover',function(){b.style.borderColor='var(--gold)';b.style.background='var(--gbg)';}); b.addEventListener('mouseout',function(){b.style.borderColor='var(--b2)';b.style.background='var(--bg2)';}); };
   var bv = document.getElementById('roleVisitor');
   var bp = document.getElementById('roleAdvertiser');
-  if (bv) { hov(bv); bv.addEventListener('click', function(){ try{localStorage.setItem('sx_role','visitor');}catch(e){} dismissGate(); }); }
-  if (bp) { hov(bp); bp.addEventListener('click', function(){ try{localStorage.setItem('sx_role','provider');}catch(e){} dismissGate(); window.location.href='/advertise'; }); }
+  if (bv) { hov(bv); bv.addEventListener('click', function(){ try{localStorage.setItem('sx_role','visitor');localStorage.setItem('sx_welcome_choice','member');}catch(e){} dismissGate(); }); }
+  if (bp) { hov(bp); bp.addEventListener('click', function(){ try{localStorage.setItem('sx_role','provider');localStorage.setItem('sx_welcome_choice','creator');}catch(e){} dismissGate(); window.location.href='/advertise'; }); }
 }
 document.getElementById('gyes').addEventListener('click', function(){
   // Lock in age verification immediately, then offer role choice
@@ -2220,9 +2224,72 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     .catbar-wrap::after { content:''; position:absolute; top:0; right:0; bottom:0; width:36px; pointer-events:none; background:linear-gradient(90deg,transparent,var(--bg) 90%); }
   </style>
 
+  <!-- ══ NAV DRAWER ══ -->
+  <div class="nav-drawer" id="navDrawer" aria-label="Navigation menu" role="dialog">
+    <div class="nav-drawer-hd">
+      <span style="font-family:var(--serif);font-size:16px;color:var(--t);">Secret<em style="color:var(--gold);font-style:italic">Xperience</em></span>
+      <button class="nav-drawer-close" id="navDrawerClose" aria-label="Close menu"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="nav-drawer-user" id="navDrawerUser" style="display:none">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="navDrawerAvatar" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--goldd));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#0a0a0a;flex-shrink:0;">A</div>
+        <div>
+          <div id="navDrawerName" style="font-size:14px;font-weight:500;color:var(--t)">Account</div>
+          <div id="navDrawerEmail" style="font-size:12px;color:var(--t2);margin-top:1px"></div>
+        </div>
+      </div>
+    </div>
+    <nav class="nav-drawer-links" id="navDrawerLinks">
+      <!-- logged-in links (hidden by default, shown by JS) -->
+      <a href="/dashboard" class="nav-drawer-link" id="ndDashboard" style="display:none"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
+      <a href="/verify" class="nav-drawer-link" id="ndVerify" style="display:none"><i class="ti ti-id-badge"></i> Verify Identity</a>
+      <a href="/tokens" class="nav-drawer-link" id="ndTokens" style="display:none"><i class="ti ti-coins"></i> Buy Tokens</a>
+      <a href="/listings/create" class="nav-drawer-link" id="ndCreate" style="display:none"><i class="ti ti-plus"></i> List a Service</a>
+      <a href="/messages" class="nav-drawer-link" id="ndMessages" style="display:none"><i class="ti ti-message"></i> Messages</a>
+      <!-- logged-out links (hidden by default, shown by JS) -->
+      <a href="/login" class="nav-drawer-link" id="ndLogin" style="display:none"><i class="ti ti-login"></i> Log In</a>
+      <a href="/advertise" class="nav-drawer-link" id="ndSignup" style="display:none"><i class="ti ti-user-plus"></i> Sign Up</a>
+      <!-- always-visible: quick actions -->
+      <a href="/search" class="nav-drawer-link"><i class="ti ti-search"></i> Search</a>
+      <a href="/discover" class="nav-drawer-link" style="color:var(--gold)"><i class="ti ti-sparkles"></i> ✦ Discover</a>
+      <a href="/livestreams" class="nav-drawer-link" style="color:#ef4444"><i class="ti ti-broadcast"></i> <span style="display:inline-flex;align-items:center;gap:5px">Live Shows <span style="width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block;animation:liveblink 1.2s ease-in-out infinite" /></span></a>
+      <a href="/live" class="nav-drawer-link" style="color:var(--t2)"><i class="ti ti-live-photo"></i> Cam Models</a>
+      <!-- ── CATEGORY GROUPS ── -->
+      <div class="nd-group-hd">Companions</div>
+      <a href="/escorts" class="nd-sub-link"><i class="ti ti-heart-handshake"></i> Escorts <span style="font-size:10px;color:var(--t3);margin-left:4px;">(outcall)</span></a>
+      <a href="/private-reception" class="nd-sub-link" style="color:var(--gold)"><i class="ti ti-home"></i> Private Reception <span style="font-size:10px;color:var(--t3);margin-left:4px;">(incall)</span></a>
+      <a href="/private-reception?cat=massage" class="nd-sub-link" style="padding-left:40px;font-size:12px"><i class="ti ti-hand-stop"></i> Massage</a>
+      <a href="/private-reception?cat=domination" class="nd-sub-link" style="padding-left:40px;font-size:12px"><i class="ti ti-crown"></i> Domination</a>
+      <a href="/private-reception?cat=experiences" class="nd-sub-link" style="padding-left:40px;font-size:12px"><i class="ti ti-sparkles"></i> Experiences</a>
+      <div class="nd-group-hd">Venues</div>
+      <a href="/nightlife" class="nd-sub-link"><i class="ti ti-glass-cocktail"></i> Nightlife</a>
+      <a href="/venues" class="nd-sub-link"><i class="ti ti-building-store"></i> All Venues</a>
+      <a href="/swingers" class="nd-sub-link"><i class="ti ti-key"></i> Swinger &amp; Parenclubs</a>
+      <a href="/fetish" class="nd-sub-link"><i class="ti ti-chain"></i> Fetish &amp; Domina</a>
+      <a href="/pride" class="nd-sub-link"><i class="ti ti-rainbow"></i> Pride · LGBTQ+</a>
+      <a href="/rentals" class="nd-sub-link"><i class="ti ti-building"></i> Rentals</a>
+      <a href="/hotels" class="nd-sub-link"><i class="ti ti-bed"></i> Hotels</a>
+      <div class="nd-group-hd">More</div>
+      <a href="/creators" class="nd-sub-link"><i class="ti ti-camera"></i> Creators</a>
+      <a href="/events" class="nd-sub-link"><i class="ti ti-calendar-event"></i> Events</a>
+      <a href="/jobs" class="nd-sub-link"><i class="ti ti-briefcase"></i> Jobs &amp; Vacancies</a>
+      <a href="/shop" class="nd-sub-link"><i class="ti ti-shopping-bag"></i> Adult Shop</a>
+      <div class="nd-group-hd">Information</div>
+      <a href="/regulations" class="nd-sub-link"><i class="ti ti-scale"></i> Regulation &amp; Rights</a>
+      <a href="/medical" class="nd-sub-link"><i class="ti ti-heart-rate-monitor"></i> Medical Resources</a>
+    </nav>
+    <div class="nav-drawer-footer" id="navDrawerLogout" style="display:none">
+      <button data-action="logout" class="nav-drawer-link" style="color:var(--wine);padding:0"><i class="ti ti-logout" style="color:var(--wine)"></i> Log Out</button>
+    </div>
+  </div>
+
+` }} />
+      <CategoryAnimations />
+
+      <div dangerouslySetInnerHTML={{ __html: `
   <!-- ══ EDITORIAL HERO ══ -->
   <!-- Visitor-selectable hero styles render here (HeroThemes) -->
-  <div id="heroThemesMount" style="margin-top:76px"></div>
+  <div id="heroThemesMount"></div>
 
   <section id="editorialHero" style="width:100%;background:var(--grad-candle);border-top:0.5px solid var(--b);border-bottom:0.5px solid var(--b);padding:4rem 1.5rem;">
     <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr;gap:2rem;align-items:center;">
@@ -2285,68 +2352,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     }
     </style>
   </section>
-
-  <!-- ══ NAV DRAWER ══ -->
-  <div class="nav-drawer" id="navDrawer" aria-label="Navigation menu" role="dialog">
-    <div class="nav-drawer-hd">
-      <span style="font-family:var(--serif);font-size:16px;color:var(--t);">Secret<em style="color:var(--gold);font-style:italic">Xperience</em></span>
-      <button class="nav-drawer-close" id="navDrawerClose" aria-label="Close menu"><i class="ti ti-x"></i></button>
-    </div>
-    <div class="nav-drawer-user" id="navDrawerUser" style="display:none">
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div id="navDrawerAvatar" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--goldd));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#0a0a0a;flex-shrink:0;">A</div>
-        <div>
-          <div id="navDrawerName" style="font-size:14px;font-weight:500;color:var(--t)">Account</div>
-          <div id="navDrawerEmail" style="font-size:12px;color:var(--t2);margin-top:1px"></div>
-        </div>
-      </div>
-    </div>
-    <nav class="nav-drawer-links" id="navDrawerLinks">
-      <!-- logged-in links (hidden by default, shown by JS) -->
-      <a href="/dashboard" class="nav-drawer-link" id="ndDashboard" style="display:none"><i class="ti ti-layout-dashboard"></i> Dashboard</a>
-      <a href="/verify" class="nav-drawer-link" id="ndVerify" style="display:none"><i class="ti ti-id-badge"></i> Verify Identity</a>
-      <a href="/tokens" class="nav-drawer-link" id="ndTokens" style="display:none"><i class="ti ti-coins"></i> Buy Tokens</a>
-      <a href="/listings/create" class="nav-drawer-link" id="ndCreate" style="display:none"><i class="ti ti-plus"></i> List a Service</a>
-      <a href="/messages" class="nav-drawer-link" id="ndMessages" style="display:none"><i class="ti ti-message"></i> Messages</a>
-      <!-- logged-out links (hidden by default, shown by JS) -->
-      <a href="/login" class="nav-drawer-link" id="ndLogin" style="display:none"><i class="ti ti-login"></i> Log In</a>
-      <a href="/advertise" class="nav-drawer-link" id="ndSignup" style="display:none"><i class="ti ti-user-plus"></i> Sign Up</a>
-      <!-- always-visible: quick actions -->
-      <a href="/search" class="nav-drawer-link"><i class="ti ti-search"></i> Search</a>
-      <a href="/discover" class="nav-drawer-link" style="color:var(--gold)"><i class="ti ti-sparkles"></i> ✦ Discover</a>
-      <a href="/livestreams" class="nav-drawer-link" style="color:#ef4444"><i class="ti ti-broadcast"></i> <span style="display:inline-flex;align-items:center;gap:5px">Live Shows <span style="width:6px;height:6px;border-radius:50%;background:#ef4444;display:inline-block;animation:liveblink 1.2s ease-in-out infinite" /></span></a>
-      <a href="/live" class="nav-drawer-link" style="color:var(--t2)"><i class="ti ti-live-photo"></i> Cam Models</a>
-      <!-- ── CATEGORY GROUPS ── -->
-      <div class="nd-group-hd">Companions</div>
-      <a href="/escorts" class="nd-sub-link"><i class="ti ti-heart-handshake"></i> Escorts <span style="font-size:10px;color:var(--t3);margin-left:4px;">(outcall)</span></a>
-      <a href="/private-reception" class="nd-sub-link" style="color:var(--gold)"><i class="ti ti-home"></i> Private Reception <span style="font-size:10px;color:var(--t3);margin-left:4px;">(incall)</span></a>
-      <a href="/private-reception?cat=massage" class="nd-sub-link" style="padding-left:40px;font-size:12px"><i class="ti ti-hand-stop"></i> Massage</a>
-      <a href="/private-reception?cat=domination" class="nd-sub-link" style="padding-left:40px;font-size:12px"><i class="ti ti-crown"></i> Domination</a>
-      <a href="/private-reception?cat=experiences" class="nd-sub-link" style="padding-left:40px;font-size:12px"><i class="ti ti-sparkles"></i> Experiences</a>
-      <div class="nd-group-hd">Venues</div>
-      <a href="/nightlife" class="nd-sub-link"><i class="ti ti-glass-cocktail"></i> Nightlife</a>
-      <a href="/venues" class="nd-sub-link"><i class="ti ti-building-store"></i> All Venues</a>
-      <a href="/swingers" class="nd-sub-link"><i class="ti ti-key"></i> Swinger &amp; Parenclubs</a>
-      <a href="/fetish" class="nd-sub-link"><i class="ti ti-chain"></i> Fetish &amp; Domina</a>
-      <a href="/pride" class="nd-sub-link"><i class="ti ti-rainbow"></i> Pride · LGBTQ+</a>
-      <a href="/rentals" class="nd-sub-link"><i class="ti ti-building"></i> Rentals</a>
-      <a href="/hotels" class="nd-sub-link"><i class="ti ti-bed"></i> Hotels</a>
-      <div class="nd-group-hd">More</div>
-      <a href="/creators" class="nd-sub-link"><i class="ti ti-camera"></i> Creators</a>
-      <a href="/events" class="nd-sub-link"><i class="ti ti-calendar-event"></i> Events</a>
-      <a href="/jobs" class="nd-sub-link"><i class="ti ti-briefcase"></i> Jobs &amp; Vacancies</a>
-      <a href="/shop" class="nd-sub-link"><i class="ti ti-shopping-bag"></i> Adult Shop</a>
-      <div class="nd-group-hd">Information</div>
-      <a href="/regulations" class="nd-sub-link"><i class="ti ti-scale"></i> Regulation &amp; Rights</a>
-      <a href="/medical" class="nd-sub-link"><i class="ti ti-heart-rate-monitor"></i> Medical Resources</a>
-    </nav>
-    <div class="nav-drawer-footer" id="navDrawerLogout" style="display:none">
-      <button data-action="logout" class="nav-drawer-link" style="color:var(--wine);padding:0"><i class="ti ti-logout" style="color:var(--wine)"></i> Log Out</button>
-    </div>
-  </div>
-
 ` }} />
-      <CategoryAnimations />
 
       {/* MOAN SPEAK — bondage-gear shop banner */}
       <div style={{ maxWidth: 1400, margin: '2.75rem auto 0', padding: '0 1rem' }}>

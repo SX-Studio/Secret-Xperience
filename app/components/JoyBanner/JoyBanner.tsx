@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import DorcelBanner from '../DorcelBanner'
 
 const SITE = 'https://www.enjoywithjoy.be/#'
 const GOLD = '#e8c97a'
@@ -80,6 +81,8 @@ export default function JoyBanner({ portalTo }: Props) {
         .jb-social:hover{background:rgba(232,201,122,.12);border-color:${GOLD}88;color:#fff}
         @keyframes jbFade{from{opacity:0}to{opacity:1}}
         @keyframes jbRise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+        .jb-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:1.5rem 0;align-items:stretch}
+        @media(max-width:900px){.jb-row{grid-template-columns:1fr}}
         @media(max-width:640px){
           .jb-card{min-height:300px !important}
           .jb-name{font-size:44px !important}
@@ -87,7 +90,8 @@ export default function JoyBanner({ portalTo }: Props) {
         }
       `}</style>
 
-      {/* ── BANNER (kader) ── */}
+      {/* ── BANNER (kader): Joy left, Dorcel Club right ── */}
+      <div className="jb-row">
       <div
         className="jb-card"
         onDoubleClick={() => setOpen(true)}
@@ -103,7 +107,6 @@ export default function JoyBanner({ portalTo }: Props) {
           cursor: 'pointer',
           border: `0.5px solid ${GOLD}55`,
           boxShadow: '0 14px 44px rgba(0,0,0,.45)',
-          margin: '1.5rem 0',
           display: 'flex',
           alignItems: 'center',
           userSelect: 'none',
@@ -129,7 +132,7 @@ export default function JoyBanner({ portalTo }: Props) {
           <div style={{ fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase', fontWeight: 700, color: GOLD, marginBottom: 8 }}>
             ✦ Featured Advertiser
           </div>
-          <div className="jb-name" style={{ fontFamily: "'Cormorant Garamond', var(--serif, serif)", fontSize: 60, fontWeight: 500, color: '#fff', lineHeight: 1, marginBottom: 10 }}>
+          <div className="jb-name" style={{ fontFamily: "'Cormorant Garamond', var(--serif, serif)", fontSize: 'clamp(40px,4.4vw,56px)', fontWeight: 500, color: '#fff', lineHeight: 1, marginBottom: 10 }}>
             Enjoy with Joy
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
@@ -171,6 +174,8 @@ export default function JoyBanner({ portalTo }: Props) {
             <i className="ti ti-click" /> Double-click the banner for the full profile
           </div>
         </div>
+      </div>
+      <DorcelBanner variant="tile" />
       </div>
     </>
   )

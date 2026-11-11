@@ -11,6 +11,10 @@ export async function GET(request: Request) {
   const oauthRole = allowedRoles.includes(roleParam) ? roleParam : 'user'
   // Use request origin so OAuth works on preview deployments, not just production
   const siteUrl = origin
+  // Where to resume after login. Relative only, and '//' rejected — that form
+  // is protocol-relative and would send the user off-site.
+  const nextParam = searchParams.get('next')
+  const resumeAt = nextParam && nextParam.startsWith('/') && !nextParam.startsWith('//') ? nextParam : null
 
   if (code) {
     const cookieStore = cookies()
@@ -49,7 +53,10 @@ export async function GET(request: Request) {
           .update(emailUpdate)
           .eq('id', user.id)
           .is('email', null)  // only update if not already set (i.e. new user)
-        if (isNew && ['provider', 'venue', 'creator'].includes(oauthRole)) {
+        if (resumeAt) {
+          // An explicit resume target (the session bridge) beats onboarding.
+          response.headers.set('Location', `${siteUrl}${resumeAt}`)
+        } else if (isNew && ['provider', 'venue', 'creator'].includes(oauthRole)) {
           response.headers.set('Location', `${siteUrl}/listings/create`)
         }
       }

@@ -54,7 +54,7 @@ export default function SliderAds() {
   useEffect(() => {
     const supabase = createClient()
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setCtaHref(session ? '/boost' : '/advertise')
+      setCtaHref(session ? '/dashboard' : '/advertise')
     })
   }, [])
 

@@ -1,24 +1,30 @@
 import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import DorcelBanner from '../components/DorcelBanner'
+import { cookies, headers } from 'next/headers'
 import Link from 'next/link'
 import ProductGrid from './ProductGrid'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
-import ShopShowcase from '../components/ShopShowcase/ShopShowcase'
+import BrandRow from './BrandRow'
+import { BRAND_COLS, PRODUCT_COLS, type Brand } from './brands'
+import { ShopHeader, ShopFooter } from './ShopChrome'
+import { SHOP_ORIGIN, isShopHost } from '../lib/domains'
 
 export async function generateMetadata() {
   return {
     title: 'The Boutique | SecretXperience',
     description: 'Curated luxury accessories, intimate gifts, and premium wellness. Discreet EU shipping in plain packaging.',
+    alternates: { canonical: `${SHOP_ORIGIN}/` },
     openGraph: {
       title: 'The Boutique | SecretXperience',
       description: 'Curated luxury accessories, intimate gifts, and premium wellness.',
-      url: 'https://www.secretxperience.eu/shop',
+      url: `${SHOP_ORIGIN}/`,
     },
   }
 }
 
 
 export default async function ShopPage() {
+  const standalone = isShopHost(headers().get('host'))
   const cookieStore = cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -26,24 +32,39 @@ export default async function ShopPage() {
     { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
   )
 
-  const { data: products } = await supabase
-    .from('products')
-    .select('id, name, description, price_cents, currency, images, category, brand, fulfillment, external_url, featured, in_stock')
-    .eq('active', true)
-    .order('featured', { ascending: false })
-    .order('created_at', { ascending: false })
-    .limit(60)
+  const [{ data: products }, { data: brandRows }] = await Promise.all([
+    supabase
+      .from('products')
+      .select(PRODUCT_COLS)
+      .eq('active', true)
+      .order('featured', { ascending: false })
+      .order('sort')
+      .order('created_at', { ascending: false })
+      .limit(60),
+    supabase
+      .from('brands')
+      .select(BRAND_COLS)
+      .eq('active', true)
+      .eq('is_house', false)
+      .order('featured', { ascending: false })
+      .order('sort')
+      .order('name'),
+  ])
 
-  const allProducts = products || []
+  const allProducts = (products || []) as any[]
+  // The house label's own products get their own section above the partners'.
+  const houseProducts = allProducts.filter(p => p.brands?.is_house)
+  const partnerProducts = allProducts.filter(p => !p.brands?.is_house)
+  const brands = (brandRows || []) as Brand[]
+  const brandBase = standalone ? '/b' : '/shop/brand'
 
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([
         { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://www.secretxperience.eu' },
-          { '@type': 'ListItem', position: 2, name: 'Shop', item: 'https://www.secretxperience.eu/shop' },
+          { '@type': 'ListItem', position: 1, name: 'The Boutique', item: `${SHOP_ORIGIN}/` },
         ]},
-        { '@context': 'https://schema.org', '@type': 'Service', name: 'Adult Shop', serviceType: 'Adult Products & Accessories', advertiser: { '@type': 'Organization', name: 'SecretXperience', url: 'https://www.secretxperience.eu' }, areaServed: ['BE','NL','DE','FR','LU','CH'], url: 'https://www.secretxperience.eu/shop', description: 'Premium adult products, accessories and lifestyle items delivered discreetly across Europe.' },
+        { '@context': 'https://schema.org', '@type': 'Store', name: 'SecretXperience Boutique', url: `${SHOP_ORIGIN}/`, areaServed: ['BE','NL','DE','FR','LU','CH'], description: 'Premium adult products, accessories and lifestyle items delivered discreetly across Europe.' },
       ]) }} />
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,9 +77,6 @@ export default async function ShopPage() {
         .sort-sel:focus { border-color: var(--gbrd); }
         @media(max-width:640px) { .shop-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; } }
         @media(max-width:380px) { .shop-grid { grid-template-columns: 1fr; } }
-        .dorcel-banner { transition: border-color .18s, box-shadow .18s; }
-        .dorcel-banner:hover { border-color: rgba(180,20,40,0.75) !important; box-shadow: 0 12px 40px rgba(0,0,0,0.55) !important; }
-        @media(max-width:560px) { .dorcel-banner { grid-template-columns: 1fr !important; gap: 1rem !important; } }
       `}</style>
 
       <div style={{ background: 'var(--bg)', minHeight: '100vh', color: 'var(--t)', fontFamily: 'var(--sans)' }}>
@@ -82,30 +100,7 @@ export default async function ShopPage() {
           <span style={{ color: 'var(--gold)', marginLeft: '8px' }}>✦</span>
         </div>
 
-        {/* NAV */}
-        <nav style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 1.5rem', height: '58px',
-          position: 'sticky', top: '34px', zIndex: 200,
-          background: 'rgba(8,6,18,0.96)', backdropFilter: 'blur(18px)',
-          borderBottom: '0.5px solid var(--b)',
-        }}>
-          <Link href="/" style={{ fontFamily: 'var(--serif)', fontSize: '22px', color: 'var(--gold)', letterSpacing: '.02em', textDecoration: 'none', filter: 'drop-shadow(0 0 12px rgba(197,160,90,0.25))' }}>
-            Secret<em style={{ fontStyle: 'italic', fontWeight: 300 }}>Xperience</em>
-          </Link>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <Link href="/events" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Events</Link>
-            <Link href="/advertise" style={{
-              height: '34px', padding: '0 16px',
-              background: 'linear-gradient(135deg,var(--gold),var(--goldd))',
-              borderRadius: 'var(--r)', color: '#0a0a0a',
-              fontSize: '13px', fontWeight: 700,
-              textDecoration: 'none', display: 'flex', alignItems: 'center',
-            }}>
-              List your shop
-            </Link>
-          </div>
-        </nav>
+        <ShopHeader standalone={standalone} />
 
         {/* HERO */}
         <div style={{
@@ -128,7 +123,7 @@ export default async function ShopPage() {
             </p>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
               <span style={{ fontSize: '13px', color: 'var(--t3)' }}>
-                <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{allProducts.length}</span> products
+                <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{brands.length}</span> brands · <span style={{ color: 'var(--gold)', fontWeight: 600 }}>{allProducts.length}</span> picks
               </span>
               <span style={{ width: '1px', height: '14px', background: 'var(--b3)', display: 'inline-block' }} />
               <span style={{ fontSize: '13px', color: 'var(--t3)' }}>🚚 Plain packaging · Free returns</span>
@@ -140,56 +135,35 @@ export default async function ShopPage() {
 
           <PremiumBanner placement="section" category="shop" />
 
-          {/* Dorcel Collection affiliate banner */}
-          <a
-            href="https://www.dorcelclub.com/en?aff=8103"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="dorcel-banner"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr auto',
-              alignItems: 'center',
-              gap: '1.5rem',
-              background: 'linear-gradient(120deg, rgba(20,8,8,0.95) 0%, rgba(80,10,20,0.7) 100%)',
-              border: '0.5px solid rgba(180,20,40,0.4)',
-              borderRadius: 16,
-              padding: '1.4rem 1.8rem',
-              marginBottom: '2rem',
-              textDecoration: 'none',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.4)',
-            }}
-          >
-            <div>
-              <div style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 700, color: '#e02030', marginBottom: 8 }}>
-                ✦ Official Partner · Premium Content
-              </div>
-              <div style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(18px,3vw,26px)', fontWeight: 400, color: '#ece8e1', lineHeight: 1.15, marginBottom: 6 }}>
-                Dorcel Club
-              </div>
-              <div style={{ fontSize: 13, color: 'rgba(236,232,225,0.5)', lineHeight: 1.5 }}>
-                Europe&apos;s most prestigious adult studio — exclusive HD films, series &amp; live shows.
-              </div>
-            </div>
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
-              fontSize: 13, fontWeight: 700, color: '#fff',
-              background: 'linear-gradient(90deg, #c0001a, #8b000f)',
-              borderRadius: 10, padding: '9px 18px', flexShrink: 0,
-            }}>
-              Visit store <i className="ti ti-arrow-right" />
-            </span>
-          </a>
+          <DorcelBanner />
 
-          <ProductGrid products={allProducts} />
+          {houseProducts.length > 0 && (
+            <section aria-label="The SecretXperience Collection" style={{ margin: '2.5rem 0 3rem' }}>
+              <p style={{ fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.6)', marginBottom: 8 }}>✦ House collection</p>
+              <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(22px,3vw,30px)', fontWeight: 400, margin: 0 }}>
+                The <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>SecretXperience</em> Collection
+              </h2>
+              <ProductGrid products={houseProducts} basePath={standalone ? '/p' : '/shop'} hideFilters />
+            </section>
+          )}
 
-          {/* Partner boutiques — lingerie & adult fashion, data in app/data/shops.ts */}
-          <div style={{ margin: '3rem -1.5rem 0' }}>
-            <ShopShowcase variant="large" />
-          </div>
+          {partnerProducts.length > 0 && (
+            <>
+              <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(22px,3vw,30px)', fontWeight: 400, margin: '2rem 0 1rem' }}>
+                Featured <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>picks</em>
+              </h2>
+              <ProductGrid products={partnerProducts} basePath={standalone ? '/p' : '/shop'} />
+            </>
+          )}
+
+          <BrandRow brands={brands} basePath={brandBase} />
+
+          <p style={{ fontSize: 11, color: 'var(--t3)', marginTop: '2rem', textAlign: 'center' }}>
+            Partner brands sell and ship their own products. We may earn a commission when you buy through links on this page.
+          </p>
 
           {/* VENDOR CTA */}
-          {allProducts.length > 0 && (
+          {!standalone && allProducts.length > 0 && (
             <div style={{
               marginTop: '4rem',
               padding: '2.5rem',
@@ -219,22 +193,7 @@ export default async function ShopPage() {
           )}
         </div>
 
-        {/* FOOTER */}
-        <footer style={{ borderTop: '0.5px solid var(--b)', background: 'var(--bg1)', padding: '2rem 1.5rem', textAlign: 'center' }}>
-          <Link href="/" style={{ fontFamily: 'var(--serif)', fontSize: '20px', color: 'var(--gold)', textDecoration: 'none', display: 'block', marginBottom: '0.5rem' }}>
-            Secret<em style={{ fontStyle: 'italic', fontWeight: 300 }}>Xperience</em>
-          </Link>
-          <p style={{ fontSize: '12px', color: 'var(--t3)' }}>
-            Adults only (18+) ·{' '}
-            <Link href="/regulations" style={{ color: 'var(--t3)', textDecoration: 'none' }}>Regulations</Link>
-            {' '}·{' '}
-            <Link href="/medical" style={{ color: 'var(--t3)', textDecoration: 'none' }}>Medical Info</Link>
-            {' '}·{' '}
-            <Link href="/terms" style={{ color: 'var(--t3)', textDecoration: 'none' }}>Terms</Link>
-            {' '}·{' '}
-            <Link href="/privacy" style={{ color: 'var(--t3)', textDecoration: 'none' }}>Privacy</Link>
-          </p>
-        </footer>
+        <ShopFooter standalone={standalone} />
       </div>
     </>
   )

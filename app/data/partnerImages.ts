@@ -1,0 +1,30 @@
+// Banner images for /partners, keyed by partner name (see app/data/partners.ts).
+// Each is the partner's own share image (og:image), cropped to 640x336 and self-hosted.
+// A partner without an entry gets a designed banner instead.
+export const PARTNER_IMAGES: Record<string, string> = {
+  "Adult Site Broker": "/partners/adult-site-broker.webp",
+  "Bluebella": "/partners/bluebella.webp",
+  "Chaturbate": "/partners/chaturbate.webp",
+  "DECADANCE Rochdale": "/partners/decadance-rochdale.webp",
+  "Elgato": "/partners/elgato.webp",
+  "Erotiek4ever.nl": "/partners/erotiek4ever-nl.webp",
+  "ExpressVPN": "/partners/expressvpn.webp",
+  "Fun Factory": "/partners/fun-factory.webp",
+  "Ignite Heathrow": "/partners/ignite-heathrow.webp",
+  "LiveJasmin": "/partners/livejasmin.webp",
+  "Logitech": "/partners/logitech.webp",
+  "NordVPN": "/partners/nordvpn.webp",
+  "Paxum": "/partners/paxum.webp",
+  "Proton": "/partners/proton.webp",
+  "Purple Mamba Club": "/partners/purple-mamba-club.webp",
+  "Quest Swingers Club": "/partners/quest-swingers-club.webp",
+  "Route69": "/partners/route69.webp",
+  "Sephora EU": "/partners/sephora-eu.webp",
+  "Streamyard": "/partners/streamyard.webp",
+  "Surfshark": "/partners/surfshark.webp",
+  "The Phoenix Club": "/partners/the-phoenix-club.webp",
+  "V2V": "/partners/v2v.webp",
+  "Vault72": "/partners/vault72.webp",
+  "Wise": "/partners/wise.webp",
+  'AI Angels': '/aiangels/a1.webp',
+}

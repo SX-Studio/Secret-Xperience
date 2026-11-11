@@ -1,6 +1,21 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { createClient } from '../lib/supabase'
+import { CANONICAL_ORIGIN } from '../lib/domains'
+
+// This page is served on secretxperience.store (middleware redirects /tokens on
+// the marketplace here). Tokens bought here land in the same wallet the
+// marketplace reads, and are spent only on live-show tips there.
+const LIVE_SHOWS_URL = `${CANONICAL_ORIGIN}/livestreams`
+
+// Verotel is still "New — Testing mode" (website #136440), so a real buyer's real card
+// cannot complete a purchase there. Until it is authorised, crypto is the only rail that
+// actually takes money, so it becomes the buy button and cards are labelled coming soon.
+//
+// TO TURN CARDS BACK ON: set NEXT_PUBLIC_CARD_PAYMENTS_LIVE=true in Vercel and redeploy.
+// That is the whole switch — the card CTA, the crypto CTA and the notice all read it.
+// (NEXT_PUBLIC_* is inlined at build time, so it needs a redeploy, not just a var change.)
+const CARDS_LIVE = process.env.NEXT_PUBLIC_CARD_PAYMENTS_LIVE === 'true'
 
 interface Package {
   id: string
@@ -27,21 +42,6 @@ interface LedgerEntry {
   balance_after: number
 }
 
-const TIER_COSTS = [
-  { tier: 'basic',    label: 'Basic Listing',     tokens: 0,    days: 0,  desc: 'Standard grid listing — free and always on.' },
-  { tier: 'featured', label: 'Featured Advertisement',  tokens: 50,   days: 7,  desc: 'Gold-bordered card, priority placement in category grid.' },
-  { tier: 'slider',   label: 'Slider Ad',         tokens: 200,  days: 7,  desc: 'Rotating slideshow ad on the home page and section pages — high visibility.' },
-  { tier: 'section',  label: 'Section Premium',   tokens: 240,  days: 7,  desc: 'Full-width premium banner across your whole category section.' },
-  { tier: 'premium',  label: 'Premium Listing',   tokens: 300,  days: 30, desc: 'Top of category for 30 days, larger card, premium badge.' },
-  { tier: 'homepage', label: 'Homepage Premium',  tokens: 1100, days: 30, desc: 'Full-width banner on the homepage — our most-visited page. Maximum exposure.' },
-]
-
-const ADD_ONS = [
-  { label: 'Photo gallery add-on',   tokens: 15  },
-  { label: 'Verification badge',     tokens: 25  },
-  { label: 'Top boost (24 h)',        tokens: 75  },
-]
-
 const FALLBACK_PACKAGES = [
   {
     id: 'starter',
@@ -52,7 +52,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 2.50,
     popular: false,
     rate: '€0.10/token',
-    perks: ['Tip a creator', 'One 6-hour flash boost'],
+    perks: ['A couple of small tips'],
   },
   {
     id: 'basic',
@@ -63,7 +63,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 5,
     popular: false,
     rate: '€0.10/token',
-    perks: ['One Featured advertisement (7 days)', 'Two flash boosts'],
+    perks: ['Five 10-token tips'],
   },
   {
     id: 'standard',
@@ -74,7 +74,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 15,
     popular: false,
     rate: '€0.10/token',
-    perks: ['One Premium listing (30 days)', 'or Featured + Slider for a week'],
+    perks: ['Six 25-token tips'],
   },
   {
     id: 'popular',
@@ -85,7 +85,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 20,
     popular: true,
     rate: '€0.095/token · +10 bonus',
-    perks: ['Featured advertisement for 7 days', 'Flash boost × 5', 'Slider ad for 7 days'],
+    perks: ['Four 50-token tips', '+10 bonus tokens'],
   },
   {
     id: 'pro',
@@ -96,7 +96,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 35,
     popular: false,
     rate: '€0.093/token · +25 bonus',
-    perks: ['Slider ad for 30 days', 'Featured advertisement × 3', 'Priority placement'],
+    perks: ['Three 100-token tips', '+25 bonus tokens'],
   },
   {
     id: 'business',
@@ -107,7 +107,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 50,
     popular: false,
     rate: '€0.091/token · +50 bonus',
-    perks: ['Premium listing for 30 days', 'Flash boost × 10', 'Concierge support'],
+    perks: ['Two 250-token tips', '+50 bonus tokens'],
   },
   {
     id: 'elite',
@@ -118,7 +118,7 @@ const FALLBACK_PACKAGES = [
     price_eur: 75,
     popular: false,
     rate: '€0.088/token · +100 bonus',
-    perks: ['2+ months premium listing', 'Unlimited flash boosts × 3', 'Personal account manager'],
+    perks: ['Three 250-token tips', '+100 bonus tokens'],
   },
 ]
 
@@ -135,7 +135,11 @@ export default function TokensPage() {
   const [session,  setSession]  = useState<any>(null)
   const [loading,  setLoading]  = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
+  const [cryptoId, setCryptoId] = useState<string | null>(null)
   const [showPayModal, setShowPayModal] = useState(false)
+  // null = the rail is genuinely not configured yet ("coming soon"). A string = the
+  // rail IS configured and the attempt failed, so say so instead of pretending.
+  const [payError, setPayError] = useState<string | null>(null)
   const [status,   setStatus]   = useState<'idle' | 'success' | 'cancel'>('idle')
   const [role,     setRole]     = useState<string>('Member')
 
@@ -179,12 +183,36 @@ export default function TokensPage() {
       })
       const data = await res.json()
       if (data.url) { window.location.href = data.url; return }
-      // Not configured / error → graceful modal, never a raw error page.
+      setPayError(data.configured === false ? null : (data.error || `Checkout failed (${res.status}).`))
       setShowPayModal(true)
-    } catch {
+    } catch (e) {
+      setPayError((e as Error).message || 'Could not reach checkout.')
       setShowPayModal(true)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // Crypto rail (NOWPayments) — parallel to Verotel. Same graceful fallback:
+  // configured:false → the "coming soon" modal, never a raw error.
+  async function payWithCrypto(pkg: Package | typeof FALLBACK_PACKAGES[0]) {
+    if (!session) { window.location.href = '/login?next=/tokens'; return }
+    setCryptoId(pkg.id)
+    try {
+      const res  = await fetch('/api/nowpayments/charge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ packageId: pkg.id }),
+      })
+      const data = await res.json()
+      if (data.url) { window.location.href = data.url; return }
+      setPayError(data.configured === false ? null : (data.error || `Checkout failed (${res.status}).`))
+      setShowPayModal(true)
+    } catch (e) {
+      setPayError((e as Error).message || 'Could not reach checkout.')
+      setShowPayModal(true)
+    } finally {
+      setCryptoId(null)
     }
   }
 
@@ -289,6 +317,42 @@ export default function TokensPage() {
           border: 0.5px solid rgba(197,160,90,0.4);
         }
         .tok-cta-btn.secondary:hover { background: rgba(197,160,90,0.06); }
+        .tok-crypto-btn {
+          width: 100%;
+          margin-top: 8px;
+          padding: 9px 0;
+          border-radius: 9px;
+          background: transparent;
+          color: rgba(236,232,225,0.6);
+          border: 0.5px solid rgba(236,232,225,0.14);
+          font: 500 10px/1 'Poppins', sans-serif;
+          letter-spacing: 0.09em;
+          text-transform: uppercase;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          transition: color 0.15s, border-color 0.15s, background 0.15s;
+        }
+        .tok-crypto-btn:hover { color: #c5a05a; border-color: rgba(197,160,90,0.4); background: rgba(197,160,90,0.04); }
+        .tok-crypto-btn:disabled { opacity: 0.45; cursor: default; }
+
+        .tok-crypto-notice {
+          display: flex;
+          gap: 12px;
+          align-items: flex-start;
+          margin-bottom: 2rem;
+          padding: 14px 16px;
+          border-radius: 12px;
+          background: rgba(197,160,90,0.06);
+          border: 0.5px solid rgba(197,160,90,0.28);
+          font: 300 13px/1.6 'Poppins', sans-serif;
+          color: rgba(236,232,225,0.72);
+        }
+        .tok-crypto-notice i { font-size: 18px; color: #c5a05a; flex-shrink: 0; margin-top: 1px; }
+        .tok-crypto-notice strong { color: #ece8e1; font-weight: 600; }
+        .tok-crypto-notice em { font-style: normal; color: #c5a05a; }
 
         .tok-section-rule {
           height: 0.5px;
@@ -358,10 +422,9 @@ export default function TokensPage() {
         </a>
 
         <nav className="tok-nav-links" style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <a href="/" className="tok-nav-link">Browse</a>
-          <a href="/discover" className="tok-nav-link">Discover</a>
-          <a href="/dashboard?tab=messages" className="tok-nav-link">Messages</a>
+          <a href="/" className="tok-nav-link">Boutique</a>
           <a href="/tokens" className="tok-nav-link active">Wallet</a>
+          <a href={LIVE_SHOWS_URL} className="tok-nav-link">Live shows</a>
         </nav>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexShrink: 0 }}>
@@ -381,7 +444,7 @@ export default function TokensPage() {
               </span>
             </div>
           )}
-          <a href="/dashboard" style={{
+          <a href={LIVE_SHOWS_URL} style={{
             fontSize: 12,
             color: 'rgba(236,232,225,0.4)',
             textDecoration: 'none',
@@ -391,7 +454,7 @@ export default function TokensPage() {
             gap: 5,
           }}>
             <i className="ti ti-arrow-left" style={{ fontSize: 13 }} />
-            Back
+            Back to live shows
           </a>
         </div>
       </header>
@@ -586,6 +649,17 @@ export default function TokensPage() {
             Single purchase · no auto-renew
           </p>
 
+          {!CARDS_LIVE && (
+            <div className="tok-crypto-notice">
+              <i className="ti ti-currency-bitcoin" aria-hidden />
+              <div>
+                <strong>Card payments aren’t live yet.</strong> Buy tokens with crypto in the
+                meantime — pick a package below and choose <em>Pay with crypto</em>. You can pay
+                by card on the checkout page if your country supports it.
+              </div>
+            </div>
+          )}
+
           <div
             className="tok-pkg-grid"
             style={{
@@ -682,20 +756,6 @@ export default function TokensPage() {
                       {rate}
                     </p>
 
-                    {/* Days of visibility at basic rate (3 tok/day) */}
-                    <p style={{
-                      fontSize: 10,
-                      color: 'rgba(236,232,225,0.3)',
-                      fontWeight: 300,
-                      marginBottom: perks.length ? '1rem' : '1.25rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}>
-                      <i className="ti ti-calendar" style={{ fontSize: 10 }} />
-                      ≈ {Math.floor(total / 3)} days visibility at basic tier
-                    </p>
-
                     {/* Perks */}
                     {perks.length > 0 && (
                       <ul style={{
@@ -725,14 +785,40 @@ export default function TokensPage() {
                       </ul>
                     )}
 
-                    {/* CTA */}
-                    <button
-                      className={`tok-cta-btn ${isFeatured ? 'primary' : 'secondary'}`}
-                      onClick={() => handlePurchase(pkg as any)}
-                      disabled={loading && selected === pkg.id}
-                    >
-                      {loading && selected === pkg.id ? 'Redirecting…' : 'Buy now'}
-                    </button>
+                    {/* CTA — while cards are not live, crypto IS the buy button. Leaving
+                        "Buy now" as the primary action would send real buyers to a
+                        payment page that cannot take their card. */}
+                    {CARDS_LIVE ? (
+                      <>
+                        <button
+                          className={`tok-cta-btn ${isFeatured ? 'primary' : 'secondary'}`}
+                          onClick={() => handlePurchase(pkg as any)}
+                          disabled={loading && selected === pkg.id}
+                        >
+                          {loading && selected === pkg.id ? 'Redirecting…' : 'Buy now'}
+                        </button>
+                        <button
+                          className="tok-crypto-btn"
+                          onClick={() => payWithCrypto(pkg as any)}
+                          disabled={cryptoId === pkg.id}
+                        >
+                          {cryptoId === pkg.id ? 'Redirecting…' : <><span aria-hidden>◎</span> Pay with crypto</>}
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className={`tok-cta-btn ${isFeatured ? 'primary' : 'secondary'}`}
+                          onClick={() => payWithCrypto(pkg as any)}
+                          disabled={cryptoId === pkg.id}
+                        >
+                          {cryptoId === pkg.id ? 'Redirecting…' : <><span aria-hidden>◎</span> Pay with crypto</>}
+                        </button>
+                        <button className="tok-crypto-btn" onClick={() => setShowPayModal(true)}>
+                          Card · coming soon
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               )
@@ -859,7 +945,7 @@ export default function TokensPage() {
           </div>
         </div>
 
-        {/* ── LISTING TIERS ── */}
+        {/* ── HOW TOKENS WORK ── */}
         <div style={{ marginBottom: '3.5rem' }}>
           <p style={{
             fontSize: 10,
@@ -879,71 +965,26 @@ export default function TokensPage() {
             lineHeight: 1.15,
             marginBottom: '0.1rem',
           }}>
-            Listing <em style={{ fontStyle: 'italic', color: '#c5a05a' }}>tiers</em>
+            How <em style={{ fontStyle: 'italic', color: '#c5a05a' }}>tokens</em> work
           </h2>
           <div className="tok-section-rule" />
-          <p style={{
-            fontSize: 12,
-            color: 'rgba(236,232,225,0.35)',
-            fontWeight: 300,
-            marginBottom: '1.5rem',
-          }}>
-            Tiers stack — extend any time by spending more tokens
-          </p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 12 }}>
-            {TIER_COSTS.map(t => (
-              <div key={t.tier} style={{
+            {[
+              { icon: 'ti-coins', title: 'Buy here', desc: 'Tokens are sold on this page only. They land in your account straight away once the payment settles.' },
+              { icon: 'ti-broadcast', title: 'Watch a live show', desc: 'Your balance is the same on SecretXperience — sign in there and open any live show.' },
+              { icon: 'ti-heart', title: 'Tip the performer', desc: 'Tips of 10 to 250 tokens go to the performer and appear in the show chat. Tokens have no other use.' },
+            ].map(step => (
+              <div key={step.title} style={{
                 background: 'rgba(255,255,255,0.025)',
                 border: '0.5px solid rgba(255,255,255,0.07)',
                 borderRadius: 12,
                 padding: '1.25rem',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.6rem' }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: '#ece8e1' }}>{t.label}</span>
-                  <span style={{
-                    fontSize: 11,
-                    fontWeight: 700,
-                    color: '#c5a05a',
-                    background: 'rgba(197,160,90,0.1)',
-                    borderRadius: 6,
-                    padding: '2px 8px',
-                  }}>
-                    {t.tokens === 0 ? 'Free' : `${t.tokens} ◈`}
-                  </span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: '0.6rem' }}>
+                  <i className={`ti ${step.icon}`} style={{ fontSize: 16, color: '#c5a05a' }} />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: '#ece8e1' }}>{step.title}</span>
                 </div>
-                <p style={{ fontSize: 12, color: 'rgba(236,232,225,0.45)', lineHeight: 1.6, marginBottom: '0.5rem', fontWeight: 300 }}>{t.desc}</p>
-                <p style={{ fontSize: 11, color: 'rgba(236,232,225,0.25)' }}>
-                  {t.days === 0 ? 'Always on' : `Duration: ${t.days} days`}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── ADD-ONS ── */}
-        <div style={{ marginBottom: '3.5rem' }}>
-          <h2 style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: 'clamp(22px, 3vw, 30px)',
-            fontWeight: 400,
-            color: '#ece8e1',
-            marginBottom: '1.25rem',
-          }}>
-            Add‑ons
-          </h2>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>
-            {ADD_ONS.map(a => (
-              <div key={a.label} style={{
-                background: 'rgba(255,255,255,0.025)',
-                border: '0.5px solid rgba(255,255,255,0.07)',
-                borderRadius: 10,
-                padding: '0.75rem 1.25rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-              }}>
-                <span style={{ fontSize: 13, color: '#ece8e1' }}>{a.label}</span>
-                <span style={{ fontSize: 12, fontWeight: 700, color: '#c5a05a' }}>{a.tokens} ◈</span>
+                <p style={{ fontSize: 12, color: 'rgba(236,232,225,0.45)', lineHeight: 1.6, fontWeight: 300 }}>{step.desc}</p>
               </div>
             ))}
           </div>
@@ -955,7 +996,7 @@ export default function TokensPage() {
             Accepted payment methods
           </p>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: '1.5rem' }}>
-            {['Visa', 'Mastercard', 'Cryptocurrency', 'Bank Transfer'].map(m => (
+            {(CARDS_LIVE ? ['Visa', 'Mastercard', 'Cryptocurrency'] : ['Cryptocurrency']).map(m => (
               <span key={m} style={{
                 fontSize: 11,
                 color: 'rgba(236,232,225,0.4)',
@@ -970,7 +1011,7 @@ export default function TokensPage() {
           </div>
           <p style={{ fontSize: 12, color: 'rgba(236,232,225,0.28)', lineHeight: 1.8, maxWidth: 640, fontWeight: 300 }}>
             Payments are processed securely via an adult-friendly payment processor. All transactions are encrypted. Tokens are non-refundable except as required by applicable Belgian consumer law (14-day withdrawal right). Token purchases appear discreetly on your statement. By purchasing you agree to our{' '}
-            <a href="/terms" style={{ color: 'rgba(197,160,90,0.6)', textDecoration: 'none' }}>Terms of Use</a>.
+            <a href="/terms" style={{ color: 'rgba(197,160,90,0.6)', textDecoration: 'none' }}>Terms of Sale</a>.
           </p>
         </div>
       </main>
@@ -989,10 +1030,14 @@ export default function TokensPage() {
               <i className="ti ti-lock" style={{ fontSize: 24, color: '#e8c97a' }} />
             </div>
             <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 26, fontWeight: 400, color: '#ece8e1', marginBottom: 10 }}>
-              Payment coming soon
+              {payError ? 'Checkout could not start' : 'Card payments coming soon'}
             </div>
             <p style={{ fontSize: 14, color: 'rgba(236,232,225,0.55)', lineHeight: 1.6, marginBottom: 24 }}>
-              Secure token checkout is being finalised. To purchase tokens or enquire about early access, contact us directly.
+              {payError
+                ? `${payError} Please try again, or contact us and we'll sort it out.`
+                : 'Card checkout is still being finalised. You can buy tokens right now with ' +
+                  '“Pay with crypto” — the checkout page also accepts a card in many countries. ' +
+                  'Prefer to wait, or need a hand? Contact us.'}
             </p>
             <a
               href="mailto:support@secretxperience.eu"
@@ -1002,7 +1047,7 @@ export default function TokensPage() {
             </a>
             <div style={{ marginTop: 8 }}>
               <button
-                onClick={() => { setShowPayModal(false); setSelected(null) }}
+                onClick={() => { setShowPayModal(false); setSelected(null); setPayError(null) }}
                 style={{ background: 'none', border: 'none', color: 'rgba(236,232,225,0.35)', fontSize: 12, cursor: 'pointer', padding: '6px 12px' }}
               >
                 Close
@@ -1014,16 +1059,12 @@ export default function TokensPage() {
 
       <footer style={{ borderTop: '0.5px solid rgba(197,160,90,0.1)', padding: '2rem 24px', textAlign: 'center' }}>
         <p style={{ fontSize: 11, color: 'rgba(236,232,225,0.25)', fontWeight: 300 }}>
-          © 2026 SecretXperience.eu ·{' '}
-          <a href="/regulations" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Regulations</a>
-          {' '}·{' '}
-          <a href="/medical" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Medical Info</a>
-          {' '}·{' '}
-          <a href="/terms" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Terms</a>
+          © 2026 SecretXperience ·{' '}
+          <a href="/terms" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Terms of Sale</a>
           {' '}·{' '}
           <a href="/privacy" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Privacy</a>
           {' '}·{' '}
-          <a href="/contact" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Support</a>
+          <a href="mailto:support@secretxperience.eu" style={{ color: 'rgba(197,160,90,0.5)', textDecoration: 'none' }}>Support</a>
         </p>
       </footer>
     </div>

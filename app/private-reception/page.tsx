@@ -45,6 +45,7 @@ const HOST_TYPES = [
 ]
 
 const CATEGORIES = [
+  { value: 'escorts',       label: 'Escorts' },
   { value: 'companionship', label: 'Companionship' },
   { value: 'massage',       label: 'Massage' },
   { value: 'domination',    label: 'Domination' },
@@ -160,7 +161,7 @@ function SpotlightStrip({ items, discreet }: { items: Listing[]; discreet: boole
 
 function HostCard({ l, discreet, isPremier }: { l: Listing; discreet: boolean; isPremier?: boolean }) {
   const [imgIdx, setImgIdx] = useState(0)
-  const imgs = l.images || []
+  const imgs = (l.images || []).slice(0, 5) // max 5 photos per ad
   const img = imgs[imgIdx] || imgs[0] || null
   const availNow = isAvailableNow(l.tags)
   const isNew = isNewListing(l.created_at)
@@ -283,7 +284,17 @@ export default function PrivateReceptionPage() {
     return false
   })
 
-  const [hostType, setHostType]         = useState('women')
+  const [hostType, setHostType]         = useState(() => {
+    if (typeof window !== 'undefined') {
+      const g = new URLSearchParams(window.location.search).get('gender')
+      if (g === 'female') return 'women'
+      if (g === 'male')   return 'men'
+      if (g === 'trans')  return 'trans-woman'
+      if (g === 'couple') return 'couples'
+      if (g === 'gay')    return 'all'
+    }
+    return 'women'
+  })
   const [category, setCategory]         = useState(() => {
     if (typeof window !== 'undefined') {
       const p = new URLSearchParams(window.location.search).get('cat')
@@ -291,7 +302,13 @@ export default function PrivateReceptionPage() {
     }
     return 'all'
   })
-  const [orientation, setOrientation]   = useState('all')
+  const [orientation, setOrientation]   = useState(() => {
+    if (typeof window !== 'undefined') {
+      const g = new URLSearchParams(window.location.search).get('gender')
+      if (g === 'gay') return 'gay'
+    }
+    return 'all'
+  })
   const [city, setCity]                 = useState('All Cities')
   const [priceMin, setPriceMin]         = useState(0)
   const [priceMax, setPriceMax]         = useState(1000)
@@ -300,19 +317,19 @@ export default function PrivateReceptionPage() {
   const [hairColor, setHairColor]       = useState('Any')
   const [build, setBuild]               = useState('Any')
   const [selectedServices, setSelectedServices] = useState<string[]>([])
-  const [sortBy, setSortBy]             = useState<'rating' | 'price_asc' | 'price_desc' | 'newest' | 'available'>('rating')
+  const [sortBy, setSortBy]             = useState<'rating' | 'price_asc' | 'price_desc' | 'newest' | 'available' | 'city'>('rating')
 
   const fetchListings = useCallback(async () => {
     setLoading(true)
-    const cats = category === 'all'
-      ? ['companionship', 'massage', 'domination', 'experiences']
-      : [category]
-
+    // "Private reception" is a venue type carried on the listing's subcategory, not a
+    // category of its own — 269 of the 281 tagged ads are escorts, so filter on the
+    // tag across every category instead of a category whitelist.
     let q = supabase
       .from('listings')
       .select('id,title,description,category,subcategory,city,country,price_from,price_to,currency,meet_type,images,image_focus,verified,premium,rating,review_count,tags,created_at,featured_until,age')
       .eq('active', true)
-      .in('category', cats)
+      .ilike('subcategory', 'private reception%')
+    if (category !== 'all') q = q.eq('category', category)
 
     if (city !== 'All Cities') q = q.eq('city', city)
     if (verifiedOnly) q = q.eq('verified', true)
@@ -322,9 +339,10 @@ export default function PrivateReceptionPage() {
     if (sortBy === 'rating') q = q.order('rating', { ascending: false, nullsFirst: false })
     else if (sortBy === 'price_asc') q = q.order('price_from', { ascending: true, nullsFirst: false })
     else if (sortBy === 'price_desc') q = q.order('price_from', { ascending: false, nullsFirst: false })
+    else if (sortBy === 'city') q = q.order('city', { ascending: true, nullsFirst: false })
     else q = q.order('created_at', { ascending: false })
 
-    q = q.limit(60)
+    q = q.limit(sortBy === 'city' ? 1000 : 60) // load full set for the per-municipality directory
 
     const { data } = await q
     let results = data ?? []
@@ -369,6 +387,28 @@ export default function PrivateReceptionPage() {
 
   useEffect(() => { fetchListings() }, [fetchListings])
 
+  // Filter toast for arrivals from homepage pill dropdowns
+  const [filterToast, setFilterToast] = useState<string | null>(null)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const g = new URLSearchParams(window.location.search).get('gender')
+    const c = new URLSearchParams(window.location.search).get('cat')
+    let label = ''
+    if (g === 'female')      label = 'Vrouwen'
+    else if (g === 'male')   label = 'Mannen'
+    else if (g === 'trans')  label = 'Transgenders'
+    else if (g === 'couple') label = 'Koppels'
+    else if (g === 'gay')    label = "Homo's"
+    else if (c === 'companionship') label = 'Companionship'
+    else if (c === 'massage')       label = 'Massage'
+    else if (c === 'domination')    label = 'Dominantie'
+    else if (c === 'experiences')   label = 'Experiences'
+    if (!label) return
+    setFilterToast(`Gefilterd op: ${label}`)
+    const t = setTimeout(() => setFilterToast(null), 3500)
+    return () => clearTimeout(t)
+  }, [])
+
   function toggleService(s: string) {
     setSelectedServices(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])
   }
@@ -411,6 +451,12 @@ export default function PrivateReceptionPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {filterToast && (
+        <div style={{ position: 'fixed', top: 78, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: 'linear-gradient(90deg,#b45cff,#7a4dff)', color: '#fff', borderRadius: 999, padding: '10px 20px', fontSize: 13, fontWeight: 600, boxShadow: '0 12px 32px rgba(0,0,0,0.4)', display: 'inline-flex', alignItems: 'center', gap: 8, animation: 'sxFilterToastIn .35s cubic-bezier(.2,.8,.4,1)' }}>
+          <span>🏠</span> {filterToast}
+        </div>
+      )}
+      <style>{`@keyframes sxFilterToastIn { from { opacity:0; transform:translate(-50%,-10px) } to { opacity:1; transform:translate(-50%,0) } }`}</style>
       <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--t)', fontFamily: 'var(--sans)' }}>
         <style>{`
           *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -632,6 +678,7 @@ export default function PrivateReceptionPage() {
                   <option value="price_asc">Price: Low → High</option>
                   <option value="price_desc">Price: High → Low</option>
                   <option value="newest">Newest</option>
+                  <option value="city">Per gemeente (A–Z)</option>
                 </select>
               </div>
             </div>
@@ -659,7 +706,34 @@ export default function PrivateReceptionPage() {
                 <p style={{ fontSize: '14px', marginBottom: '1.5rem' }}>Try adjusting your filters</p>
                 <button onClick={resetFilters} style={{ background: 'var(--grad-gold)', border: 'none', borderRadius: '999px', padding: '10px 24px', color: '#000', fontWeight: 700, fontSize: '13px', cursor: 'pointer', fontFamily: 'var(--sans)' }}>Clear all filters</button>
               </div>
-            ) : (() => {
+            ) : sortBy === 'city' ? (() => {
+                // Redlights-style: grouped per municipality, each header shows the city + ad count
+                const groups = Object.entries(
+                  listings.reduce((acc: Record<string, Listing[]>, l) => {
+                    const c = (l.city || '').trim() || 'Overige'
+                    ;(acc[c] ||= []).push(l)
+                    return acc
+                  }, {})
+                ).sort((a, b) => a[0].localeCompare(b[0], 'nl'))
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+                    {groups.map(([cityName, items]) => (
+                      <div key={cityName}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+                          <span style={{ fontFamily: 'var(--serif)', fontSize: '20px', color: 'var(--t)', whiteSpace: 'nowrap' }}>
+                            <i className="ti ti-map-pin" style={{ color: 'var(--gold)', marginRight: 6 }} />{cityName}
+                            <span style={{ color: 'var(--gold)', marginLeft: 8 }}>{items.length}</span>
+                          </span>
+                          <div style={{ flex: 1, height: '0.5px', background: 'linear-gradient(90deg, rgba(197,160,90,0.35), transparent)' }} />
+                        </div>
+                        <div className="listing-grid">
+                          {items.map(l => <HostCard key={l.id} l={l} discreet={discreetMode} isPremier={l.premium} />)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )
+              })() : (() => {
                 const now = new Date().toISOString()
                 const premierList  = listings.filter(l => l.premium && !(l.featured_until && l.featured_until > now))
                 const standardList = listings.filter(l => !l.premium)

@@ -10,9 +10,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { createClient } from '@supabase/supabase-js'
-import { siteUrl } from '../../../lib/site'
-
-const SITE = siteUrl()
+import { SHOP_ORIGIN, isShopHost } from '../../../lib/domains'
 
 export async function POST(req: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -29,6 +27,12 @@ export async function POST(req: NextRequest) {
 
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return NextResponse.json({ error: 'Please log in to purchase.' }, { status: 401 })
+
+  // Card checkout only ever starts on the storefront: that is the domain the
+  // Stripe account is registered for, and /shop on the marketplace redirects there.
+  if (!isShopHost(req.headers.get('host'))) {
+    return NextResponse.json({ error: `The boutique is at ${SHOP_ORIGIN}` }, { status: 403 })
+  }
 
   const { productId } = await req.json()
   if (!productId) return NextResponse.json({ error: 'productId required' }, { status: 400 })
@@ -74,8 +78,8 @@ export async function POST(req: NextRequest) {
       quantity: 1,
     }],
     metadata: { order_id: order?.id || '', product_id: product.id, buyer_id: session.user.id },
-    success_url: `${SITE}/shop?order=success`,
-    cancel_url: `${SITE}/shop?order=cancelled`,
+    success_url: `${SHOP_ORIGIN}/?order=success`,
+    cancel_url: `${SHOP_ORIGIN}/?order=cancelled`,
   })
 
   if (order?.id) {

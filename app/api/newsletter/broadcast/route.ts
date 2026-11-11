@@ -2,6 +2,7 @@ import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { MAIL_FROM, MAIL_REPLY_TO } from '../../../lib/mail-from'
 
 export async function POST(req: NextRequest) {
   const cookieStore = cookies()
@@ -50,7 +51,7 @@ export async function POST(req: NextRequest) {
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(
         chunk.map((to: string) => ({
-          from: 'SecretXperience <hello@secretxperience.eu>',
+          from: MAIL_FROM, reply_to: MAIL_REPLY_TO,
           to,
           subject,
           html,

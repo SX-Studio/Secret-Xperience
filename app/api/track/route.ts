@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { isOwnHost } from '../../lib/domains'
 
 // First-party pageview beacon. Privacy-first by design:
 //  - stores the pathname only (query string dropped — never captures tokens/PII in URLs)
@@ -33,7 +34,7 @@ export async function POST(req: NextRequest) {
     if (ref) {
       try {
         const host = new URL(ref).hostname
-        if (host && !host.endsWith('secretxperience.eu')) referrer_host = host.slice(0, 120)
+        if (host && !isOwnHost(host)) referrer_host = host.slice(0, 120)
       } catch { /* ignore malformed referrer */ }
     }
 

@@ -18,6 +18,7 @@ const CATEGORIES = [
   { value: 'nightlife',     label: 'Nightlife',      icon: '◐' },
   { value: 'experiences',   label: 'Experiences',    icon: '◆' },
   { value: 'rentals',       label: 'Rentals',        icon: '□' },
+  { value: 'hotels',        label: 'Hotels',         icon: '⌂' },
   { value: 'events',        label: 'Event Spaces',   icon: '◳' },
   { value: 'photo',         label: 'Photo / Video',  icon: '◑' },
   { value: 'memberships',   label: 'Memberships',    icon: '◈' },
@@ -52,6 +53,11 @@ const SERVICE_TAGS: Record<string, string[]> = {
 const ETHNICITY_OPTIONS = ETHNICITIES
 const BUILD_OPTIONS     = BUILDS
 const HAIR_OPTIONS      = HAIR_COLOURS
+const GENDER_OPTIONS    = ['Woman', 'Man', 'Trans woman', 'Trans man', 'Non-binary', 'Couple']
+const EYE_OPTIONS       = ['Brown', 'Blue', 'Green', 'Hazel', 'Grey', 'Amber']
+const CUP_OPTIONS       = ['A', 'B', 'C', 'D', 'DD', 'E', 'F+']
+const HAIRSTYLE_OPTIONS = ['Shaved', 'Trimmed', 'Natural']
+const YESNO_OPTIONS     = ['Yes', 'No']
 
 const STATS_CATEGORIES  = ['escorts', 'companionship', 'massage', 'domination']
 const WH_CATEGORIES     = ['escorts', 'companionship', 'massage', 'domination', 'nightlife', 'adult']
@@ -62,6 +68,7 @@ const WH_DAY_LABELS     = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
 interface FormState {
   category:    string
+  extra_categories: string[]
   subcategory: string
   title:       string
   description: string
@@ -79,6 +86,13 @@ interface FormState {
   ethnicity:   string
   build:       string
   hair:        string
+  gender:      string
+  eyes:        string
+  cup:         string
+  hairstyle:   string
+  tattoos:     string
+  piercings:   string
+  smoker:      string
   tier:        string
   website:     string
   contact_phone:  string
@@ -87,14 +101,6 @@ interface FormState {
   wh_fri: string; wh_sat: string; wh_sun: string
 }
 
-const LISTING_TIERS = [
-  { id: 'basic',    label: 'Basic',            tokens: 0,    days: 1,  desc: 'Standard grid listing — free, always on',          color: '#ffffff44' },
-  { id: 'featured', label: 'Featured',         tokens: 50,   days: 7,  desc: 'Gold-border, priority in category grid',           color: '#c5a05a' },
-  { id: 'slider',   label: 'Slider Ad',        tokens: 200,  days: 7,  desc: 'Rotating slideshow ad — site-wide visibility',     color: '#7a8aee' },
-  { id: 'section',  label: 'Section Premium',  tokens: 240,  days: 7,  desc: 'Full-width banner across your category page',      color: '#5ec8c0' },
-  { id: 'premium',  label: 'Premium',          tokens: 300,  days: 30, desc: 'Top of category for 30 days, premium badge',       color: '#e0a0c8' },
-  { id: 'homepage', label: 'Homepage Premium', tokens: 1100, days: 30, desc: 'Full-width banner on the homepage — max exposure', color: '#e8c97a' },
-]
 
 interface UploadingImage {
   id:       string
@@ -179,13 +185,13 @@ export default function CreateListingPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError]     = useState('')
-  const [wallet, setWallet]   = useState<{ balance: number } | null>(null)
   // Identity-verification gate: 'loading' until checked, then verified / pending / rejected / none.
   const [verifGate, setVerifGate] = useState<'loading' | 'verified' | 'pending' | 'rejected' | 'none'>('loading')
 
   const [form, setForm] = useState<FormState>({
     tier:        'basic',
     category:    '',
+    extra_categories: [],
     subcategory: '',
     title:       '',
     description: '',
@@ -203,6 +209,13 @@ export default function CreateListingPage() {
     ethnicity:   '',
     build:       '',
     hair:        '',
+    gender:      '',
+    eyes:        '',
+    cup:         '',
+    hairstyle:   '',
+    tattoos:     '',
+    piercings:   '',
+    smoker:      '',
     website:        '',
     contact_phone:  '',
     whatsapp_optin: false,
@@ -286,10 +299,6 @@ export default function CreateListingPage() {
           : verif?.status === 'rejected' ? 'rejected'
           : 'none')
       }
-      // Load token wallet
-      const { data: w } = await supabase
-        .from('user_wallets').select('balance').eq('user_id', session.user.id).maybeSingle()
-      setWallet(w)
       // Check for saved draft. If one exists, hold autosave until the user
       // resumes or dismisses it; otherwise enable autosave right away.
       try {
@@ -515,7 +524,7 @@ export default function CreateListingPage() {
         .gte('created_at', since)
         .limit(1)
       if (recent && recent.length > 0) {
-        setError('Basic listings are limited to one per 24 hours. Upgrade to Featured, Slider Ad, or Premium to list more.')
+        setError('Listings are limited to one per 24 hours. Please try again tomorrow.')
         setLoading(false)
         return
       }
@@ -527,6 +536,18 @@ export default function CreateListingPage() {
       if (form.ethnicity) statTags.push(`Ethnicity: ${form.ethnicity}`)
       if (form.build)     statTags.push(`Build: ${form.build}`)
       if (form.hair)      statTags.push(`Hair: ${form.hair}`)
+      if (form.gender) {
+        statTags.push(`Gender: ${form.gender}`)
+        // Same `type:` tag the dashboard editor writes, so the escorts/pride/discover filters match new adverts.
+        const typeTag: Record<string, string> = { 'Woman': 'women', 'Man': 'men', 'Trans woman': 'trans woman', 'Trans man': 'trans man', 'Non-binary': 'non-binary', 'Couple': 'couples' }
+        if (typeTag[form.gender]) statTags.push(`type:${typeTag[form.gender]}`)
+      }
+      if (form.eyes)      statTags.push(`Eyes: ${form.eyes}`)
+      if (form.cup)       statTags.push(`Cup: ${form.cup}`)
+      if (form.hairstyle) statTags.push(`Hairstyle: ${form.hairstyle}`)
+      if (form.tattoos)   statTags.push(`Tattoos: ${form.tattoos}`)
+      if (form.piercings) statTags.push(`Piercings: ${form.piercings}`)
+      if (form.smoker)    statTags.push(`Smoker: ${form.smoker}`)
     }
     const whTags: string[] = []
     if (WH_CATEGORIES.includes(form.category)) {
@@ -546,6 +567,7 @@ export default function CreateListingPage() {
       title:           form.title,
       description:     form.description || null,
       category:        form.category,
+      extra_categories: form.extra_categories.filter(c => c && c !== form.category).slice(0, 2),
       subcategory:     form.subcategory || null,
       price_from:      form.price_from ? parseInt(form.price_from) : null,
       price_to:        form.price_to   ? parseInt(form.price_to)   : null,
@@ -582,37 +604,6 @@ export default function CreateListingPage() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.NEXT_PUBLIC_INTERNAL_SECRET || 'sx-internal'}` },
         body: JSON.stringify({ listingId: newListing.id, title: form.title, description: form.description, category: form.category }),
       }).catch(() => {})
-    }
-
-    // Spend tokens for the chosen tier — must succeed before continuing
-    if (newListing?.id && form.tier !== 'basic') {
-      try {
-        const spendRes = await fetch('/api/tokens/spend', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ listingId: newListing.id, tier: form.tier }),
-        })
-        const spendData = await spendRes.json().catch(() => ({}))
-        if (!spendRes.ok) {
-          // Downgrade to basic if token spend fails (insufficient balance etc.)
-          await supabase.from('listings').update({ tier: 'basic', tier_expires_at: null }).eq('id', newListing.id)
-          if (spendRes.status === 402) {
-            setError('Insufficient tokens — listing saved as basic. Top up your wallet to upgrade.')
-          } else {
-            setError(spendData.error || 'Token spend failed — listing saved as basic tier.')
-          }
-          setLoading(false)
-          return
-        }
-        if (spendData.warning) {
-          setError(spendData.warning)
-        }
-      } catch (e) {
-        await supabase.from('listings').update({ tier: 'basic', tier_expires_at: null }).eq('id', newListing.id)
-        setError('Could not process token payment — listing saved as basic tier.')
-        setLoading(false)
-        return
-      }
     }
 
     // Check if advertiser has Stripe connected
@@ -1084,7 +1075,7 @@ export default function CreateListingPage() {
                   <div
                     key={cat.value}
                     className={`cl-category-card${form.category === cat.value ? ' selected' : ''}`}
-                    onClick={() => set('category', cat.value)}
+                    onClick={() => setForm(f => ({ ...f, category: cat.value, extra_categories: f.extra_categories.filter(x => x !== cat.value) }))}
                   >
                     <span
                       className="cl-cat-icon"
@@ -1120,6 +1111,45 @@ export default function CreateListingPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Extra categories — an ad can appear in up to 3 categories total */}
+              {form.category && (
+                <div style={{ marginBottom: '2rem' }}>
+                  <label style={label}>Also list in (optional — up to 2 more)</label>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px' }}>
+                    {CATEGORIES.filter(c => c.value !== form.category).map(c => {
+                      const on = form.extra_categories.includes(c.value)
+                      const full = form.extra_categories.length >= 2
+                      return (
+                        <button
+                          type="button"
+                          key={c.value}
+                          disabled={!on && full}
+                          onClick={() => setForm(f => ({
+                            ...f,
+                            extra_categories: on
+                              ? f.extra_categories.filter(x => x !== c.value)
+                              : (f.extra_categories.length >= 2 ? f.extra_categories : [...f.extra_categories, c.value]),
+                          }))}
+                          style={{
+                            padding: '7px 14px', borderRadius: '20px', fontSize: '12px', fontFamily: 'var(--sans)',
+                            cursor: (!on && full) ? 'not-allowed' : 'pointer',
+                            border: on ? '1px solid var(--gold, #c5a05a)' : '0.5px solid var(--b2, rgba(255,255,255,0.12))',
+                            background: on ? 'var(--gbg, rgba(197,160,90,0.12))' : 'transparent',
+                            color: on ? 'var(--gold, #c5a05a)' : 'var(--t2, rgba(255,255,255,0.6))',
+                            opacity: (!on && full) ? 0.4 : 1,
+                          }}
+                        >
+                          {c.icon} {c.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <p style={{ fontSize: '11px', color: 'var(--t3)', marginTop: '8px' }}>
+                    Your ad also shows on these category pages · {form.extra_categories.length}/2 selected
+                  </p>
+                </div>
+              )}
 
               {/* Subcategory for escorts */}
               {form.category === 'escorts' && (
@@ -1365,6 +1395,59 @@ export default function CreateListingPage() {
                       >
                         <option value="">Select…</option>
                         {HAIR_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Extra escort profile details */}
+                  <div className="cl-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginTop: '10px' }}>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Gender</label>
+                      <select className="cl-inp" style={inpField} value={form.gender} onChange={e => set('gender', e.target.value)}>
+                        <option value="">Select…</option>
+                        {GENDER_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Eye color</label>
+                      <select className="cl-inp" style={inpField} value={form.eyes} onChange={e => set('eyes', e.target.value)}>
+                        <option value="">Select…</option>
+                        {EYE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Cup size</label>
+                      <select className="cl-inp" style={inpField} value={form.cup} onChange={e => set('cup', e.target.value)}>
+                        <option value="">Select…</option>
+                        {CUP_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Intimate hairstyle</label>
+                      <select className="cl-inp" style={inpField} value={form.hairstyle} onChange={e => set('hairstyle', e.target.value)}>
+                        <option value="">Select…</option>
+                        {HAIRSTYLE_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Tattoo(s)</label>
+                      <select className="cl-inp" style={inpField} value={form.tattoos} onChange={e => set('tattoos', e.target.value)}>
+                        <option value="">Select…</option>
+                        {YESNO_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Piercing(s)</label>
+                      <select className="cl-inp" style={inpField} value={form.piercings} onChange={e => set('piercings', e.target.value)}>
+                        <option value="">Select…</option>
+                        {YESNO_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label style={{ ...label, marginBottom: '4px' }}>Smoker</label>
+                      <select className="cl-inp" style={inpField} value={form.smoker} onChange={e => set('smoker', e.target.value)}>
+                        <option value="">Select…</option>
+                        {YESNO_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
                       </select>
                     </div>
                   </div>
@@ -1844,51 +1927,6 @@ export default function CreateListingPage() {
           {step === 5 && (
             <div>
               <h2 className="cl-section-heading">Review &amp; Publish</h2>
-
-              {/* ── Tier picker ── */}
-              <div style={{ marginBottom:'2rem' }}>
-                <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.75rem' }}>
-                  <p style={{ fontSize:13, fontWeight:600, color:'var(--t,#ece8e1)', letterSpacing:'0.04em' }}>Choose your advertisement tier</p>
-                  {wallet ? (
-                    <a href="/tokens" target="_blank" rel="noopener" style={{ fontSize:12, color:'var(--gold,#c5a05a)', textDecoration:'none' }}>
-                      ◈ {wallet.balance} tokens available
-                    </a>
-                  ) : (
-                    <a href="/tokens" target="_blank" rel="noopener" style={{ fontSize:12, color:'var(--gold,#c5a05a)', textDecoration:'none' }}>Buy tokens →</a>
-                  )}
-                </div>
-                <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))', gap:10 }}>
-                  {LISTING_TIERS.map(t => {
-                    const active = form.tier === t.id
-                    const canAfford = !wallet || wallet.balance >= t.tokens || t.id === 'basic'
-                    return (
-                      <button key={t.id} type="button"
-                        onClick={() => setForm(f => ({ ...f, tier: t.id }))}
-                        style={{
-                          background: active ? `${t.color}18` : 'var(--bg2,rgba(255,255,255,0.02))',
-                          border: `0.5px solid ${active ? t.color : 'rgba(255,255,255,0.08)'}`,
-                          borderRadius:12, padding:'1rem', textAlign:'left', cursor:'pointer',
-                          transition:'all .15s', opacity: canAfford ? 1 : 0.45,
-                        }}>
-                        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'0.4rem' }}>
-                          <span style={{ fontSize:13, fontWeight:600, color: active ? t.color : 'var(--t,#ece8e1)' }}>{t.label}</span>
-                          <span style={{ fontSize:11, fontWeight:700, color:t.color, background:`${t.color}18`, borderRadius:6, padding:'2px 7px' }}>
-                            {t.id === 'basic' ? 'Free' : `${t.tokens} ◈`}
-                          </span>
-                        </div>
-                        <p style={{ fontSize:11, color:'var(--t3,rgba(255,255,255,0.25))', lineHeight:1.5, marginBottom:'0.3rem' }}>{t.desc}</p>
-                        <p style={{ fontSize:10, color:'var(--t3,rgba(255,255,255,0.2))' }}>{t.id === 'basic' ? 'Always on' : `${t.days} days`}</p>
-                      </button>
-                    )
-                  })}
-                </div>
-                {form.tier !== 'basic' && wallet && wallet.balance < (LISTING_TIERS.find(t => t.id === form.tier)?.tokens ?? 0) && (
-                  <p style={{ fontSize:12, color:'#e05a5a', marginTop:'0.5rem' }}>
-                    Insufficient tokens for this tier.{' '}
-                    <a href="/tokens" target="_blank" rel="noopener" style={{ color:'var(--gold,#c5a05a)' }}>Buy tokens →</a>
-                  </p>
-                )}
-              </div>
 
               {/* Review card */}
               <div style={{

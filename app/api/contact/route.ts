@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
+import { MAIL_FROM } from '../../lib/mail-from'
 
 function esc(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
       method: 'POST',
       headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        from: 'SecretXperience <no-reply@secretxperience.eu>',
+        from: MAIL_FROM,
         to: ['support@secretxperience.eu'],
         reply_to: email,
         subject: `[Contact] ${safeSubject} — ${safeName}`,

@@ -231,7 +231,6 @@ export default function DiscoverPage() {
     <div style={{ minHeight: '100vh', background: '#080608', color: '#ece8e1', fontFamily: "'Poppins', sans-serif", display: 'flex', flexDirection: 'column' }}>
       <style>{`
         
-        @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css');
         *{box-sizing:border-box;margin:0;padding:0}
         .disc-like-ind,.disc-skip-ind{position:absolute;top:32px;z-index:10;font-size:13px;font-weight:700;letter-spacing:.12em;padding:8px 18px;border-radius:10px;transition:none;pointer-events:none;opacity:0;text-transform:uppercase}
         .disc-like-ind{right:20px;color:#3ecf8e;border:2px solid #3ecf8e;background:rgba(62,207,142,0.12);transform:rotate(10deg)}

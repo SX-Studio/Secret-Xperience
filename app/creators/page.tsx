@@ -9,6 +9,7 @@ import CreatorHub from './CreatorHub'
 import CollabsPromo from './CollabsPromo'
 import AIGirlfriendBanner from './AIGirlfriendBanner'
 import OnlyFansShowcase from '../components/OnlyFansShowcase/OnlyFansShowcase'
+import AIAngelsBanner from '../components/AIAngelsBanner'
 
 export async function generateMetadata() {
   return {
@@ -185,6 +186,11 @@ export default async function CreatorsPage() {
 
           {/* CREATOR HUB — slide banners, stats, meet & greets, expos, journal, earnings, brands */}
           <CreatorHub creatorCount={allListings.length} />
+
+          {/* AI Angels affiliate banner — aiangels.io */}
+          <div style={{ marginBottom: '2rem' }}>
+            <AIAngelsBanner />
+          </div>
 
           {/* OnlyFans directory — inherits the neon palette */}
           <div style={{ margin: '0 -1.5rem 3rem' }}>

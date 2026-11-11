@@ -95,7 +95,7 @@ export default async function PrivateReceptionCityPage({ params }: { params: { c
     .from('listings')
     .select('id, title, category, city, country, price_from, images, verified, premium, age, tags')
     .eq('active', true)
-    .in('category', ['companionship', 'massage', 'domination', 'experiences'])
+    .ilike('subcategory', 'private reception%')
     .order('premium', { ascending: false })
     .limit(60)
 

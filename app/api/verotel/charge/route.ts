@@ -29,6 +29,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
+import { SHOP_ORIGIN, isShopHost } from '../../../lib/domains'
 
 const VEROTEL_SHOP_ID       = process.env.VEROTEL_SHOP_ID
 const VEROTEL_SIGNATURE_KEY = process.env.VEROTEL_SIGNATURE_KEY
@@ -53,6 +54,11 @@ export async function POST(req: NextRequest) {
     (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)!,
     { cookies: { getAll: () => cookieStore.getAll(), setAll: () => {} } }
   )
+
+  // Tokens are only sold on the storefront domain — the one a processor reviews.
+  if (!isShopHost(req.headers.get('host'))) {
+    return NextResponse.json({ error: `Tokens are sold on ${SHOP_ORIGIN}/tokens` }, { status: 403 })
+  }
 
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -90,13 +96,14 @@ export async function POST(req: NextRequest) {
       package_id:     pkg.id,
       tokens_granted: totalTokens,
       amount_eur:     pkg.price_eur,
-      advertiser:       'verotel',
+      provider:         'verotel',
       status:         'pending',
     })
     .select('id')
     .single()
 
   if (orderErr || !order) {
+    console.error('[payment_orders] insert failed:', orderErr?.message ?? orderErr)
     return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
   }
 

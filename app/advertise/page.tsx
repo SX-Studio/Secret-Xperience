@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import DestinationDeals from './DestinationDeals'
 
 const categories = [
   { icon: 'ti-user', title: 'Escorts & Companions', desc: 'Independent escorts, agency companions, GFE, touring — verified profiles with booking calendar and private messaging.', color: 'var(--grad-boudoir)' },
@@ -27,7 +28,7 @@ const plans = [
     name: 'Basic',
     price: '€0',
     period: 'to get started',
-    desc: 'Create your profile and go live for free. Use tokens to boost visibility.',
+    desc: 'Create your profile and go live for free.',
     cta: 'Create free profile',
     ctaHref: '/login',
     ctaStyle: 'ghost',
@@ -46,8 +47,8 @@ const plans = [
     price: '€29',
     period: 'for 7 days',
     desc: 'Gold-bordered card, priority placement in every category and search page.',
-    cta: 'Get featured',
-    ctaHref: '/boost',
+    cta: 'Contact us',
+    ctaHref: '/contact',
     ctaStyle: 'gold',
     highlight: true,
     features: [
@@ -65,8 +66,8 @@ const plans = [
     price: '€79',
     period: 'for 30 days',
     desc: 'Appear in the homepage featured slider — maximum visibility to every visitor.',
-    cta: 'Get in the slider',
-    ctaHref: '/boost',
+    cta: 'Contact us',
+    ctaHref: '/contact',
     ctaStyle: 'gold',
     features: [
       'Everything in Featured',
@@ -82,8 +83,8 @@ const plans = [
 const faqs = [
   { q: 'How quickly can I get my profile live?', a: 'Profiles go live within minutes after identity verification is approved — usually within a few hours.' },
   { q: 'Does my basic listing ever expire?', a: 'No. A basic listing is completely free and stays live permanently — set it up once and you never need to re-list or pay to keep it visible.' },
-  { q: 'What payment methods do you accept?', a: 'Featured placement boosts are processed via Stripe (card). Token packages for flash boosts and upgrades can also be purchased by card.' },
-  { q: 'How do tokens work?', a: 'Tokens are an optional platform currency — 1 token = €0.10. They are used for flash boosts (a short visibility bump) and to upgrade a listing tier. Your basic listing never costs tokens. Packages start from €2.50.' },
+  { q: 'How do I get featured or into the slider?', a: 'Paid placements are arranged directly with our team — contact us and we will set it up.' },
+  { q: 'How do tokens work?', a: 'Tokens are used to tip performers during live shows. They are sold at secretxperience.store and appear in the same account here. Listing on SecretXperience never costs tokens.' },
   { q: 'Is my personal information protected?', a: 'Yes. We never display your real name, address or personal contact details publicly. All client communication goes through our encrypted messaging system.' },
   { q: 'Can I list in multiple cities?', a: 'Yes. You can create listings in any city across Europe and manage them from one dashboard.' },
   { q: 'What is the difference between featured and slider?', a: 'Featured (€29/7 days) gives you a gold badge and priority in category/search pages. Slider (€79/30 days) adds placement in the homepage featured slider seen by every visitor.' },
@@ -167,6 +168,9 @@ export default function AdvertisePage() {
           ))}
         </div>
       </section>
+
+      {/* POPULAR DESTINATIONS (Booking.com) */}
+      <DestinationDeals />
 
       {/* BENEFITS */}
       <section style={{ padding: '6rem 1.5rem', background: 'var(--bg1)', borderTop: '0.5px solid var(--b)' }}>
@@ -283,7 +287,7 @@ export default function AdvertisePage() {
           <Link href="/login?next=/listings/create" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '15px 36px', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', border: 'none', borderRadius: 'var(--r)', color: '#0a0a0a', fontSize: '16px', fontWeight: 700, cursor: 'pointer', textDecoration: 'none' }}>
             <i className="ti ti-plus" /> Create your free profile
           </Link>
-          <p style={{ marginTop: '1.25rem', fontSize: '12px', color: 'var(--t3)' }}>Questions? Contact us at <a href="mailto:hello@secretxperience.eu" style={{ color: 'var(--gold)' }}>hello@secretxperience.eu</a></p>
+          <p style={{ marginTop: '1.25rem', fontSize: '12px', color: 'var(--t3)' }}>Questions? Contact us at <a href="mailto:support@secretxperience.eu" style={{ color: 'var(--gold)' }}>support@secretxperience.eu</a></p>
         </div>
       </section>
 

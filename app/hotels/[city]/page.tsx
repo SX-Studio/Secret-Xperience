@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import type { Metadata } from 'next'
 import { getCityEditorial, cityFaq } from '../../lib/cityContent'
+import BookingSearch from '../BookingSearch'
 
 const CITIES: Record<string, string> = {
   brussels:   'Brussels',
@@ -157,6 +158,8 @@ export default async function HotelsCityPage({ params }: { params: { city: strin
               </div>
             )}
           </div>
+
+          <BookingSearch defaultCity={cityName} />
 
           {(!listings || listings.length === 0) ? (
             <div style={{ textAlign: 'center', padding: '4rem 0', color: S.t2 }}>

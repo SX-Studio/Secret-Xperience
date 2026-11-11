@@ -10,6 +10,7 @@ import UpcomingEventBanner from './components/UpcomingEventBanner'
 import PartnersShowcase from './components/PartnersShowcase/PartnersShowcase'
 import VenuesShowcase from './components/VenuesShowcase'
 import OnlyFansShowcase from './components/OnlyFansShowcase/OnlyFansShowcase'
+import AIAngelsBanner from './components/AIAngelsBanner'
 import StripchatLive from './components/StripchatLive/StripchatLive'
 import HeroThemes from './components/HeroThemes/HeroThemes'
 import ShopShowcase from './components/ShopShowcase/ShopShowcase'
@@ -67,6 +68,10 @@ if (_ageOk > Date.now()) {
 function showRoleStep(){
   var box = gate ? gate.querySelector('.gate-box') : null;
   if (!box) { dismissGate(); return; }
+  // Past the age check the platform shows through behind the role card.
+  gate.style.background = 'rgba(6,4,12,0.35)';
+  gate.style.backdropFilter = 'none';
+  gate.style.webkitBackdropFilter = 'none';
   box.innerHTML = '<div style="position:absolute;top:-60px;left:50%;transform:translateX(-50%);width:200px;height:200px;background:radial-gradient(circle,rgba(197,160,90,0.15) 0%,transparent 70%);pointer-events:none;"></div>'
     + '<div style="font:600 11px/1 var(--sans);letter-spacing:0.32em;color:var(--gold);text-align:center;margin-bottom:1.25rem;text-transform:uppercase;position:relative;z-index:2;">Welcome</div>'
     + '<h2 style="font-family:var(--serif);font-size:24px;font-weight:400;text-align:center;margin:0 0 0.4rem;position:relative;z-index:2;">How would you like to explore?</h2>'
@@ -84,8 +89,8 @@ function showRoleStep(){
   var hov = function(b){ b.addEventListener('mouseover',function(){b.style.borderColor='var(--gold)';b.style.background='var(--gbg)';}); b.addEventListener('mouseout',function(){b.style.borderColor='var(--b2)';b.style.background='var(--bg2)';}); };
   var bv = document.getElementById('roleVisitor');
   var bp = document.getElementById('roleAdvertiser');
-  if (bv) { hov(bv); bv.addEventListener('click', function(){ try{localStorage.setItem('sx_role','visitor');}catch(e){} dismissGate(); }); }
-  if (bp) { hov(bp); bp.addEventListener('click', function(){ try{localStorage.setItem('sx_role','provider');}catch(e){} dismissGate(); window.location.href='/advertise'; }); }
+  if (bv) { hov(bv); bv.addEventListener('click', function(){ try{localStorage.setItem('sx_role','visitor');localStorage.setItem('sx_welcome_choice','member');}catch(e){} dismissGate(); }); }
+  if (bp) { hov(bp); bp.addEventListener('click', function(){ try{localStorage.setItem('sx_role','provider');localStorage.setItem('sx_welcome_choice','creator');}catch(e){} dismissGate(); window.location.href='/advertise'; }); }
 }
 document.getElementById('gyes').addEventListener('click', function(){
   // Lock in age verification immediately, then offer role choice
@@ -197,9 +202,20 @@ document.querySelectorAll('.cat').forEach(function(c){
       var isOpen = menu && menu.classList.contains('open');
       closeAllGroups();
       if (!isOpen && menu){
+        // Belt-and-braces: re-portal to body every open. Guarantees the menu
+        // escapes the catbar's overflow:auto clip region even if the initial
+        // portal missed it or the catbar was rebuilt.
+        if (menu.parentElement !== document.body) document.body.appendChild(menu);
         var rect = pill.getBoundingClientRect();
-        (menu as HTMLElement).style.left = rect.left + 'px';
-        (menu as HTMLElement).style.top = (rect.bottom + 8) + 'px';
+        var m = menu as HTMLElement;
+        m.style.position = 'fixed';
+        m.style.zIndex = '99999';
+        // Flip to the right edge if the menu would run off-screen
+        var estWidth = 220;
+        var left = rect.left;
+        if (left + estWidth > window.innerWidth - 8) left = Math.max(8, window.innerWidth - estWidth - 8);
+        m.style.left = left + 'px';
+        m.style.top = (rect.bottom + 8) + 'px';
         menu.classList.add('open');
         pill.classList.add('open');
         (pill as HTMLElement).setAttribute('aria-expanded','true');
@@ -2073,18 +2089,17 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   <!-- NAV -->
   <nav role="navigation" aria-label="Main navigation" style="display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:64px;position:sticky;top:0;z-index:200;background:rgba(8,6,18,0.92);backdrop-filter:blur(18px);border-bottom:0.5px solid var(--b);">
     <div class="nav-logo">Secret<em style="font-style:italic;font-weight:300">Xperience</em></div>
+    <div id="heroThemesNavMount" style="position:relative;margin-left:14px;display:flex;align-items:center;"></div>
     <div class="nav-right">
       <button class="nb" id="locBtn" aria-label="Location"><i class="ti ti-map-pin" aria-hidden="true"></i> Brussels</button>
       <button onclick="__cycleTheme()" aria-label="Toggle theme" style="width:34px;height:34px;background:var(--bg2);border:0.5px solid var(--b2);border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t2);font-size:16px;flex-shrink:0;"><i class="ti ti-moon-stars" id="themeIcon"></i></button>
       <!-- logged-out -->
       <a href="/discover" class="nb" style="text-decoration:none;display:flex;align-items:center;gap:5px;color:var(--gold);font-weight:500;" title="Swipe to discover"><i class="ti ti-sparkles" aria-hidden="true"></i> Discover</a>
-      <a href="/livestreams" class="nb" style="text-decoration:none;display:flex;align-items:center;gap:5px;color:#ef4444;font-weight:600;" title="Our performers live now"><i class="ti ti-broadcast" aria-hidden="true"></i> Live Shows <span style="width:5px;height:5px;border-radius:50%;background:#ef4444;display:inline-block;animation:liveblink 1.2s ease-in-out infinite;margin-left:1px;"></span></a>
-      <a href="/live" class="nb" style="text-decoration:none;display:flex;align-items:center;gap:5px;color:var(--t2);font-weight:500;" title="Cam models"><i class="ti ti-live-photo" aria-hidden="true"></i> Cams</a>
-      <a href="/events" class="nb" style="text-decoration:none;display:flex;align-items:center;gap:6px;"><i class="ti ti-calendar-event" aria-hidden="true"></i> Events</a>
       <button class="nb" id="loginBtn">Log in</button>
       <button class="nb pri" id="signupBtn" onclick="window.location.href='/advertise'">List your service</button>
       <!-- logged-in: List service + profile avatar -->
       <button class="nb pri" id="listServiceBtn" style="display:none" onclick="window.location.href='/listings/create'"><i class="ti ti-plus" aria-hidden="true"></i> List service</button>
+      <div id="langPickerNavMount" style="position:relative;display:flex;align-items:center;"></div>
       <div id="profileMenuWrap" style="display:none;position:relative;align-items:center;gap:8px;">
         <!-- Notification bell -->
         <div style="position:relative;">
@@ -2130,36 +2145,57 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </div>
   </nav>
 
-  <!-- CATEGORY BAR -->
-  <div class="catbar" role="navigation" aria-label="Categories" id="catBar">
-    <!-- All -->
-    <div class="cat active" data-cat="all">All</div>
+  <!-- CATEGORY BAR (colorful pill row) -->
+  <div class="catbar sx-pillbar" role="navigation" aria-label="Categories" id="catBar" style="display:flex;gap:9px;flex-wrap:nowrap;padding:12px 1.5rem;align-items:center;overflow-x:auto;overflow-y:hidden;height:auto;min-height:60px;-webkit-overflow-scrolling:touch;scrollbar-width:none;scroll-snap-type:x proximity;scroll-padding-left:1.5rem;touch-action:pan-x;">
 
-    <!-- COMPANIONS group: Escorts + incall personal services -->
+    <!-- ESCORT group (💋 outcall) -->
     <div class="cat-group">
-      <button class="cat-group-pill" data-group="companions" aria-haspopup="true" aria-expanded="false">
-        Companions <i class="ti ti-chevron-down cg-chev"></i>
+      <button class="cat-group-pill sx-pill" data-group="escort" aria-haspopup="true" aria-expanded="false" style="background:linear-gradient(90deg,#ff8a5c,#ff5c7a);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        💋 Escort <i class="ti ti-chevron-down cg-chev" style="font-size:12px;"></i>
       </button>
-      <div class="cat-group-menu" id="cgm-companions" role="menu">
-        <span class="cat-group-label">Outcall</span>
-        <a class="cat-group-item" href="/escorts" role="menuitem">
-          Escorts
-          <span class="cat-group-item-sub">Advertiser travels to you</span>
-        </a>
-        <a class="cat-group-item" href="/private-reception" role="menuitem" style="color:var(--gold);font-size:11px;text-transform:uppercase;letter-spacing:0.1em;padding:6px 14px 4px;font-weight:600;">
-          Incall · Private Reception →
-        </a>
-        <a class="cat-group-item" href="/private-reception?cat=companionship" role="menuitem">Companionship</a>
-        <a class="cat-group-item" href="/private-reception?cat=massage" role="menuitem">Massage</a>
-        <a class="cat-group-item" href="/private-reception?cat=domination" role="menuitem">Domination</a>
-        <a class="cat-group-item" href="/private-reception?cat=experiences" role="menuitem">Experiences</a>
+      <div class="cat-group-menu" id="cgm-escort" role="menu">
+        <a class="cat-group-item" href="/escorts?gender=female" role="menuitem">Vrouwen</a>
+        <a class="cat-group-item" href="/escorts?gender=male" role="menuitem">Mannen</a>
+        <a class="cat-group-item" href="/escorts?gender=gay" role="menuitem">Homo's</a>
+        <a class="cat-group-item" href="/escorts?gender=trans" role="menuitem">Transgenders</a>
+        <a class="cat-group-item" href="/escorts?gender=couple" role="menuitem">Koppels</a>
       </div>
     </div>
 
-    <!-- VENUES group -->
+    <!-- PRIVE group (🏠 incall) -->
     <div class="cat-group">
-      <button class="cat-group-pill" data-group="venues" aria-haspopup="true" aria-expanded="false">
-        Venues <i class="ti ti-chevron-down cg-chev"></i>
+      <button class="cat-group-pill sx-pill" data-group="prive" aria-haspopup="true" aria-expanded="false" style="background:linear-gradient(90deg,#b45cff,#7a4dff);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        🏠 Privé <i class="ti ti-chevron-down cg-chev" style="font-size:12px;"></i>
+      </button>
+      <div class="cat-group-menu" id="cgm-prive" role="menu">
+        <a class="cat-group-item" href="/private-reception?gender=female" role="menuitem">Vrouwen</a>
+        <a class="cat-group-item" href="/private-reception?gender=male" role="menuitem">Mannen</a>
+        <a class="cat-group-item" href="/private-reception?gender=gay" role="menuitem">Homo's</a>
+        <a class="cat-group-item" href="/private-reception?gender=trans" role="menuitem">Transgenders</a>
+        <a class="cat-group-item" href="/private-reception?gender=couple" role="menuitem">Koppels</a>
+      </div>
+    </div>
+
+    <!-- XPERIENCE group (✨ services/discover/events/jobs) -->
+    <div class="cat-group">
+      <button class="cat-group-pill sx-pill" data-group="xperience" aria-haspopup="true" aria-expanded="false" style="background:linear-gradient(90deg,#ff5c9e,#e02d94);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        ✨ Xperience <i class="ti ti-chevron-down cg-chev" style="font-size:12px;"></i>
+      </button>
+      <div class="cat-group-menu" id="cgm-xperience" role="menu">
+        <a class="cat-group-item" href="/private-reception?cat=companionship" role="menuitem">Companionship</a>
+        <a class="cat-group-item" href="/private-reception?cat=massage" role="menuitem">Massage</a>
+        <a class="cat-group-item" href="/private-reception?cat=domination" role="menuitem">Dominantie</a>
+        <a class="cat-group-item" href="/discover" role="menuitem">Discover</a>
+        <a class="cat-group-item" href="/events" role="menuitem">Event</a>
+        <a class="cat-group-item" href="/jobs" role="menuitem">Jobs</a>
+        <a class="cat-group-item" href="/events?cat=swingers" role="menuitem">Swingers</a>
+      </div>
+    </div>
+
+    <!-- VENUES group (🥂 nightlife/rentals/hotels) -->
+    <div class="cat-group">
+      <button class="cat-group-pill sx-pill" data-group="venues" aria-haspopup="true" aria-expanded="false" style="background:linear-gradient(90deg,#ffb46b,#ff8a3c);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        🥂 Venues <i class="ti ti-chevron-down cg-chev" style="font-size:12px;"></i>
       </button>
       <div class="cat-group-menu" id="cgm-venues" role="menu">
         <a class="cat-group-item" href="/nightlife" role="menuitem">Nightlife</a>
@@ -2168,77 +2204,27 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       </div>
     </div>
 
-    <!-- Standalone categories -->
-    <div class="cat" data-cat="creators">Creators</div>
-    <div class="cat" data-cat="events">Events</div>
-    <div class="cat" data-cat="shop">Adult Shop</div>
-  </div>
-
-  <!-- ══ EDITORIAL HERO ══ -->
-  <!-- Visitor-selectable hero styles render here (HeroThemes) -->
-  <div id="heroThemesMount"></div>
-
-  <section id="editorialHero" style="width:100%;background:var(--grad-candle);border-top:0.5px solid var(--b);border-bottom:0.5px solid var(--b);padding:4rem 1.5rem;">
-    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr;gap:2rem;align-items:center;">
-      <!-- LEFT: text -->
-      <div>
-        <p class="t-eyebrow-gold" style="margin-bottom:1rem;">EU · DISCREET · VERIFIED</p>
-        <h1 style="font-family:var(--serif);font-size:56px;font-weight:500;line-height:1.04;letter-spacing:-0.005em;margin:0 0 1.25rem;">
-          Where the night begins<br>
-          <em style="font-style:italic;background:var(--grad-gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;">with someone discreet</em>
-        </h1>
-        <p class="t-body" style="color:var(--t2);max-width:480px;margin-bottom:1.5rem;">A members-only marketplace for escorts, companions, nightlife, creators, rentals, and the after-hours.</p>
-        <div style="position:relative;max-width:480px;margin-bottom:1.5rem;">
-          <i class="ti ti-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:16px;"></i>
-          <input type="text" id="heroSearch" placeholder="Search listings, companions, venues…" style="width:100%;height:52px;padding:0 90px 0 42px;background:var(--bg2);border:0.5px solid var(--gbrd);border-radius:20px;color:var(--t);font:400 14px var(--sans);outline:none;" onkeydown="if(event.key==='Enter'){var q=this.value.trim();if(q){window.location.href='/search?q='+encodeURIComponent(q)}else{window.location.href='/search'}}" />
-          <button id="heroSearchBtn" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);height:40px;padding:0 16px;background:var(--grad-gold);border:none;border-radius:16px;color:#000;font:600 13px var(--sans);cursor:pointer;letter-spacing:0.04em;">Search</button>
-        </div>
-        <div id="liveNowPill" style="display:inline-flex;align-items:center;gap:8px;margin-bottom:1.25rem;padding:7px 14px;background:rgba(38,212,160,0.08);border:0.5px solid rgba(38,212,160,0.3);border-radius:999px;font:500 12.5px var(--sans);color:var(--t);">
-          <span style="position:relative;display:inline-flex;width:8px;height:8px;"><span style="position:absolute;inset:0;border-radius:50%;background:#26d4a0;animation:sxPulse 1.8s ease-out infinite;"></span><span style="position:relative;width:8px;height:8px;border-radius:50%;background:#26d4a0;"></span></span>
-          <span><strong id="statListingsPill" style="color:#26d4a0;">—</strong> listings live now across <strong id="statCitiesPill" style="color:#26d4a0;">—</strong> cities in Belgium, Netherlands &amp; Germany</span>
-        </div>
-        <div class="hero-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;">
-          <div><div id="statListings" style="font-family:var(--serif);font-size:28px;color:var(--gold);">40+</div><div class="t-meta" style="color:var(--t3);">LISTINGS</div></div>
-          <div><div id="statCitiesHero" style="font-family:var(--serif);font-size:28px;color:var(--gold);">—</div><div class="t-meta" style="color:var(--t3);">CITIES</div></div>
-          <div><div style="font-family:var(--serif);font-size:28px;color:var(--gold);">8</div><div class="t-meta" style="color:var(--t3);">CATEGORIES</div></div>
-          <div><div style="font-family:var(--serif);font-size:28px;color:var(--gold);">4.8 ★</div><div class="t-meta" style="color:var(--t3);">AVG RATING</div></div>
-        </div>
-      </div>
-      <!-- RIGHT: featured advertisement card -->
-      <div class="hero-hero-col" id="heroFeaturedCard" style="width:100%;max-width:320px;border-radius:var(--rl);border:0.5px solid var(--b2);box-shadow:var(--shadow-card-h);overflow:hidden;cursor:pointer;" onclick="document.getElementById('heroFeaturedCard').style.transform='translateY(-3px)'">
-        <div class="cat-escort" style="height:240px;position:relative;display:flex;align-items:flex-end;padding:1.25rem;">
-          <img id="heroCardImg" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;" />
-          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(8,6,14,0.75) 0%, transparent 55%);pointer-events:none;" id="heroCardGradient" style="display:none;"></div>
-          <div style="position:absolute;top:0.75rem;right:0.75rem;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.30);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;"><i class="ti ti-heart-filled" style="color:var(--pink);font-size:15px;"></i></div>
-          <span style="font-family:var(--serif);font-size:96px;font-style:italic;font-weight:400;color:rgba(197,160,90,0.30);line-height:1;position:absolute;bottom:0.5rem;left:1.25rem;" id="heroMonogram">Sa</span>
-        </div>
-        <div style="background:var(--bg1);padding:1rem 1.25rem;">
-          <div class="t-card-title" id="heroCardName">Sophia A.</div>
-          <div class="t-body-sm" style="color:var(--t2);margin:0.25rem 0 0.75rem;" id="heroCardSub">Escort · Independent · Brussels</div>
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span style="font-family:var(--serif);font-size:18px;color:var(--gold);" id="heroCardPrice">€280/hr</span>
-            <span class="t-body-sm" style="color:var(--t2);" id="heroCardRating">★ 4.9</span>
-          </div>
-        </div>
+    <!-- Standalone pills -->
+    <a class="sx-pill" href="/creators" style="background:linear-gradient(90deg,#5c8bff,#7a4dff);color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">🎨 Content Creators</a>
+    <div class="cat-group">
+      <button class="cat-group-pill sx-pill" data-group="live" aria-haspopup="true" aria-expanded="false" style="background:linear-gradient(90deg,#2dd4a0,#0e9f8f);color:#fff;border:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;">
+        📹 Live <i class="ti ti-chevron-down cg-chev" style="font-size:12px;"></i>
+      </button>
+      <div class="cat-group-menu" id="cgm-live" role="menu">
+        <a class="cat-group-item" href="/livestreams" role="menuitem">Live Shows</a>
+        <a class="cat-group-item" href="/live" role="menuitem">Cams</a>
       </div>
     </div>
-    <style>
-    @media(max-width:960px){#editorialHero>div{grid-template-columns:1fr 1fr!important}}
-    @media(max-width:640px){
-      #editorialHero{padding:2.5rem 1rem!important}
-      #editorialHero>div{grid-template-columns:1fr!important;gap:1rem}
-      #editorialHero .hero-promo-col{display:none!important}
-      #editorialHero h1{font-size:clamp(28px,8vw,48px)!important}
-      #editorialHero .hero-stats{grid-template-columns:repeat(2,1fr)!important;gap:.75rem!important}
-      #editorialHero .hero-hero-col{display:none!important}
-      #editorialHero input[type=text]{font-size:16px!important}
-    }
-    @media(max-width:400px){
-      #editorialHero{padding:2rem .75rem!important}
-      #editorialHero h1{font-size:clamp(26px,7.5vw,36px)!important}
-    }
-    </style>
-  </section>
+    <a class="sx-pill" href="/shop" style="background:linear-gradient(90deg,#e8c97e,#c5883f);color:#0a0a0a;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">🛍️ Webshop &amp; Brands</a>
+    <a class="sx-pill" href="/partners" style="background:linear-gradient(90deg,#c0001a,#7a1238);color:#fff;text-decoration:none;border-radius:999px;padding:9px 18px;font-size:12.5px;font-weight:600;display:inline-flex;align-items:center;gap:6px;">🤝 Partners &amp; Links</a>
+  </div>
+  <style>
+    #catBar::-webkit-scrollbar { display:none; }
+    #catBar > .cat-group, #catBar > .sx-pill { flex-shrink:0; scroll-snap-align:start; }
+    /* Soft fade on the right edge to hint that there's more to swipe */
+    .catbar-wrap { position:relative; }
+    .catbar-wrap::after { content:''; position:absolute; top:0; right:0; bottom:0; width:36px; pointer-events:none; background:linear-gradient(90deg,transparent,var(--bg) 90%); }
+  </style>
 
   <!-- ══ NAV DRAWER ══ -->
   <div class="nav-drawer" id="navDrawer" aria-label="Navigation menu" role="dialog">
@@ -2301,6 +2287,93 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
 
 ` }} />
       <CategoryAnimations />
+
+      <div dangerouslySetInnerHTML={{ __html: `
+  <!-- ══ EDITORIAL HERO ══ -->
+  <!-- Visitor-selectable hero styles render here (HeroThemes) -->
+  <div id="heroThemesMount"></div>
+
+  <section id="editorialHero" style="width:100%;background:var(--grad-candle);border-top:0.5px solid var(--b);border-bottom:0.5px solid var(--b);padding:4rem 1.5rem;">
+    <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1.5fr 1fr;gap:2rem;align-items:center;">
+      <!-- LEFT: text -->
+      <div>
+        <p class="t-eyebrow-gold" style="margin-bottom:1rem;">EU · DISCREET · VERIFIED</p>
+        <h1 style="font-family:var(--serif);font-size:56px;font-weight:500;line-height:1.04;letter-spacing:-0.005em;margin:0 0 1.25rem;">
+          Where the night begins<br>
+          <em style="font-style:italic;background:var(--grad-gold);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent;">Europe's discreet adult lifestyle marketplace</em>
+        </h1>
+        <p class="t-body" style="color:var(--t2);max-width:480px;margin-bottom:1.5rem;">A members-only marketplace for escorts, companions, nightlife, creators, rentals, and the after-hours.</p>
+        <div style="position:relative;max-width:480px;margin-bottom:1.5rem;">
+          <i class="ti ti-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:16px;"></i>
+          <input type="text" id="heroSearch" placeholder="Search listings, companions, venues…" style="width:100%;height:52px;padding:0 90px 0 42px;background:var(--bg2);border:0.5px solid var(--gbrd);border-radius:20px;color:var(--t);font:400 14px var(--sans);outline:none;" onkeydown="if(event.key==='Enter'){var q=this.value.trim();if(q){window.location.href='/search?q='+encodeURIComponent(q)}else{window.location.href='/search'}}" />
+          <button id="heroSearchBtn" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);height:40px;padding:0 16px;background:var(--grad-gold);border:none;border-radius:16px;color:#000;font:600 13px var(--sans);cursor:pointer;letter-spacing:0.04em;">Search</button>
+        </div>
+        <div id="liveNowPill" style="display:inline-flex;align-items:center;gap:8px;margin-bottom:1.25rem;padding:7px 14px;background:rgba(38,212,160,0.08);border:0.5px solid rgba(38,212,160,0.3);border-radius:999px;font:500 12.5px var(--sans);color:var(--t);">
+          <span style="position:relative;display:inline-flex;width:8px;height:8px;"><span style="position:absolute;inset:0;border-radius:50%;background:#26d4a0;animation:sxPulse 1.8s ease-out infinite;"></span><span style="position:relative;width:8px;height:8px;border-radius:50%;background:#26d4a0;"></span></span>
+          <span><strong id="statListingsPill" style="color:#26d4a0;">—</strong> listings live now across <strong id="statCitiesPill" style="color:#26d4a0;">—</strong> cities in Belgium, Netherlands &amp; Germany</span>
+        </div>
+        <div class="hero-stats" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;">
+          <div><div id="statListings" style="font-family:var(--serif);font-size:28px;color:var(--gold);">40+</div><div class="t-meta" style="color:var(--t3);">LISTINGS</div></div>
+          <div><div id="statCitiesHero" style="font-family:var(--serif);font-size:28px;color:var(--gold);">—</div><div class="t-meta" style="color:var(--t3);">CITIES</div></div>
+          <div><div style="font-family:var(--serif);font-size:28px;color:var(--gold);">8</div><div class="t-meta" style="color:var(--t3);">CATEGORIES</div></div>
+          <div><div style="font-family:var(--serif);font-size:28px;color:var(--gold);">4.8 ★</div><div class="t-meta" style="color:var(--t3);">AVG RATING</div></div>
+        </div>
+      </div>
+      <!-- RIGHT: featured advertisement card -->
+      <div class="hero-hero-col" id="heroFeaturedCard" style="width:100%;max-width:320px;border-radius:var(--rl);border:0.5px solid var(--b2);box-shadow:var(--shadow-card-h);overflow:hidden;cursor:pointer;" onclick="document.getElementById('heroFeaturedCard').style.transform='translateY(-3px)'">
+        <div class="cat-escort" style="height:240px;position:relative;display:flex;align-items:flex-end;padding:1.25rem;">
+          <img id="heroCardImg" src="" alt="" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;" />
+          <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(8,6,14,0.75) 0%, transparent 55%);pointer-events:none;" id="heroCardGradient" style="display:none;"></div>
+          <div style="position:absolute;top:0.75rem;right:0.75rem;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,0.30);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;"><i class="ti ti-heart-filled" style="color:var(--pink);font-size:15px;"></i></div>
+          <span style="font-family:var(--serif);font-size:96px;font-style:italic;font-weight:400;color:rgba(197,160,90,0.30);line-height:1;position:absolute;bottom:0.5rem;left:1.25rem;" id="heroMonogram">Sa</span>
+        </div>
+        <div style="background:var(--bg1);padding:1rem 1.25rem;">
+          <div class="t-card-title" id="heroCardName">Sophia A.</div>
+          <div class="t-body-sm" style="color:var(--t2);margin:0.25rem 0 0.75rem;" id="heroCardSub">Escort · Independent · Brussels</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-family:var(--serif);font-size:18px;color:var(--gold);" id="heroCardPrice">€280/hr</span>
+            <span class="t-body-sm" style="color:var(--t2);" id="heroCardRating">★ 4.9</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <style>
+    @media(max-width:960px){#editorialHero>div{grid-template-columns:1fr 1fr!important}}
+    @media(max-width:640px){
+      #editorialHero{padding:2.5rem 1rem!important}
+      #editorialHero>div{grid-template-columns:1fr!important;gap:1rem}
+      #editorialHero .hero-promo-col{display:none!important}
+      #editorialHero h1{font-size:clamp(28px,8vw,48px)!important}
+      #editorialHero .hero-stats{grid-template-columns:repeat(2,1fr)!important;gap:.75rem!important}
+      #editorialHero .hero-hero-col{display:none!important}
+      #editorialHero input[type=text]{font-size:16px!important}
+    }
+    @media(max-width:400px){
+      #editorialHero{padding:2rem .75rem!important}
+      #editorialHero h1{font-size:clamp(26px,7.5vw,36px)!important}
+    }
+    </style>
+  </section>
+` }} />
+
+      {/* MOAN SPEAK — bondage-gear shop banner */}
+      <div style={{ maxWidth: 1400, margin: '2.75rem auto 0', padding: '0 1rem' }}>
+        <a
+          href="/shop"
+          title="MOAN SPEAK — bondage gear. Shop the collection."
+          aria-label="MOAN SPEAK — leather, latex and lust. Shop the collection."
+          style={{
+            display: 'block', borderRadius: 18, overflow: 'hidden',
+            border: '0.5px solid rgba(197,160,90,0.35)', boxShadow: '0 14px 44px rgba(0,0,0,0.38)',
+          }}
+        >
+          <img
+            src="/promos/moanspeak-banner.webp"
+            alt="MOAN SPEAK — leer, latex en lust. Bondage-gear met karakter. Shop de collectie."
+            style={{ display: 'block', width: '100%', height: 'auto' }}
+          />
+        </a>
+      </div>
 
       {/* Curated partners — uniform banner grid */}
       <div style={{ maxWidth: 1400, margin: '2.75rem auto 0.5rem', padding: '0 1rem' }}>
@@ -3107,6 +3180,9 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
     </a>
   </div>
 
+  <!-- ══ AI ANGELS affiliate banner (React portal — AIAngelsBanner) ══ -->
+  <div id="aiAngelsMount"></div>
+
   <!-- ══ ONLYFANS CREATORS (React portal — OnlyFansShowcase) ══ -->
   <div id="onlyfansShowcaseMount"></div>
 
@@ -3828,6 +3904,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       {/* GSAP slider ads — rendered as React portal anchored after #featuredBanner */}
       <SliderAds />
       {/* OnlyFans creator directory — portal into #onlyfansShowcaseMount above the partners band */}
+      <AIAngelsBanner portalTo="aiAngelsMount" />
       <OnlyFansShowcase portalTo="onlyfansShowcaseMount" />
       {/* Partner boutiques — portal between OnlyFans creators and Partners & Links */}
       <ShopShowcase variant="compact" portalTo="shopShowcaseMount" />

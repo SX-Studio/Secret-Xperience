@@ -164,7 +164,7 @@ function SpotlightStrip({ items, discreet }: { items: Listing[]; discreet: boole
 /* ── Card component ─────────────────────────────────────── */
 function EscortCard({ l, discreet, isPremier, isLive }: { l: Listing; discreet: boolean; isPremier?: boolean; isLive?: boolean }) {
   const [imgIdx, setImgIdx] = useState(0)
-  const imgs = l.images || []
+  const imgs = (l.images || []).slice(0, 6) // max 6 photos per ad
   const img = imgs[imgIdx] || imgs[0] || null
   const availNow = isAvailableNow(l.tags)
   const isNew = isNewListing(l.created_at)
@@ -290,7 +290,7 @@ export default function EscortsPage() {
   const [hairColor, setHairColor]       = useState('Any')
   const [build, setBuild]               = useState('Any')
   const [selectedServices, setSelectedServices] = useState<string[]>([])
-  const [sortBy, setSortBy]             = useState<'price_asc' | 'price_desc' | 'newest' | 'available'>('newest')
+  const [sortBy, setSortBy]             = useState<'price_asc' | 'price_desc' | 'newest' | 'available' | 'city'>('newest')
 
   const fetchListings = useCallback(async () => {
     setLoading(true)
@@ -299,7 +299,8 @@ export default function EscortsPage() {
       .from('listings')
       .select('id,profile_id,title,description,category,subcategory,city,country,price_from,price_to,currency,meet_type,images,image_focus,verified,premium,tags,created_at,featured_until,age')
       .eq('active', true)
-      .in('category', ['escorts', 'companionship', 'domination', 'experiences', 'massage'])
+      // primary category OR one of the ad's up-to-3 extra categories
+      .or('category.in.(escorts,companionship,domination,experiences,massage),extra_categories.ov.{escorts,companionship,domination,experiences,massage}')
 
     if (city !== 'All Cities') q = q.eq('city', city)
     if (verifiedOnly) q = q.eq('verified', true)
@@ -309,9 +310,10 @@ export default function EscortsPage() {
 
     if (sortBy === 'price_asc') q = q.order('price_from', { ascending: true, nullsFirst: false })
     else if (sortBy === 'price_desc') q = q.order('price_from', { ascending: false, nullsFirst: false })
+    else if (sortBy === 'city') q = q.order('city', { ascending: true, nullsFirst: false })
     else q = q.order('created_at', { ascending: false })
 
-    q = q.limit(60)
+    q = q.limit(sortBy === 'city' ? 1000 : 60) // load full set for the per-municipality directory
 
     const { data } = await q
     let results = data ?? []
@@ -326,8 +328,10 @@ export default function EscortsPage() {
         // Category / subcategory fallbacks for listings without an explicit type tag
         if (escortType === 'women') return !tags.some((t: string) => tagMatchesType(t, 'men') || t.includes('trans') || tagMatchesType(t, 'couples') || tagMatchesType(t, 'non-binary'))
         if (escortType === 'men') return sub.includes('gigolo') || sub.includes('male')
-        if (escortType === 'couples') return sub.includes('couple')
-        if (escortType === 'fetish') return l.category === 'domination'
+        if (escortType === 'couples') return sub.includes('couple') || sub.includes('duo')
+        if (escortType === 'trans-woman' || escortType === 'trans-man') return sub.includes('trans')
+        if (escortType === 'non-binary') return sub.includes('non-binary') || sub.includes('nonbinary')
+        if (escortType === 'fetish') return l.category === 'domination' || sub.includes('fetish')
         return false
       })
     }
@@ -364,6 +368,26 @@ export default function EscortsPage() {
   }, [escortType, orientation, meetType, city, priceMin, priceMax, verifiedOnly, ethnicity, hairColor, build, selectedServices, sortBy])
 
   useEffect(() => { fetchListings() }, [fetchListings])
+
+  // Read ?gender= query param from the pill dropdowns on the homepage and
+  // pre-apply the matching filter on mount.
+  const [filterToast, setFilterToast] = useState<string | null>(null)
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const g = new URLSearchParams(window.location.search).get('gender')
+    if (!g) return
+    let label = ''
+    if (g === 'female')      { setEscortType('women');       label = 'Vrouwen' }
+    else if (g === 'male')   { setEscortType('men');         label = 'Mannen' }
+    else if (g === 'trans')  { setEscortType('trans-woman'); label = 'Transgenders' }
+    else if (g === 'couple') { setEscortType('couples');     label = 'Koppels' }
+    else if (g === 'gay')    { setEscortType('all'); setOrientation('gay'); label = "Homo's" }
+    if (label) {
+      setFilterToast(`Gefilterd op: ${label}`)
+      const t = setTimeout(() => setFilterToast(null), 3500)
+      return () => clearTimeout(t)
+    }
+  }, [])
 
   useEffect(() => {
     async function fetchLive() {
@@ -419,6 +443,12 @@ export default function EscortsPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {filterToast && (
+        <div style={{ position: 'fixed', top: 78, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: 'linear-gradient(90deg,#ff8a5c,#ff5c7a)', color: '#fff', borderRadius: 999, padding: '10px 20px', fontSize: 13, fontWeight: 600, boxShadow: '0 12px 32px rgba(0,0,0,0.4)', display: 'inline-flex', alignItems: 'center', gap: 8, animation: 'sxFilterToastIn .35s cubic-bezier(.2,.8,.4,1)' }}>
+          <span>💋</span> {filterToast}
+        </div>
+      )}
+      <style>{`@keyframes sxFilterToastIn { from { opacity:0; transform:translate(-50%,-10px) } to { opacity:1; transform:translate(-50%,0) } }`}</style>
     <div style={{ minHeight: '100vh', background: 'var(--bg)', color: 'var(--t)', fontFamily: 'var(--sans)' }}>
       <style>{`
         
@@ -669,6 +699,7 @@ export default function EscortsPage() {
                 <option value="price_asc">Price: Low → High</option>
                 <option value="price_desc">Price: High → Low</option>
                 <option value="newest">Newest</option>
+                <option value="city">Per gemeente (A–Z)</option>
               </select>
             </div>
           </div>
@@ -701,7 +732,34 @@ export default function EscortsPage() {
               <p style={{ fontSize: '14px', marginBottom: '1.5rem' }}>Try adjusting your filters</p>
               <button onClick={resetFilters} style={{ background: 'var(--grad-gold)', border: 'none', borderRadius: '999px', padding: '10px 24px', color: '#000', fontWeight: 700, fontSize: '13px', cursor: 'pointer', fontFamily: 'var(--sans)' }}>Clear all filters</button>
             </div>
-          ) : (() => {
+          ) : sortBy === 'city' ? (() => {
+              // Redlights-style: grouped per municipality, each header shows the city + ad count
+              const groups = Object.entries(
+                listings.reduce((acc: Record<string, Listing[]>, l) => {
+                  const c = (l.city || '').trim() || 'Overige'
+                  ;(acc[c] ||= []).push(l)
+                  return acc
+                }, {})
+              ).sort((a, b) => a[0].localeCompare(b[0], 'nl'))
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+                  {groups.map(([cityName, items]) => (
+                    <div key={cityName}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '1rem' }}>
+                        <span style={{ fontFamily: 'var(--serif)', fontSize: '20px', color: 'var(--t)', whiteSpace: 'nowrap' }}>
+                          <i className="ti ti-map-pin" style={{ color: 'var(--gold)', marginRight: 6 }} />{cityName}
+                          <span style={{ color: 'var(--gold)', marginLeft: 8 }}>{items.length}</span>
+                        </span>
+                        <div style={{ flex: 1, height: '0.5px', background: 'linear-gradient(90deg, rgba(197,160,90,0.35), transparent)' }} />
+                      </div>
+                      <div className="listing-grid">
+                        {items.map(l => <EscortCard key={l.id} l={l} discreet={discreetMode} isPremier={l.premium} isLive={liveSet.has(l.profile_id)} />)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
+            })() : (() => {
               const now = new Date().toISOString()
               const premierList  = listings.filter(l => l.premium && !(l.featured_until && l.featured_until > now))
               const standardList = listings.filter(l => !l.premium)

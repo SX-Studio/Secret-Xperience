@@ -29,7 +29,7 @@ export default function PrideMode() {
         aria-pressed={on}
         title={on ? 'Turn Pride mode off' : 'Turn Pride mode on'}
         style={{
-          position: 'fixed', left: 16, bottom: 16, zIndex: 9000,
+          position: 'fixed', left: 16, bottom: 92, zIndex: 9000,
           height: 44, padding: '0 14px', borderRadius: 999, cursor: 'pointer',
           display: 'inline-flex', alignItems: 'center', gap: 8,
           border: on ? '1.5px solid transparent' : '1px solid rgba(255,255,255,0.18)',

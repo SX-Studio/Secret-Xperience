@@ -3,8 +3,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '../lib/supabase'
 import { detectFocalPoint, imageFromUrl } from '../lib/imageFocus'
+import CampaignsTab from './CampaignsTab'
+import EventsTab from './EventsTab'
+import ShopTab from './ShopTab'
 
-const TABS = ['Listings', 'Users', 'Verification', 'Reports', 'Bookings', 'Payouts', 'Newsletter', 'Contacts', 'Acquisition', 'Keywords', 'Tools'] as const
+const TABS = ['Listings', 'Users', 'Verification', 'Reports', 'Bookings', 'Payouts', 'Newsletter', 'Contacts', 'Acquisition', 'Keywords', 'Campaigns', 'Events', 'Shop', 'Tools'] as const
 type Tab = typeof TABS[number]
 
 const TAB_ICONS: Record<Tab, string> = {
@@ -18,6 +21,9 @@ const TAB_ICONS: Record<Tab, string> = {
   Contacts: 'address-book',
   Acquisition: 'chart-arrows-vertical',
   Keywords: 'search',
+  Campaigns: 'send',
+  Events: 'calendar-star',
+  Shop: 'building-store',
   Tools: 'tool',
 }
 
@@ -26,7 +32,7 @@ const LS_KEY = (t: Tab) => `sx_admin_seen_${t.toLowerCase()}`
 // Categories an admin can reassign a listing to (value must match the live category routes).
 const ADMIN_CATEGORIES = [
   'escorts', 'massage', 'companionship', 'domination', 'adult',
-  'creators', 'nightlife', 'experiences', 'rentals', 'hotels', 'events', 'shop',
+  'creators', 'nightlife', 'experiences', 'rentals', 'hotels', 'events', 'shop', 'photo',
 ]
 
 function exportCsv(rows: any[], filename: string) {
@@ -50,7 +56,7 @@ export default function AdminPage() {
   const [isAdmin, setIsAdmin] = useState(false)
   const [navOpen, setNavOpen] = useState(false)
   const [tab, setTab] = useState<Tab>('Listings')
-  const [badges, setBadges] = useState<Record<Tab, number>>({ Listings: 0, Users: 0, Verification: 0, Reports: 0, Bookings: 0, Payouts: 0, Newsletter: 0, Contacts: 0, Acquisition: 0, Keywords: 0, Tools: 0 })
+  const [badges, setBadges] = useState<Record<Tab, number>>({ Listings: 0, Users: 0, Verification: 0, Reports: 0, Bookings: 0, Payouts: 0, Newsletter: 0, Contacts: 0, Acquisition: 0, Keywords: 0, Campaigns: 0, Events: 0, Shop: 0, Tools: 0 })
   const [reports, setReports] = useState<any[]>([])
   const [reportWorking, setReportWorking] = useState<string | null>(null)
   const [payouts, setPayouts] = useState<any[]>([])
@@ -184,10 +190,14 @@ export default function AdminPage() {
         Verification: (vr.data || []).filter((v: any) => new Date(v.submitted_at || v.created_at).getTime() > seenVerification).length,
         Reports:      (rr.data || []).filter((r: any) => r.status === 'open' && new Date(r.created_at).getTime() > seenReports).length,
         Bookings:     bs.filter((b: any) => new Date(b.created_at).getTime() > seenBookings).length,
+        Payouts:      0,
         Newsletter:   0,
         Contacts:     (leadsr.data || []).filter((l: any) => new Date(l.created_at).getTime() > seenContacts).length,
         Acquisition:  0,
         Keywords:     0,
+        Campaigns:    0,
+        Events:       0,
+        Shop:         0,
         Tools:        0,
       })
       // Mark the initial active tab as seen immediately
@@ -492,6 +502,8 @@ export default function AdminPage() {
         .adm-action-btn { transition: opacity var(--t-fast, 0.15s); }
         .adm-action-btn:hover { opacity: 0.8; }
         .adm-tab-btn:hover { color: var(--gold, #c5a05a) !important; }
+        /* Boxed tables scroll sideways at every width (touch-friendly on mobile) */
+        .adm-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
         .adm-hamburger { display: none; }
         .adm-nav-overlay { display: none; }
         @media (max-width: 768px) {
@@ -629,7 +641,7 @@ export default function AdminPage() {
             <div style={{ minWidth: 0 }}>
             <h1 style={{ fontFamily: 'var(--serif)', fontWeight: 500, fontSize: '36px', color: 'var(--t, #ece8e1)', margin: 0, lineHeight: 1.1 }}>{tab}</h1>
             <div style={{ font: '300 11px/1 var(--sans)', color: 'var(--t3, #4c4a47)', marginTop: '4px', letterSpacing: '0.04em' }}>
-              {tab === 'Listings' ? `${filteredListings.length} listings` : tab === 'Users' ? `${filteredUsers.length} users` : tab === 'Reports' ? `${reports.filter(r => r.status === 'open').length} open · ${reports.length} total` : tab === 'Payouts' ? `${payouts.filter(p => p.status === 'requested').length} pending · ${payouts.length} total` : tab === 'Newsletter' ? (search ? `${filteredNlSubs.length} of ${nlSubCount ?? '…'} subscribers` : `${nlSubCount ?? '…'} subscribers`) : tab === 'Contacts' ? `${optinContacts.length} opted-in · ${leads.length} leads` : tab === 'Acquisition' ? `${acqTotal} tracked signups · ${acq.length} sources` : tab === 'Keywords' ? `${kwResults.length ? `${kwResults.length} results` : 'SEO research'}` : tab === 'Tools' ? 'Admin tools' : `${filteredBookings.length} bookings`}
+              {tab === 'Listings' ? `${filteredListings.length} listings` : tab === 'Users' ? `${filteredUsers.length} users` : tab === 'Reports' ? `${reports.filter(r => r.status === 'open').length} open · ${reports.length} total` : tab === 'Payouts' ? `${payouts.filter(p => p.status === 'requested').length} pending · ${payouts.length} total` : tab === 'Newsletter' ? (search ? `${filteredNlSubs.length} of ${nlSubCount ?? '…'} subscribers` : `${nlSubCount ?? '…'} subscribers`) : tab === 'Contacts' ? `${listings.filter((l: any) => (l.contact_phone || '').trim()).length} advertiser contacts · ${optinContacts.length} opted-in · ${leads.length} leads` : tab === 'Acquisition' ? `${acqTotal} tracked signups · ${acq.length} sources` : tab === 'Keywords' ? `${kwResults.length ? `${kwResults.length} results` : 'SEO research'}` : tab === 'Tools' ? 'Admin tools' : tab === 'Shop' ? 'Brands & items on secretxperience.store' : tab === 'Events' ? 'Events' : `${filteredBookings.length} bookings`}
             </div>
             </div>
           </div>
@@ -1171,8 +1183,8 @@ export default function AdminPage() {
                     <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
                   </button>
                 </div>
-                <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                     <thead>
                       <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                         {['Email', 'Status', 'Subscribed'].map(h => (
@@ -1207,6 +1219,19 @@ export default function AdminPage() {
               (!contactFilter.country || (c.country || '').toLowerCase().includes(contactFilter.country.toLowerCase())) &&
               (!contactFilter.category || c.category === contactFilter.category)
             )
+            // Every advertiser that left a phone on their listing — not only the
+            // ones who ticked the WhatsApp-consent box. Sourced from listings
+            // already loaded in state (no extra query). The opt-in flag is kept
+            // separate so we never misrepresent who actually consented.
+            const allPhoneContacts = listings.filter((l: any) => (l.contact_phone || '').trim())
+            const filteredAllContacts = allPhoneContacts.filter((c: any) =>
+              (!contactFilter.country || (c.country || '').toLowerCase().includes(contactFilter.country.toLowerCase())) &&
+              (!contactFilter.category || c.category === contactFilter.category) &&
+              (!search ||
+                (c.title || '').toLowerCase().includes(search.toLowerCase()) ||
+                (c.contact_phone || '').toLowerCase().includes(search.toLowerCase()) ||
+                (c.city || '').toLowerCase().includes(search.toLowerCase()))
+            )
             const filteredLeads = leads.filter(l =>
               (!contactFilter.country || (l.country || '').toLowerCase().includes(contactFilter.country.toLowerCase())) &&
               (!contactFilter.category || l.category === contactFilter.category) &&
@@ -1239,11 +1264,14 @@ export default function AdminPage() {
                     style={{ height: '44px', padding: '0 10px', background: 'var(--bg3, #111)', border: '0.5px solid var(--b2, rgba(255,255,255,0.08))', borderRadius: 'var(--r, 8px)', color: 'var(--t, #ece8e1)', font: '400 13px/1 var(--sans)', outline: 'none' }}
                   >
                     <option value="">All categories</option>
-                    <option value="escort_agency">Escort agency</option>
-                    <option value="venue">Venue</option>
-                    <option value="nightlife">Nightlife</option>
-                    <option value="massage">Massage</option>
-                    <option value="other">Other</option>
+                    <optgroup label="Listings">
+                      {ADMIN_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </optgroup>
+                    <optgroup label="B2B leads">
+                      <option value="escort_agency">Escort agency</option>
+                      <option value="venue">Venue</option>
+                      <option value="other">Other</option>
+                    </optgroup>
                   </select>
                   <select
                     value={contactFilter.status}
@@ -1281,8 +1309,8 @@ export default function AdminPage() {
                       <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
                     </button>
                   </div>
-                  <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                       <thead>
                         <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                           {['Listing', 'Category', 'City', 'Country', 'Phone', 'Opted In'].map(h => (
@@ -1312,6 +1340,60 @@ export default function AdminPage() {
                   </div>
                 </div>
 
+                {/* Section 1b: All advertiser contacts (every listing with a phone) */}
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <div>
+                      <div style={{ font: '600 11px/1 var(--sans)', color: 'var(--t2, #8c8880)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                        <i className="ti ti-address-book" style={{ marginRight: '6px', color: 'var(--gold)' }} />
+                        All Advertiser Contacts
+                      </div>
+                      <div style={{ font: '300 11px/1 var(--sans)', color: 'var(--t3, #4c4a47)' }}>{filteredAllContacts.length} listings with a phone number · <span style={{ color: '#25d366' }}>✓ = WhatsApp consent given</span></div>
+                    </div>
+                    <button
+                      onClick={() => exportCsv(filteredAllContacts.map((c: any) => ({ title: c.title, category: c.category, city: c.city, country: c.country, phone: c.contact_phone, whatsapp_consent: c.whatsapp_optin ? 'yes' : 'no', created: c.created_at })), `sx-advertiser-contacts-${new Date().toISOString().slice(0,10)}.csv`)}
+                      className="adm-action-icon-btn"
+                      style={{ color: 'var(--gold)', borderColor: 'var(--gbrd)', gap: '6px' }}
+                    >
+                      <i className="ti ti-download" />
+                      <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
+                    </button>
+                  </div>
+                  <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden', maxHeight: '560px', overflowY: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
+                      <thead>
+                        <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
+                          {['Listing', 'Category', 'City', 'Country', 'Phone', 'Consent'].map(h => (
+                            <th key={h} style={{ textAlign: 'left', padding: '12px 16px', font: '600 9px/1 var(--sans)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--t3, #4c4a47)', position: 'sticky', top: 0, background: 'var(--bg2, #0f0f0f)' }}>{h}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {filteredAllContacts.length === 0 && <tr><td colSpan={6} style={{ padding: '3rem', textAlign: 'center', color: 'var(--t3, #4c4a47)' }}>No advertiser contacts</td></tr>}
+                        {filteredAllContacts.map((c: any) => (
+                          <tr key={c.id} className="adm-tr" style={{ borderTop: '0.5px solid var(--b, rgba(255,255,255,0.04))' }}>
+                            <td style={{ padding: '12px 16px', fontWeight: 500, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{c.title || '—'}</td>
+                            <td style={{ padding: '12px 16px', color: 'var(--t2, #8c8880)', fontSize: '12px' }}>{c.category || '—'}</td>
+                            <td style={{ padding: '12px 16px', color: 'var(--t2, #8c8880)', fontSize: '12px' }}>{c.city || '—'}</td>
+                            <td style={{ padding: '12px 16px', color: 'var(--t2, #8c8880)', fontSize: '12px' }}>{c.country || '—'}</td>
+                            <td style={{ padding: '12px 16px' }}>
+                              <a href={`https://wa.me/${(c.contact_phone || '').replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25d366', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                <i className="ti ti-brand-whatsapp" style={{ fontSize: '14px' }} />
+                                {c.contact_phone}
+                              </a>
+                            </td>
+                            <td style={{ padding: '12px 16px' }}>
+                              {c.whatsapp_optin
+                                ? <span style={{ color: '#25d366', fontSize: '13px' }} title="WhatsApp consent given"><i className="ti ti-circle-check-filled" /></span>
+                                : <span style={{ color: 'var(--t3, #4c4a47)', fontSize: '11px' }}>—</span>}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
                 {/* Section 2: B2B Leads */}
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -1331,8 +1413,8 @@ export default function AdminPage() {
                       <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
                     </button>
                   </div>
-                  <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                  <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                       <thead>
                         <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                           {['Business', 'Contact', 'Email', 'Category', 'Location', 'Status', 'Submitted'].map(h => (
@@ -1402,8 +1484,8 @@ export default function AdminPage() {
                   <span style={{ font: '600 11px/1 var(--sans)', letterSpacing: '0.08em' }}>Export CSV</span>
                 </button>
               </div>
-              <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+              <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                   <thead>
                     <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                       {['Source', 'Medium', 'Campaign', 'Signups', 'Last signup'].map(h => (
@@ -1489,8 +1571,8 @@ export default function AdminPage() {
               </div>
 
               {kwResults.length > 0 && (
-                <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+                <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                     <thead>
                       <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                         {['Keyword', 'Volume / mo', 'CPC', 'Competition', 'Difficulty'].map(h => (
@@ -1554,7 +1636,7 @@ export default function AdminPage() {
                       </div>
                       <p style={{ color: 'var(--t, #ece8e1)', fontSize: '13px', lineHeight: 1.7, margin: '0 0 12px', whiteSpace: 'pre-wrap' }}>{r.detail}</p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '12px', color: 'var(--t2, #8c8880)', marginBottom: '14px' }}>
-                        <span><i className="ti ti-link" style={{ marginRight: 5 }} /><a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gold, #c5a05a)', textDecoration: 'none' }}>{r.url.length > 60 ? r.url.slice(0, 60) + '…' : r.url}</a></span>
+                        {r.url && <span><i className="ti ti-link" style={{ marginRight: 5 }} /><a href={r.url} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--gold, #c5a05a)', textDecoration: 'none' }}>{r.url.length > 60 ? r.url.slice(0, 60) + '…' : r.url}</a></span>}
                         {r.listing_id && <a href={`/listings/${r.listing_id}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--t2, #8c8880)', textDecoration: 'none' }}><i className="ti ti-eye" style={{ marginRight: 5 }} />View listing</a>}
                         {r.email && <span><i className="ti ti-mail" style={{ marginRight: 5 }} /><a href={`mailto:${r.email}`} style={{ color: 'var(--t2, #8c8880)', textDecoration: 'none' }}>{r.email}</a></span>}
                       </div>
@@ -1625,8 +1707,8 @@ export default function AdminPage() {
           })()}
 
           {tab === 'Bookings' && (
-            <div style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+            <div className="adm-table-wrap" style={{ background: 'var(--bg1, #0a0a0a)', border: '0.5px solid var(--b, rgba(255,255,255,0.06))', borderRadius: 'var(--rl, 13px)', overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '640px' }}>
                 <thead>
                   <tr style={{ background: 'var(--bg2, rgba(255,255,255,0.02))' }}>
                     {['Listing', 'Client', 'Date', 'Duration', 'Amount', 'Status'].map(h => (
@@ -1650,6 +1732,7 @@ export default function AdminPage() {
                             <button
                               className="adm-action-icon-btn adm-action-btn"
                               onClick={async () => {
+                                if (!confirm(`Cancel this booking for "${b.listings?.title || 'listing'}"?`)) return
                                 const supabase = createClient()
                                 await supabase.from('bookings').update({ status: 'cancelled' }).eq('id', b.id)
                                 setBookings(prev => prev.map(x => x.id === b.id ? { ...x, status: 'cancelled' } : x))
@@ -1669,6 +1752,10 @@ export default function AdminPage() {
               </table>
             </div>
           )}
+          {tab === 'Campaigns' && <CampaignsTab />}
+          {tab === 'Events' && <EventsTab />}
+          {tab === 'Shop' && <ShopTab />}
+
           {tab === 'Tools' && (
             <div>
               {/* ── Image Focus Backfill ── */}

@@ -59,7 +59,7 @@ function Headline({ accent, size = 56 }: { accent: string; size?: number }) {
     <>
       <div style={{ fontSize: 12, letterSpacing: '.28em', color: accent, marginBottom: 18 }}>EU · DISCREET · VERIFIED</div>
       <h1 style={{ fontFamily: serif, fontWeight: 400, fontSize: size, lineHeight: 1.08, color: '#fff', margin: 0 }}>Where the night begins</h1>
-      <h1 style={{ fontFamily: serif, fontWeight: 400, fontStyle: 'italic', fontSize: size - 4, lineHeight: 1.2, color: accent, margin: '0 0 20px' }}>with someone discreet</h1>
+      <h1 style={{ fontFamily: serif, fontWeight: 400, fontStyle: 'italic', fontSize: size - 4, lineHeight: 1.2, color: accent, margin: '0 0 20px' }}>Europe&apos;s discreet adult lifestyle marketplace</h1>
       <p style={{ color: '#b7a8b3', fontSize: 15, lineHeight: 1.7, maxWidth: 430, marginBottom: 26 }}>
         A members-only marketplace for escorts, companions, nightlife, creators, rentals, and the after-hours.
       </p>
@@ -104,7 +104,6 @@ function GoldenAura() {
 }
 
 function SunsetVelvet() {
-  const cp: CSSProperties = { padding: '9px 18px', borderRadius: 999, fontSize: 12.5, fontWeight: 600, color: '#fff', textDecoration: 'none' }
   return (
     <section style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(2rem,5vw,4rem) clamp(1rem,4vw,3.5rem)', background: 'radial-gradient(ellipse 60% 70% at 88% 8%,rgba(255,110,90,.35),transparent 55%),radial-gradient(ellipse 55% 60% at 70% 100%,rgba(255,45,120,.28),transparent 60%),#190a18' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 40, flexWrap: 'wrap' }}>
@@ -113,13 +112,6 @@ function SunsetVelvet() {
           <SearchBar btnBg="linear-gradient(90deg,#ff8a5c,#ff2d78)" btnColor="#fff" />
           <LivePill color="#ffb46b" />
           <Stats color="#ff9d7a" />
-          <div style={{ display: 'flex', gap: 9, marginTop: 24, flexWrap: 'wrap' }}>
-            <a href="/escorts" style={{ ...cp, background: 'linear-gradient(90deg,#ff8a5c,#ff5c7a)' }}>💋 Escorts</a>
-            <a href="/private-reception" style={{ ...cp, background: 'linear-gradient(90deg,#b45cff,#7a4dff)' }}>🏠 Privé</a>
-            <a href="/private-reception?cat=massage" style={{ ...cp, background: 'linear-gradient(90deg,#ff5c9e,#e02d94)' }}>💆 Massage</a>
-            <a href="/live" style={{ ...cp, background: 'linear-gradient(90deg,#2dd4a0,#0e9f8f)' }}>📹 Live</a>
-            <a href="/nightlife" style={{ ...cp, background: 'linear-gradient(90deg,#ffb46b,#ff8a3c)' }}>🥂 Nightlife</a>
-          </div>
         </div>
         <div style={{ position: 'relative' }}>
           <div style={{ position: 'absolute', inset: -3, borderRadius: 23, background: 'linear-gradient(140deg,#ff8a5c,#ff2d78 55%,#b45cff)' }} />
@@ -252,7 +244,7 @@ function Orbit() {
       <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto' }}>
         <div style={{ display: 'inline-block', background: 'rgba(232,201,126,.12)', border: '1px solid rgba(232,201,126,.4)', borderRadius: 999, padding: '8px 20px', fontSize: 12, letterSpacing: '.2em', color: '#e8c97e', marginBottom: 24 }}>EU · DISCREET · VERIFIED</div>
         <h1 style={{ fontFamily: serif, fontWeight: 400, fontSize: 'clamp(34px,5vw,60px)', lineHeight: 1.08, color: '#fff', margin: 0 }}>
-          Where the night begins <em style={{ fontStyle: 'italic', background: 'linear-gradient(90deg,#e8c97e,#ff8fb0)', WebkitBackgroundClip: 'text', color: 'transparent' }}>with someone discreet</em>
+          Where the night begins <em style={{ fontStyle: 'italic', background: 'linear-gradient(90deg,#e8c97e,#ff8fb0)', WebkitBackgroundClip: 'text', color: 'transparent' }}>Europe&apos;s discreet adult lifestyle marketplace</em>
         </h1>
         <p style={{ color: '#b7a8b3', fontSize: 15.5, lineHeight: 1.7, margin: '22px auto 28px', maxWidth: 460 }}>A members-only marketplace for escorts, companions, nightlife, creators, rentals, and the after-hours.</p>
         <div onClick={goSearch} style={{ display: 'flex', alignItems: 'center', background: '#fff', borderRadius: 999, padding: '8px 8px 8px 26px', maxWidth: 520, margin: '0 auto', boxShadow: '0 24px 60px rgba(0,0,0,.45)', cursor: 'pointer' }}>
@@ -347,7 +339,7 @@ function AppStyle() {
         <div style={{ maxWidth: 620 }}>
           <div style={{ fontSize: 12, letterSpacing: '.28em', color: '#ff8fa8', marginBottom: 14 }}>EU · DISCREET · VERIFIED</div>
           <h1 style={{ fontFamily: serif, fontWeight: 400, fontSize: 'clamp(30px,4vw,50px)', lineHeight: 1.12, color: '#fff', margin: 0 }}>
-            Where the night begins <em style={{ fontStyle: 'italic', color: '#ff8fa8' }}>with someone discreet</em>
+            Where the night begins <em style={{ fontStyle: 'italic', color: '#ff8fa8' }}>Europe&apos;s discreet adult lifestyle marketplace</em>
           </h1>
         </div>
         <Stats color="#ff8fa8" />
@@ -387,12 +379,21 @@ const THEMES: Array<{ id: string; name: string; dots: string[]; render: () => Re
 
 export default function HeroThemes() {
   const [mountEl, setMountEl] = useState<HTMLElement | null>(null)
+  const [pickerMountEl, setPickerMountEl] = useState<HTMLElement | null>(null)
   const [theme, setTheme] = useState<string>('')
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
     setMountEl(document.getElementById('heroThemesMount'))
     try { setTheme(localStorage.getItem(LS_KEY) || '') } catch {}
+    let attempts = 0
+    const findNav = () => {
+      const el = document.getElementById('heroThemesNavMount')
+      if (el) { setPickerMountEl(el); return }
+      attempts++
+      if (attempts < 40) setTimeout(findNav, 150)
+    }
+    findNav()
   }, [])
 
   // Hide/show the built-in hero depending on selection
@@ -405,10 +406,16 @@ export default function HeroThemes() {
   if (!mountEl) return null
   const active = THEMES.find(t => t.id === theme)
 
+  const inNav = !!pickerMountEl
   const picker = (
-      <div style={{ position: 'fixed', left: 18, bottom: 84, zIndex: 99999 }}>
+      <div style={inNav
+        ? { position: 'relative', display: 'inline-flex', zIndex: 99999 }
+        : { position: 'fixed', left: 18, bottom: 84, zIndex: 99999 }}>
         {open && (
-          <div style={{ marginBottom: 10, background: 'rgba(14,10,16,0.97)', border: '0.5px solid rgba(197,160,90,0.35)', borderRadius: 16, padding: 10, width: 228, boxShadow: '0 20px 60px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', maxHeight: '60vh', overflowY: 'auto' }}>
+          <div style={inNav
+            ? { position: 'absolute', top: 'calc(100% + 8px)', left: 0, background: 'rgba(14,10,16,0.97)', border: '0.5px solid rgba(197,160,90,0.35)', borderRadius: 16, padding: 10, width: 228, boxShadow: '0 20px 60px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', maxHeight: '60vh', overflowY: 'auto' }
+            : { marginBottom: 10, background: 'rgba(14,10,16,0.97)', border: '0.5px solid rgba(197,160,90,0.35)', borderRadius: 16, padding: 10, width: 228, boxShadow: '0 20px 60px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', maxHeight: '60vh', overflowY: 'auto' }
+          }>
             <div style={{ fontSize: 10, letterSpacing: '.14em', color: 'rgba(197,160,90,0.7)', textTransform: 'uppercase', padding: '4px 8px 8px' }}>✨ Kies jouw look</div>
             <button onClick={() => { setTheme(''); setOpen(false) }} style={{ display: 'flex', alignItems: 'center', gap: 10, width: '100%', padding: '9px 10px', background: theme === '' ? 'rgba(197,160,90,0.14)' : 'transparent', border: 'none', borderRadius: 10, cursor: 'pointer', color: '#ece8e1', fontSize: 13, fontFamily: 'inherit', textAlign: 'left' }}>
               <span style={{ display: 'inline-flex' }}><span style={{ width: 14, height: 14, borderRadius: '50%', background: '#c5a05a' }} /><span style={{ width: 14, height: 14, borderRadius: '50%', background: '#1a1024', marginLeft: -5 }} /></span>
@@ -425,7 +432,9 @@ export default function HeroThemes() {
             ))}
           </div>
         )}
-        <button onClick={() => setOpen(o => !o)} aria-label="Kies jouw look" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(14,10,16,0.95)', border: '0.5px solid rgba(197,160,90,0.5)', borderRadius: 999, padding: '10px 16px', color: '#e8c97e', fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', fontFamily: 'inherit' }}>
+        <button onClick={(e) => { e.stopPropagation(); setOpen(o => !o) }} aria-label="Kies jouw look" style={inNav
+          ? { display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(14,10,16,0.85)', border: '0.5px solid rgba(197,160,90,0.4)', borderRadius: 999, padding: '6px 12px', color: '#e8c97e', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }
+          : { display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(14,10,16,0.95)', border: '0.5px solid rgba(197,160,90,0.5)', borderRadius: 999, padding: '10px 16px', color: '#e8c97e', fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', fontFamily: 'inherit' }}>
           🎨 {active ? active.name : 'Kies jouw look'}
         </button>
       </div>
@@ -434,7 +443,7 @@ export default function HeroThemes() {
   return (
     <>
       {createPortal(<>{active?.render()}</>, mountEl)}
-      {createPortal(picker, document.body)}
+      {createPortal(picker, pickerMountEl || document.body)}
     </>
   )
 }

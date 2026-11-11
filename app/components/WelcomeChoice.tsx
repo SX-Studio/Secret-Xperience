@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { isShopHost, isLegacyShopHost } from '../lib/domains'
 
 // First-visit welcome modal: asks whether the visitor is here to browse (Member)
 // or to advertise (Creator). The creator choice sends them to /advertise#pricing.
@@ -13,7 +14,12 @@ export default function WelcomeChoice() {
 
   useEffect(() => {
     try {
-      if (localStorage.getItem(KEY)) return
+      if (localStorage.getItem(KEY) || localStorage.getItem('sx_role')) return
+      // The storefront has no visitor/creator split.
+      const host = window.location.host
+      if (isShopHost(host) || isLegacyShopHost(host)) return
+      // Pages with the age gate ask this in the gate's own role step.
+      if (document.getElementById('gate')) return
       const path = window.location.pathname
       if (SKIP.some((p) => path === p || path.startsWith(p + '/'))) return
       const t = setTimeout(() => setOpen(true), 600)
@@ -37,7 +43,7 @@ export default function WelcomeChoice() {
       onClick={() => choose('member')}
       style={{
         position: 'fixed', inset: 0, zIndex: 10000,
-        background: 'rgba(6,4,12,0.78)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+        background: 'rgba(6,4,12,0.35)',
         display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px',
         fontFamily: "'Poppins', sans-serif", animation: 'sxwc-fade .25s ease',
       }}

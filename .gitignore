@@ -47,3 +47,10 @@ __pycache__/
 
 # Generated business documents (contain PII — never commit)
 Verotel_Questionnaire_*.docx
+
+# redlights audit tool — local data & reports (contain advertiser PII; never commit)
+scripts/.listings.json
+scripts/.redlights-cache.json
+.redlights-cache.json
+redlights-audit-*.csv
+redlights-audit-*.json

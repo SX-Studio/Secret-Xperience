@@ -88,6 +88,7 @@ const CAT_NAV = [
   { value: 'domination', label: 'Domination' },
   { value: 'experiences', label: 'Experiences' },
   { value: 'rentals', label: 'Rentals' },
+  { value: 'hotels', label: 'Hotels' },
 ]
 
 const CAT_HERO_BG: Record<string, string> = {

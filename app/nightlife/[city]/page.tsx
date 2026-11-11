@@ -62,7 +62,7 @@ export default async function NightlifeCityPage({ params }: { params: { city: st
     .from('listings')
     .select('id, title, category, city, images, verified, premium, tags')
     .eq('active', true)
-    .in('category', ['nightlife', 'clubs', 'fetish', 'swinger'])
+    .in('category', ['nightlife'])
     .ilike('city', `%${cityName}%`)
     .order('premium', { ascending: false })
     .limit(48)

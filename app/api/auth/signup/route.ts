@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { rateLimit } from '../../../lib/ratelimit'
 import { siteUrl } from '../../../lib/site'
+import { MAIL_FROM, MAIL_REPLY_TO } from '../../../lib/mail-from'
 
 const SITE = siteUrl()
 
@@ -127,7 +128,7 @@ async function sendWelcomeEmail(email: string, name: string, role: string) {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: 'SecretXperience <hello@secretxperience.eu>', to: [email], subject, html }),
+    body: JSON.stringify({ from: MAIL_FROM, reply_to: MAIL_REPLY_TO, to: [email], subject, html }),
   })
   if (!res.ok) {
     const body = await res.text().catch(() => '')

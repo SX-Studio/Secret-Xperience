@@ -9,9 +9,11 @@ import { useEffect, useState } from 'react'
 export default function PrideMode() {
   const [on, setOn] = useState(false)
   const [burst, setBurst] = useState(false)
+  const [hidden, setHidden] = useState(false)
 
   useEffect(() => {
     setOn(document.documentElement.classList.contains('pride-mode'))
+    setHidden(window.location.pathname.startsWith('/controlekamer'))
   }, [])
 
   const toggle = () => {
@@ -21,6 +23,8 @@ export default function PrideMode() {
     try { localStorage.prideMode = next ? 'on' : 'off' } catch {}
     if (next) { setBurst(true); setTimeout(() => setBurst(false), 1100) }
   }
+
+  if (hidden) return null
 
   return (
     <>

@@ -5,6 +5,7 @@ export default function CookieBanner() {
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
+    if (window.location.pathname.startsWith('/controlekamer')) return
     if (!localStorage.getItem('sx_cookie_consent')) setVisible(true)
   }, [])
 

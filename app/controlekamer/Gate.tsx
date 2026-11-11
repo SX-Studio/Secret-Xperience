@@ -15,6 +15,7 @@ export default function Gate() {
   const [otp, setOtp] = useState('')
   const [otpErr, setOtpErr] = useState('')
   const [otpBusy, setOtpBusy] = useState(false)
+  const [errText, setErrText] = useState('')
   const tokenRef = useRef<string>('')
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -25,8 +26,13 @@ export default function Gate() {
     setStatus('loading')
     try {
       const r = await fetch('/api/controlekamer/session', { method: 'POST' })
-      if (!r.ok) throw new Error('session')
-      const j = await r.json()
+      const j = await r.json().catch(() => ({}))
+      if (!r.ok) {
+        setErrText(j.error === 'not_configured'
+          ? 'De controlekamer is nog niet geconfigureerd op de server (INTERNAL_SECRET ontbreekt in Vercel).'
+          : 'De server kon geen sessie starten.')
+        setStatus('error'); return
+      }
       tokenRef.current = j.token
       setCode(j.code); setQrSvg(j.qrSvg || ''); setApproveUrl(j.approveUrl || '')
       setStatus('pending')
@@ -44,6 +50,7 @@ export default function Gate() {
         } catch { /* transient network — keep polling */ }
       }, 2500)
     } catch {
+      setErrText('Geen verbinding met de server.')
       setStatus('error')
     }
   }, [])
@@ -141,7 +148,7 @@ export default function Gate() {
           {(status === 'expired' || status === 'error') && (
             <div className="ck-state">
               <svg viewBox="0 0 24 24" className="ck-state-ic"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-              <div>{status === 'expired' ? 'De code is verlopen.' : 'Er ging iets mis.'}</div>
+              <div>{status === 'expired' ? 'De code is verlopen.' : (errText || 'Er ging iets mis.')}</div>
               <button className="ck-btn" onClick={start}>Nieuwe code</button>
             </div>
           )}

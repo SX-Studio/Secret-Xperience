@@ -9,6 +9,12 @@ function secret(): string {
   return (process.env.INTERNAL_SECRET || process.env.NEXT_PUBLIC_INTERNAL_SECRET || '').trim()
 }
 
+// Without a signing secret every grant fails verification, which looks like the gate
+// silently looping back to the QR after a successful approval. Callers check this first.
+export function grantSecretConfigured(): boolean {
+  return secret().length > 0
+}
+
 function b64url(input: Buffer | string): string {
   return Buffer.from(input).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }

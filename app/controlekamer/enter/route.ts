@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
-import { mintGrant, GRANT_COOKIE, GRANT_TTL_HOURS } from '../../lib/controlekamer'
+import { mintGrant, grantSecretConfigured, GRANT_COOKIE, GRANT_TTL_HOURS } from '../../lib/controlekamer'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +26,7 @@ export async function GET(req: Request) {
   const gate = new URL('/controlekamer', url.origin)
 
   // Feature off (no secret set) or wrong/blank key → silently fall back to the QR gate.
-  if (!secret || !key || !safeEq(key, secret)) {
+  if (!grantSecretConfigured() || !secret || !key || !safeEq(key, secret)) {
     return NextResponse.redirect(gate, { status: 303 })
   }
 

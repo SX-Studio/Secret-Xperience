@@ -80,6 +80,12 @@ export default function AdminPage() {
     setPayouts(rows.map((r: any) => ({ ...r, recipient: profs[r.recipient_id] || null, earnings: earns[r.recipient_id] || null })))
   }
   const currentTab = useRef<Tab>('Listings')
+  // Deep link: /admin?tab=Verification opens that tab (used by the Controlekamer shortcuts).
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get('tab')
+    const match = TABS.find(t => t.toLowerCase() === (wanted || '').toLowerCase())
+    if (match) { currentTab.current = match; setTab(match) }
+  }, [])
   const [listings, setListings] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
   const [bookings, setBookings] = useState<any[]>([])

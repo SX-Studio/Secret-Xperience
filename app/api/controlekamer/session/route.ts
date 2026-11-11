@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import QRCode from 'qrcode'
-import { newToken, newCode, mintGrant, GRANT_COOKIE, GRANT_TTL_HOURS } from '../../../lib/controlekamer'
+import { newToken, newCode, mintGrant, grantSecretConfigured, GRANT_COOKIE, GRANT_TTL_HOURS } from '../../../lib/controlekamer'
 import { maskPhone, otpPhone } from '../../../lib/twilio'
 
 export const dynamic = 'force-dynamic'
@@ -25,6 +25,10 @@ function originOf(req: Request): string {
 
 // Desktop asks for a fresh pending session and its QR.
 export async function POST(req: Request) {
+  if (!grantSecretConfigured()) {
+    console.error('[controlekamer] INTERNAL_SECRET is not set — grants cannot be signed')
+    return NextResponse.json({ error: 'not_configured' }, { status: 503 })
+  }
   const token = newToken()
   const code = newCode()
   const origin = originOf(req)

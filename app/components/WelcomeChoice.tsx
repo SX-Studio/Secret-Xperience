@@ -7,7 +7,7 @@ import { isShopHost, isLegacyShopHost } from '../lib/domains'
 // Shows once, then remembers the choice in localStorage.
 const KEY = 'sx_welcome_choice'
 // Paths where the modal shouldn't interrupt (onboarding / auth / dashboards).
-const SKIP = ['/advertise', '/login', '/admin', '/creators/studio']
+const SKIP = ['/advertise', '/login', '/admin', '/controlekamer', '/creators/studio']
 
 export default function WelcomeChoice() {
   const [open, setOpen] = useState(false)

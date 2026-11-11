@@ -14,7 +14,7 @@ export default function robots(): MetadataRoute.Robots {
   }
 
   return {
-    rules: { userAgent: '*', allow: '/', disallow: ['/dashboard', '/admin', '/messages', '/advertiser', '/api/'] },
+    rules: { userAgent: '*', allow: '/', disallow: ['/dashboard', '/admin', '/controlekamer', '/messages', '/advertiser', '/api/'] },
     sitemap: `${CANONICAL_ORIGIN}/sitemap.xml`,
   }
 }

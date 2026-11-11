@@ -279,6 +279,7 @@ const langPickerScript = `
     var navMount = document.getElementById('langPickerNavMount');
     var wrap = navMount || document.getElementById('langPickerWrap');
     if (!wrap) return;
+    if (location.pathname.indexOf('/controlekamer') === 0) return;
     var inNav = !!navMount;
 
     var btn = document.createElement('button');

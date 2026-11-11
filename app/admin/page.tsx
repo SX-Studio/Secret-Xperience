@@ -80,6 +80,12 @@ export default function AdminPage() {
     setPayouts(rows.map((r: any) => ({ ...r, recipient: profs[r.recipient_id] || null, earnings: earns[r.recipient_id] || null })))
   }
   const currentTab = useRef<Tab>('Listings')
+  // Deep link: /admin?tab=Verification opens that tab (used by the Controlekamer shortcuts).
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get('tab')
+    const match = TABS.find(t => t.toLowerCase() === (wanted || '').toLowerCase())
+    if (match) { currentTab.current = match; setTab(match) }
+  }, [])
   const [listings, setListings] = useState<any[]>([])
   const [users, setUsers] = useState<any[]>([])
   const [bookings, setBookings] = useState<any[]>([])
@@ -619,6 +625,11 @@ export default function AdminPage() {
             <i className="ti ti-building-community" style={{ fontSize: '16px' }} aria-hidden="true" />
             <span style={{ flex: 1 }}>Community</span>
             <i className="ti ti-external-link" style={{ fontSize: '13px', opacity: 0.6 }} aria-hidden="true" />
+          </a>
+          <a href="/controlekamer" className="adm-tab-btn" style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '10px', padding: '0.75rem 1.5rem', textDecoration: 'none', background: 'transparent', borderLeft: '2px solid transparent', color: 'var(--gold, #c5a05a)', font: '600 13px/1 var(--sans)' }}>
+            <i className="ti ti-shield-lock" style={{ fontSize: '16px' }} aria-hidden="true" />
+            <span style={{ flex: 1 }}>Controlekamer</span>
+            <i className="ti ti-qrcode" style={{ fontSize: '13px', opacity: 0.6 }} aria-hidden="true" />
           </a>
         </nav>
         <div className="adm-sidebar-footer" style={{ padding: '1rem 1.5rem', borderTop: '0.5px solid var(--b, rgba(255,255,255,0.06))' }}>

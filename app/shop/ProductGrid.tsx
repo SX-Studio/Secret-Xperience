@@ -15,6 +15,8 @@ export interface Product {
   external_url?: string | null
   featured?: boolean
   in_stock?: boolean
+  deal?: boolean
+  compare_at_cents?: number | null
   brands?: { slug: string; name: string; is_house: boolean } | null
 }
 
@@ -34,10 +36,16 @@ const GRADS = [
   'linear-gradient(140deg, #2a1028 0%, #150814 100%)',
 ]
 
+function money(c: number, cur?: string) {
+  return `${(cur || 'EUR') === 'GBP' ? '£' : '€'}${(c / 100).toFixed(2)}`
+}
+
 function price(p: Product) {
-  if (!p.price_cents) return null
-  const sym = (p.currency || 'EUR') === 'GBP' ? '£' : '€'
-  return `${sym}${(p.price_cents / 100).toFixed(2)}`
+  return p.price_cents ? money(p.price_cents, p.currency) : null
+}
+
+function wasPrice(p: Product) {
+  return p.deal && p.price_cents && p.compare_at_cents && p.compare_at_cents > p.price_cents ? money(p.compare_at_cents, p.currency) : null
 }
 
 function ProductCard({ p, idx, basePath }: { p: Product; idx: number; basePath: string }) {
@@ -67,6 +75,7 @@ function ProductCard({ p, idx, basePath }: { p: Product; idx: number; basePath: 
           <div style={{ fontFamily: 'var(--serif)', fontSize: '15px', color: 'var(--t)', marginBottom: '6px', lineHeight: 1.3 }}>{p.name}</div>
           <div style={{ fontFamily: 'var(--serif)', fontSize: '15px', color: 'var(--gold)', fontWeight: 500 }}>
             {price(p) || (isAffiliate ? `View at ${p.brands?.name || p.brand || 'partner'}` : 'POA')}
+            {wasPrice(p) && <span style={{ fontFamily: 'var(--sans)', fontSize: '12px', color: 'var(--t3)', textDecoration: 'line-through', marginLeft: 8 }}>{wasPrice(p)}</span>}
           </div>
         </div>
       </Link>

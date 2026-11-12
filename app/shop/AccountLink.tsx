@@ -37,7 +37,7 @@ export default function AccountLink() {
 
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10, fontSize: '13px', color: 'var(--t3)' }}>
-      <span title={email} style={{ maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{email}</span>
+      <span title={email} className="sxh-email" style={{ maxWidth: 140, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{email}</span>
       <button
         onClick={async () => { await createClient().auth.signOut(); window.location.reload() }}
         style={{ background: 'none', border: '0.5px solid var(--b)', borderRadius: 'var(--r)', color: 'var(--t2)', fontSize: 12, padding: '4px 10px', cursor: 'pointer' }}

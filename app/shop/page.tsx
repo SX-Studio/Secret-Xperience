@@ -5,6 +5,7 @@ import Link from 'next/link'
 import ProductGrid from './ProductGrid'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
 import BrandRow from './BrandRow'
+import DealsSlider from './DealsSlider'
 import { BRAND_COLS, PRODUCT_COLS, type Brand } from './brands'
 import { ShopHeader, ShopFooter } from './ShopChrome'
 import { SHOP_ORIGIN, isShopHost } from '../lib/domains'
@@ -22,6 +23,10 @@ export async function generateMetadata() {
   }
 }
 
+
+function dealPct(p: { price_cents?: number | null; compare_at_cents?: number | null }) {
+  return p.price_cents && p.compare_at_cents && p.compare_at_cents > p.price_cents ? 1 - p.price_cents / p.compare_at_cents : 0
+}
 
 export default async function ShopPage() {
   const standalone = isShopHost(headers().get('host'))
@@ -52,6 +57,11 @@ export default async function ShopPage() {
   ])
 
   const allProducts = (products || []) as any[]
+  const nowMs = Date.now()
+  // Best deals first: the biggest discount leads the slider.
+  const deals = allProducts
+    .filter(p => p.deal && (!p.deal_ends_at || Date.parse(p.deal_ends_at) > nowMs))
+    .sort((a, b) => dealPct(b) - dealPct(a))
   // The house label's own products get their own section above the partners'.
   const houseProducts = allProducts.filter(p => p.brands?.is_house)
   const partnerProducts = allProducts.filter(p => !p.brands?.is_house)
@@ -101,6 +111,8 @@ export default async function ShopPage() {
         </div>
 
         <ShopHeader standalone={standalone} />
+
+        <DealsSlider deals={deals} basePath={standalone ? '/p' : '/shop'} />
 
         {/* HERO */}
         <div style={{

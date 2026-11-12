@@ -25,4 +25,4 @@ export interface Brand {
 
 export const BRAND_COLS = 'id, slug, name, tagline, description, logo_url, cover_url, website_url, affiliate_url, is_house, featured'
 
-export const PRODUCT_COLS = 'id, name, description, price_cents, currency, images, category, brand, brand_id, fulfillment, external_url, featured, in_stock, brands(slug, name, is_house)'
+export const PRODUCT_COLS = 'id, name, description, price_cents, currency, images, category, brand, brand_id, fulfillment, external_url, featured, in_stock, deal, compare_at_cents, deal_label, promo_code, deal_ends_at, brands(slug, name, is_house)'

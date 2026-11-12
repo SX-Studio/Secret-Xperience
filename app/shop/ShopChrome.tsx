@@ -17,35 +17,47 @@ const GOLD = 'var(--gold)'
 
 export function ShopHeader({ standalone, back }: { standalone: boolean; back?: { href: string; label: string } }) {
   return (
-    <nav style={{
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    <nav className="sxh" style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px',
       padding: '0 1.5rem', height: '58px',
       position: 'sticky', top: standalone && !back ? '34px' : 0, zIndex: 200,
       background: 'rgba(8,6,18,0.96)', backdropFilter: 'blur(18px)',
       borderBottom: '0.5px solid var(--b)',
     }}>
+      <style>{`
+        .sxh-logo { white-space: nowrap; flex-shrink: 0; }
+        .sxh-links { min-width: 0; }
+        @media (max-width: 640px) {
+          .sxh { padding: 0 1rem !important; }
+          .sxh-spacer { display: none; }
+          .sxh-logo { font-size: 19px !important; }
+          .sxh-logo .sxh-sub, .sxh-hide-sm, .sxh-links .sxh-email { display: none !important; }
+          .sxh-links { gap: 12px !important; }
+        }
+      `}</style>
       {back ? (
         <Link href={back.href} style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}>
           <i className="ti ti-arrow-left" /> {back.label}
         </Link>
-      ) : <span />}
+      ) : <span className="sxh-spacer" />}
 
       <Link
         href="/"
+        className="sxh-logo"
         style={{ fontFamily: 'var(--serif)', fontSize: back ? '20px' : '22px', color: GOLD, letterSpacing: '.02em', textDecoration: 'none', filter: 'drop-shadow(0 0 12px rgba(197,160,90,0.25))' }}
       >
         Secret<em style={{ fontStyle: 'italic', fontWeight: 300 }}>Xperience</em>
-        {standalone && <span style={{ fontSize: '11px', letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--t3)', marginLeft: 8, fontStyle: 'normal' }}>Boutique</span>}
+        {standalone && <span className="sxh-sub" style={{ fontSize: '11px', letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--t3)', marginLeft: 8, fontStyle: 'normal' }}>Boutique</span>}
       </Link>
 
       {back ? <span /> : (
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <div className="sxh-links" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           {standalone ? (
             <>
               <AccountLink />
               <a href="/tokens" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Tokens</a>
-              <Link href="/shipping" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Shipping</Link>
-              <Link href="/returns" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Returns</Link>
+              <Link href="/shipping" className="sxh-hide-sm" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Shipping</Link>
+              <Link href="/returns" className="sxh-hide-sm" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Returns</Link>
             </>
           ) : (
             <>

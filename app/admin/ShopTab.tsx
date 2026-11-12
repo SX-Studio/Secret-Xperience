@@ -15,6 +15,7 @@ type Product = {
   id: string; name: string; description: string | null; price_cents: number | null; images: string[] | null
   category: string | null; brand_id: string | null; fulfillment: string; external_url: string | null
   featured: boolean; in_stock: boolean; active: boolean; sort: number
+  deal: boolean; compare_at_cents: number | null; deal_label: string | null; promo_code: string | null; deal_ends_at: string | null
 }
 type Clicks = Record<string, { d7: number; d30: number }>
 type Data = { brands: Brand[]; products: Product[]; clicks: Clicks; categories: string[] }
@@ -68,7 +69,13 @@ function BrandForm({ initial, onSave, onCancel, busy }: { initial: Partial<Brand
 }
 
 function ProductForm({ initial, brands, categories, onSave, onCancel, busy }: { initial: Partial<Product>; brands: Brand[]; categories: string[]; onSave: (d: any) => void; onCancel: () => void; busy: boolean }) {
-  const [f, setF] = useState<any>({ ...initial, price: euro(initial.price_cents ?? null), images: (initial.images || []).join('\n') })
+  const [f, setF] = useState<any>({
+    ...initial,
+    price: euro(initial.price_cents ?? null),
+    was_price: euro(initial.compare_at_cents ?? null),
+    deal_ends_at: initial.deal_ends_at ? initial.deal_ends_at.slice(0, 10) : '',
+    images: (initial.images || []).join('\n'),
+  })
   const set = (k: string) => (e: any) => setF((x: any) => ({ ...x, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value }))
   const house = brands.find(b => b.id === f.brand_id)?.is_house
   return (
@@ -90,6 +97,18 @@ function ProductForm({ initial, brands, categories, onSave, onCancel, busy }: { 
       {!house && <Field l="Item link (affiliate deep link to this product) — blank = brand's link" wide><input style={input} value={f.external_url || ''} onChange={set('external_url')} placeholder="https://…" /></Field>}
       <Field l="Image links (one per line, first is the cover)" wide><textarea style={area} value={f.images} onChange={set('images')} placeholder="https://…" /></Field>
       <Field l="Description" wide><textarea style={area} value={f.description || ''} onChange={set('description')} /></Field>
+      <div style={{ gridColumn: '1 / -1', borderTop: '0.5px solid var(--b, rgba(255,255,255,0.06))', paddingTop: 12, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12 }}>
+        <label style={{ gridColumn: '1 / -1', font: '600 13px var(--sans)', color: '#ff8cc4' }}>
+          <input type="checkbox" checked={!!f.deal} onChange={set('deal')} /> 🔥 Show in the Best deals slider
+        </label>
+        <Field l="Old price € (struck through; sets the -% badge)"><input style={input} value={f.was_price ?? ''} onChange={set('was_price')} inputMode="decimal" placeholder="79.90" /></Field>
+        <Field l="Label on the card">
+          <input style={input} list="deal-labels" value={f.deal_label || ''} onChange={set('deal_label')} placeholder="HOT" />
+          <datalist id="deal-labels"><option value="HOT" /><option value="BEST DEAL" /><option value="SALE" /><option value="BESTSELLER" /><option value="LAST CHANCE" /></datalist>
+        </Field>
+        <Field l="Promo code (optional)"><input style={input} value={f.promo_code || ''} onChange={set('promo_code')} placeholder="SX15" /></Field>
+        <Field l="Deal ends (optional — drops out after)"><input style={input} type="date" value={f.deal_ends_at || ''} onChange={set('deal_ends_at')} /></Field>
+      </div>
       <div style={{ gridColumn: '1 / -1', display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
         <label style={{ font: '400 13px var(--sans)', color: 'var(--t2)' }}><input type="checkbox" checked={f.active ?? true} onChange={set('active')} /> Live</label>
         <label style={{ font: '400 13px var(--sans)', color: 'var(--t2)' }}><input type="checkbox" checked={!!f.featured} onChange={set('featured')} /> Featured</label>
@@ -219,6 +238,7 @@ export default function ShopTab() {
                         </span>
                         {!p.active && <span style={pill(false)}>Hidden</span>}
                         {p.featured && <span style={pill(true, '#c5a05a')}>Featured</span>}
+                        {p.deal && <span style={pill(true, '#ff5fae')}>🔥 Deal{p.compare_at_cents && p.price_cents ? ` -${Math.round((1 - p.price_cents / p.compare_at_cents) * 100)}%` : ''}</span>}
                         <span style={{ font: '400 12px var(--sans)', color: 'var(--t3)' }}>{p.fulfillment === 'stripe' ? 'our checkout' : `${pc.d7} / ${pc.d30} clicks`}</span>
                         {p.active && <a href={`${STORE}/p/${p.id}`} target="_blank" rel="noreferrer" style={{ ...btn(), display: 'inline-flex', alignItems: 'center', textDecoration: 'none' }}>View</a>}
                         <button style={btn()} onClick={() => setEditing(editing === `product:${p.id}` ? null : `product:${p.id}`)}>Edit</button>

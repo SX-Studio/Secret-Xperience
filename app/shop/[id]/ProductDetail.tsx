@@ -37,6 +37,10 @@ export default function ProductDetail({ params, standalone }: { params: { id: st
 
   const sym = product && (product.currency || 'EUR') === 'GBP' ? '£' : '€'
   const priceStr = product?.price_cents ? `${sym}${(product.price_cents / 100).toFixed(2)}` : null
+  const dealLive = !!product?.deal && (!product.deal_ends_at || Date.parse(product.deal_ends_at) > Date.now())
+  const wasStr = dealLive && product.compare_at_cents > (product.price_cents || 0) ? `${sym}${(product.compare_at_cents / 100).toFixed(2)}` : null
+  const pct = wasStr && product.price_cents ? Math.round((1 - product.price_cents / product.compare_at_cents) * 100) : null
+  const [copied, setCopied] = useState(false)
   const isAffiliate = product?.fulfillment === 'affiliate'
   const brand = product?.brands && !Array.isArray(product.brands) ? product.brands : null
   const brandName: string | null = brand?.name || product?.brand || null
@@ -71,7 +75,21 @@ export default function ProductDetail({ params, standalone }: { params: { id: st
               ? <Link href={brandHref} style={{ display: 'inline-block', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '10px', textDecoration: 'none' }}>{brandName} →</Link>
               : <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '10px' }}>{brandName}</div>)}
             <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(26px,4vw,36px)', fontWeight: 400, lineHeight: 1.15, margin: '0 0 1rem' }}>{product.name}</h1>
-            {priceStr && <div style={{ fontFamily: 'var(--serif)', fontSize: '28px', color: 'var(--gold)', marginBottom: '1.25rem' }}>{priceStr}</div>}
+            {priceStr && (
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+                <span style={{ fontFamily: 'var(--serif)', fontSize: '28px', color: 'var(--gold)' }}>{priceStr}</span>
+                {wasStr && <span style={{ fontSize: '16px', color: 'var(--t3)' }}>{product.compare_is_rrp && <span style={{ fontSize: 12 }}>RRP </span>}<s>{wasStr}</s></span>}
+                {pct ? <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff', background: 'linear-gradient(90deg,#e91e8c,#ff5a28)', borderRadius: 999, padding: '4px 9px' }}>-{pct}%</span> : null}
+              </div>
+            )}
+            {dealLive && product.promo_code && (
+              <button
+                onClick={() => { navigator.clipboard?.writeText(product.promo_code).then(() => { setCopied(true); setTimeout(() => setCopied(false), 2000) }).catch(() => {}) }}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, marginBottom: '1.25rem', padding: '9px 14px', background: 'transparent', border: '1px dashed rgba(255,140,196,0.7)', borderRadius: 'var(--r)', color: '#ff8cc4', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+              >
+                <i className="ti ti-ticket" /> Code: {product.promo_code} · {copied ? 'Copied ✓' : 'Copy'}
+              </button>
+            )}
             {product.description && <p style={{ fontSize: '14px', color: 'var(--t2)', lineHeight: 1.75, marginBottom: '1.75rem' }}>{product.description}</p>}
 
             {isAffiliate ? (

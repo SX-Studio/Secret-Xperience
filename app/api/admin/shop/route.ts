@@ -91,9 +91,32 @@ function productFields(d: any, creating: boolean) {
     out.images = list
   }
   const ext = linkUrl(d.external_url, 'Product link'); if (ext !== undefined) out.external_url = ext
-  for (const k of ['featured', 'active', 'in_stock'] as const) if (typeof d[k] === 'boolean') out[k] = d[k]
+  for (const k of ['featured', 'active', 'in_stock', 'deal', 'compare_is_rrp'] as const) if (typeof d[k] === 'boolean') out[k] = d[k]
   if (d.sort !== undefined) out.sort = Number.isFinite(+d.sort) ? Math.trunc(+d.sort) : 0
+  if (d.was_price !== undefined) {
+    if (d.was_price === null || d.was_price === '') out.compare_at_cents = null
+    else {
+      const n = Math.round(Number(String(d.was_price).replace(',', '.')) * 100)
+      if (!Number.isFinite(n) || n <= 0 || n > 10_000_000) throw new Error('Old price must be a number in euros'); out.compare_at_cents = n
+    }
+  }
+  if (d.deal_label !== undefined) out.deal_label = str(d.deal_label, 24)
+  if (d.promo_code !== undefined) out.promo_code = str(d.promo_code, 40)
+  if (d.deal_ends_at !== undefined) {
+    const s = str(d.deal_ends_at, 40)
+    if (s && Number.isNaN(Date.parse(s))) throw new Error('Deal end date is not a valid date')
+    // A bare date means "through that day", in Brussels time.
+    out.deal_ends_at = s ? new Date(/^\d{4}-\d{2}-\d{2}$/.test(s) ? `${s}T23:59:59+01:00` : s).toISOString() : null
+  }
   return out
+}
+
+/** A deal must show a real saving: old price above the current one. */
+function checkDeal(f: Record<string, unknown>) {
+  const price = f.price_cents as number | null | undefined
+  const was = f.compare_at_cents as number | null | undefined
+  if (was != null && price != null && was <= price) throw new Error('Old price must be higher than the current price')
+  if (f.deal === true && (price == null || was == null)) throw new Error('A deal needs both the current price and the old price')
 }
 
 /** Decide fulfillment from the brand, and keep products.brand (legacy text) in step. */
@@ -118,7 +141,7 @@ export async function GET() {
   const since7 = Date.now() - 7 * 864e5
   const [{ data: brands }, { data: products }, { data: clicks }] = await Promise.all([
     ctx.admin.from('brands').select('*').order('is_house', { ascending: false }).order('featured', { ascending: false }).order('sort').order('name'),
-    ctx.admin.from('products').select('id, name, description, price_cents, currency, images, category, brand_id, fulfillment, external_url, featured, in_stock, active, sort, created_at')
+    ctx.admin.from('products').select('id, name, description, price_cents, currency, images, category, brand_id, fulfillment, external_url, featured, in_stock, active, sort, created_at, deal, compare_at_cents, compare_is_rrp, deal_label, promo_code, deal_ends_at')
       .order('sort').order('created_at', { ascending: false }),
     ctx.admin.from('affiliate_clicks').select('brand_id, product_id, clicked_at').gte('clicked_at', since30).limit(100000),
   ])
@@ -150,6 +173,7 @@ export async function POST(request: Request) {
     }
     if (type === 'product') {
       const fields = productFields(data || {}, true)
+      checkDeal(fields)
       await attachBrand(ctx.admin, fields)
       const { data: row, error } = await ctx.admin.from('products').insert(fields).select('id').single()
       if (error) return bad(error.message)
@@ -175,9 +199,10 @@ export async function PATCH(request: Request) {
     }
     if (type === 'product') {
       const fields = productFields(data || {}, false)
-      const { data: cur } = await ctx.admin.from('products').select('brand_id, price_cents').eq('id', id).maybeSingle()
+      const { data: cur } = await ctx.admin.from('products').select('brand_id, price_cents, compare_at_cents, deal').eq('id', id).maybeSingle()
       if (!cur) return NextResponse.json({ error: 'Not found' }, { status: 404 })
       if (!('price_cents' in fields)) fields.price_cents = cur.price_cents
+      checkDeal({ deal: cur.deal, compare_at_cents: cur.compare_at_cents, ...fields })
       await attachBrand(ctx.admin, fields, cur.brand_id)
       const { error } = await ctx.admin.from('products').update(fields).eq('id', id)
       if (error) return bad(error.message)

@@ -92,7 +92,7 @@ export default async function BrandPage({ params }: { params: { slug: string } }
             <h2 style={{ fontFamily: 'var(--serif)', fontSize: 24, fontWeight: 400, margin: '2.5rem 0 0' }}>
               Featured from <em style={{ color: 'var(--gold)' }}>{brand.name}</em>
             </h2>
-            <ProductGrid products={products as any} basePath={standalone ? '/p' : '/shop'} hideFilters />
+            <ProductGrid products={products as any} basePath={standalone ? '/p' : '/shop'} hideFilters source="brand" />
           </>
         ) : (
           <p style={{ textAlign: 'center', color: 'var(--t3)', fontSize: 14, padding: '3.5rem 1rem' }}>

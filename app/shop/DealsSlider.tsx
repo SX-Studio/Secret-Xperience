@@ -1,12 +1,13 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
+import { goProduct } from '../lib/shopLinks'
 
 /**
  * "Best deals" slider across the full width of the storefront, above the hero.
  * Shows every live product marked as a deal (Admin → Shop), from any brand.
- * Cards open the product page on our domain; the click out to the brand is
- * counted there. Renders nothing when there are no deals, so an empty band
+ * A partner's card goes straight to that shop's product page (through /go,
+ * so the click is counted); a house item opens our own product page. Renders nothing when there are no deals, so an empty band
  * never sits at the top of the store.
  */
 
@@ -22,7 +23,8 @@ export interface Deal {
   promo_code?: string | null
   deal_ends_at?: string | null
   brand?: string | null
-  brands?: { name: string } | null
+  fulfillment?: string | null
+  brands?: { name: string; is_house?: boolean } | null
 }
 
 const money = (c: number, cur?: string | null) => `${(cur || 'EUR') === 'GBP' ? '£' : '€'}${(c / 100).toFixed(2).replace(/\.00$/, '')}`
@@ -109,6 +111,8 @@ export default function DealsSlider({ deals, basePath }: { deals: Deal[]; basePa
         .dls-now { font:700 17px/1 var(--sans); color:#ffd23f; }
         .dls-was { font:400 12px/1 var(--sans); color:rgba(243,233,238,.45); white-space:nowrap; }
         .dls-rrp { font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; }
+        .dls-go { margin-top:6px; font:600 11px/1 var(--sans); color:#f3e9ee; opacity:.75; }
+        .dls-card:hover .dls-go { opacity:1; color:#ff8cc4; }
         .dls-code { align-self:flex-start; margin-top:6px; font:600 10.5px/1 var(--sans); letter-spacing:.06em; color:#ff8cc4; border:1px dashed rgba(255,140,196,.6); border-radius:6px; padding:5px 7px; }
         @media (max-width:640px) {
           .dls-in { padding:.9rem 1rem 1rem; }
@@ -141,8 +145,9 @@ export default function DealsSlider({ deals, basePath }: { deals: Deal[]; basePa
             const pct = discountPct(d)
             const ends = now ? endsIn(d.deal_ends_at, now) : null
             const brand = d.brands?.name || d.brand
-            return (
-              <Link key={d.id} href={`${basePath}/${d.id}`} className="dls-card">
+            const external = d.fulfillment === 'affiliate' && !d.brands?.is_house
+            const inner = (
+              <>
                 <div className="dls-img">
                   {d.images?.[0]
                     ? <img src={d.images[0]} alt="" loading="lazy" />
@@ -163,9 +168,13 @@ export default function DealsSlider({ deals, basePath }: { deals: Deal[]; basePa
                     </span>
                   )}
                   {d.promo_code && <span className="dls-code">Code: {d.promo_code}</span>}
+                  {external && brand && <span className="dls-go">Shop at {brand} ↗</span>}
                 </div>
-              </Link>
+              </>
             )
+            return external
+              ? <a key={d.id} href={goProduct(d.id, 'deals')} target="_blank" rel="sponsored noopener" className="dls-card" aria-label={`${d.name} at ${brand || 'partner shop'}`}>{inner}</a>
+              : <Link key={d.id} href={`${basePath}/${d.id}`} className="dls-card">{inner}</Link>
           })}
         </div>
       </div>

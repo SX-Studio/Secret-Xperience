@@ -37,7 +37,7 @@ export function productDestination(externalUrl: string | null | undefined, brand
   return safeOutboundUrl(externalUrl) || brandDestination(brand)
 }
 
-export const CLICK_SOURCES = ['home', 'brand', 'product', 'brands'] as const
+export const CLICK_SOURCES = ['home', 'brand', 'product', 'brands', 'deals'] as const
 export type ClickSource = typeof CLICK_SOURCES[number]
 
 export function goBrand(slug: string, source: ClickSource) {

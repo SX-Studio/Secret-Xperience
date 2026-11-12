@@ -1,6 +1,7 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
+import { goProduct, type ClickSource } from '../lib/shopLinks'
 
 export interface Product {
   id: string
@@ -41,6 +42,13 @@ function money(c: number, cur?: string) {
   return `${(cur || 'EUR') === 'GBP' ? '£' : '€'}${(c / 100).toFixed(2)}`
 }
 
+/** Partner items open the shop's own product page (counted via /go); house items stay on our page. */
+function CardLink({ external, href, label, style, children }: { external: boolean; href: string; label: string; style: React.CSSProperties; children: React.ReactNode }) {
+  return external
+    ? <a href={href} target="_blank" rel="sponsored noopener" className="shop-card" aria-label={label} style={style}>{children}</a>
+    : <Link href={href} className="shop-card" style={style}>{children}</Link>
+}
+
 function price(p: Product) {
   return p.price_cents ? money(p.price_cents, p.currency) : null
 }
@@ -49,14 +57,14 @@ function wasPrice(p: Product) {
   return p.deal && p.price_cents && p.compare_at_cents && p.compare_at_cents > p.price_cents ? money(p.compare_at_cents, p.currency) : null
 }
 
-function ProductCard({ p, idx, basePath }: { p: Product; idx: number; basePath: string }) {
+function ProductCard({ p, idx, basePath, source }: { p: Product; idx: number; basePath: string; source: ClickSource }) {
   const monogram = (p.brand || p.name || 'Sx').slice(0, 2).toUpperCase()
   const grad = GRADS[idx % GRADS.length]
   const isAffiliate = p.fulfillment === 'affiliate'
 
   return (
     <div style={{ position: 'relative' }}>
-      <Link href={`${basePath}/${p.id}`} className="shop-card" style={{ display: 'block', textDecoration: 'none', background: 'var(--bg1)', border: '0.5px solid var(--b)', borderRadius: '12px', overflow: 'hidden', transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.15s' }}>
+      <CardLink external={isAffiliate && !p.brands?.is_house} href={isAffiliate && !p.brands?.is_house ? goProduct(p.id, source) : `${basePath}/${p.id}`} label={p.name} style={{ display: 'block', textDecoration: 'none', background: 'var(--bg1)', border: '0.5px solid var(--b)', borderRadius: '12px', overflow: 'hidden', transition: 'transform 0.2s ease, box-shadow 0.2s ease, border-color 0.15s' }}>
         <div style={{ height: '200px', background: grad, position: 'relative', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {p.images?.[0] ? (
             <img src={p.images[0]} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', position: 'absolute', inset: 0 }} />
@@ -79,14 +87,14 @@ function ProductCard({ p, idx, basePath }: { p: Product; idx: number; basePath: 
             {wasPrice(p) && <span style={{ fontFamily: 'var(--sans)', fontSize: '12px', color: 'var(--t3)', marginLeft: 8 }}>{p.compare_is_rrp && 'RRP '}<s>{wasPrice(p)}</s></span>}
           </div>
         </div>
-      </Link>
+      </CardLink>
     </div>
   )
 }
 
 // basePath differs per domain: products are /shop/<id> on the marketplace and
 // /p/<id> on the standalone storefront, where the shop is the whole site.
-export default function ProductGrid({ products, basePath = '/shop', hideFilters = false }: { products: Product[]; basePath?: string; hideFilters?: boolean }) {
+export default function ProductGrid({ products, basePath = '/shop', hideFilters = false, source = 'home' }: { products: Product[]; basePath?: string; hideFilters?: boolean; source?: ClickSource }) {
   const [filter, setFilter] = useState('all')
   const filtered = products.filter(p => filter === 'all' || (p.category ?? '').toLowerCase() === filter)
 
@@ -112,7 +120,7 @@ export default function ProductGrid({ products, basePath = '/shop', hideFilters 
         <div style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--t3)' }}>No products match this filter</div>
       ) : (
         <div className="shop-grid">
-          {filtered.map((p, i) => <ProductCard key={p.id} p={p} idx={i} basePath={basePath} />)}
+          {filtered.map((p, i) => <ProductCard key={p.id} p={p} idx={i} basePath={basePath} source={source} />)}
         </div>
       )}
     </>

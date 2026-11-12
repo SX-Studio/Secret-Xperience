@@ -45,7 +45,7 @@ export default async function ShopPage() {
       .order('featured', { ascending: false })
       .order('sort')
       .order('created_at', { ascending: false })
-      .limit(60),
+      .limit(240),
     supabase
       .from('brands')
       .select(BRAND_COLS)

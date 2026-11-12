@@ -91,7 +91,7 @@ function productFields(d: any, creating: boolean) {
     out.images = list
   }
   const ext = linkUrl(d.external_url, 'Product link'); if (ext !== undefined) out.external_url = ext
-  for (const k of ['featured', 'active', 'in_stock', 'deal'] as const) if (typeof d[k] === 'boolean') out[k] = d[k]
+  for (const k of ['featured', 'active', 'in_stock', 'deal', 'compare_is_rrp'] as const) if (typeof d[k] === 'boolean') out[k] = d[k]
   if (d.sort !== undefined) out.sort = Number.isFinite(+d.sort) ? Math.trunc(+d.sort) : 0
   if (d.was_price !== undefined) {
     if (d.was_price === null || d.was_price === '') out.compare_at_cents = null
@@ -141,7 +141,7 @@ export async function GET() {
   const since7 = Date.now() - 7 * 864e5
   const [{ data: brands }, { data: products }, { data: clicks }] = await Promise.all([
     ctx.admin.from('brands').select('*').order('is_house', { ascending: false }).order('featured', { ascending: false }).order('sort').order('name'),
-    ctx.admin.from('products').select('id, name, description, price_cents, currency, images, category, brand_id, fulfillment, external_url, featured, in_stock, active, sort, created_at, deal, compare_at_cents, deal_label, promo_code, deal_ends_at')
+    ctx.admin.from('products').select('id, name, description, price_cents, currency, images, category, brand_id, fulfillment, external_url, featured, in_stock, active, sort, created_at, deal, compare_at_cents, compare_is_rrp, deal_label, promo_code, deal_ends_at')
       .order('sort').order('created_at', { ascending: false }),
     ctx.admin.from('affiliate_clicks').select('brand_id, product_id, clicked_at').gte('clicked_at', since30).limit(100000),
   ])

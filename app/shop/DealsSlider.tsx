@@ -15,6 +15,7 @@ export interface Deal {
   name: string
   price_cents: number | null
   compare_at_cents: number | null
+  compare_is_rrp?: boolean | null
   currency?: string | null
   images?: string[] | null
   deal_label?: string | null
@@ -106,7 +107,8 @@ export default function DealsSlider({ deals, basePath }: { deals: Deal[]; basePa
         .dls-name { font-family:var(--serif); font-size:15px; line-height:1.25; color:#f3e9ee; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
         .dls-price { display:flex; align-items:baseline; gap:8px; margin-top:auto; padding-top:4px; }
         .dls-now { font:700 17px/1 var(--sans); color:#ffd23f; }
-        .dls-was { font:400 12px/1 var(--sans); color:rgba(243,233,238,.45); text-decoration:line-through; }
+        .dls-was { font:400 12px/1 var(--sans); color:rgba(243,233,238,.45); white-space:nowrap; }
+        .dls-rrp { font-size:9.5px; letter-spacing:.06em; text-transform:uppercase; }
         .dls-code { align-self:flex-start; margin-top:6px; font:600 10.5px/1 var(--sans); letter-spacing:.06em; color:#ff8cc4; border:1px dashed rgba(255,140,196,.6); border-radius:6px; padding:5px 7px; }
         @media (max-width:640px) {
           .dls-in { padding:.9rem 1rem 1rem; }
@@ -155,7 +157,9 @@ export default function DealsSlider({ deals, basePath }: { deals: Deal[]; basePa
                   {d.price_cents != null && (
                     <span className="dls-price">
                       <span className="dls-now">{money(d.price_cents, d.currency)}</span>
-                      {d.compare_at_cents != null && <span className="dls-was">{money(d.compare_at_cents, d.currency)}</span>}
+                      {d.compare_at_cents != null && (
+                        <span className="dls-was">{d.compare_is_rrp && <span className="dls-rrp">RRP </span>}<s>{money(d.compare_at_cents, d.currency)}</s></span>
+                      )}
                     </span>
                   )}
                   {d.promo_code && <span className="dls-code">Code: {d.promo_code}</span>}

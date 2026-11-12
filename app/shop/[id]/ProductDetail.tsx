@@ -78,7 +78,7 @@ export default function ProductDetail({ params, standalone }: { params: { id: st
             {priceStr && (
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
                 <span style={{ fontFamily: 'var(--serif)', fontSize: '28px', color: 'var(--gold)' }}>{priceStr}</span>
-                {wasStr && <span style={{ fontSize: '16px', color: 'var(--t3)', textDecoration: 'line-through' }}>{wasStr}</span>}
+                {wasStr && <span style={{ fontSize: '16px', color: 'var(--t3)' }}>{product.compare_is_rrp && <span style={{ fontSize: 12 }}>RRP </span>}<s>{wasStr}</s></span>}
                 {pct ? <span style={{ fontSize: '12px', fontWeight: 800, color: '#fff', background: 'linear-gradient(90deg,#e91e8c,#ff5a28)', borderRadius: 999, padding: '4px 9px' }}>-{pct}%</span> : null}
               </div>
             )}

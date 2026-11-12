@@ -17,6 +17,7 @@ export interface Product {
   in_stock?: boolean
   deal?: boolean
   compare_at_cents?: number | null
+  compare_is_rrp?: boolean
   brands?: { slug: string; name: string; is_house: boolean } | null
 }
 
@@ -75,7 +76,7 @@ function ProductCard({ p, idx, basePath }: { p: Product; idx: number; basePath: 
           <div style={{ fontFamily: 'var(--serif)', fontSize: '15px', color: 'var(--t)', marginBottom: '6px', lineHeight: 1.3 }}>{p.name}</div>
           <div style={{ fontFamily: 'var(--serif)', fontSize: '15px', color: 'var(--gold)', fontWeight: 500 }}>
             {price(p) || (isAffiliate ? `View at ${p.brands?.name || p.brand || 'partner'}` : 'POA')}
-            {wasPrice(p) && <span style={{ fontFamily: 'var(--sans)', fontSize: '12px', color: 'var(--t3)', textDecoration: 'line-through', marginLeft: 8 }}>{wasPrice(p)}</span>}
+            {wasPrice(p) && <span style={{ fontFamily: 'var(--sans)', fontSize: '12px', color: 'var(--t3)', marginLeft: 8 }}>{p.compare_is_rrp && 'RRP '}<s>{wasPrice(p)}</s></span>}
           </div>
         </div>
       </Link>

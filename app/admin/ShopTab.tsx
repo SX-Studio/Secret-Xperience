@@ -15,7 +15,7 @@ type Product = {
   id: string; name: string; description: string | null; price_cents: number | null; images: string[] | null
   category: string | null; brand_id: string | null; fulfillment: string; external_url: string | null
   featured: boolean; in_stock: boolean; active: boolean; sort: number
-  deal: boolean; compare_at_cents: number | null; deal_label: string | null; promo_code: string | null; deal_ends_at: string | null
+  deal: boolean; compare_at_cents: number | null; compare_is_rrp: boolean; deal_label: string | null; promo_code: string | null; deal_ends_at: string | null
 }
 type Clicks = Record<string, { d7: number; d30: number }>
 type Data = { brands: Brand[]; products: Product[]; clicks: Clicks; categories: string[] }
@@ -102,6 +102,9 @@ function ProductForm({ initial, brands, categories, onSave, onCancel, busy }: { 
           <input type="checkbox" checked={!!f.deal} onChange={set('deal')} /> 🔥 Show in the Best deals slider
         </label>
         <Field l="Old price € (struck through; sets the -% badge)"><input style={input} value={f.was_price ?? ''} onChange={set('was_price')} inputMode="decimal" placeholder="79.90" /></Field>
+        <label style={{ font: '400 12px/1.4 var(--sans)', color: 'var(--t2)', alignSelf: 'end' }}>
+          <input type="checkbox" checked={!!f.compare_is_rrp} onChange={set('compare_is_rrp')} /> Old price is the brand's RRP (adviesprijs), not the shop's own earlier price
+        </label>
         <Field l="Label on the card">
           <input style={input} list="deal-labels" value={f.deal_label || ''} onChange={set('deal_label')} placeholder="HOT" />
           <datalist id="deal-labels"><option value="HOT" /><option value="BEST DEAL" /><option value="SALE" /><option value="BESTSELLER" /><option value="LAST CHANCE" /></datalist>

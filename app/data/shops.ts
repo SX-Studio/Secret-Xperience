@@ -12,7 +12,6 @@ export interface BoutiqueShop {
 
 export const BOUTIQUE_SHOPS: BoutiqueShop[] = [
   { slug: 'maison-close',   name: 'Maison Close',     url: 'https://maison-close.com',                  img: true },
-  { slug: 'elynaforce',     name: 'Elyna Force',      url: 'https://elynaforce.com/',                   img: false },
   { slug: 'womanza',        name: 'Womanza',          url: 'https://www.womanza.com/',                  img: true },
   { slug: 'noirsatine',     name: 'Noir Satine',      url: 'https://www.noirsatine.com/',               img: true },
   { slug: 'parfaitamour',   name: 'Parfait Amour',    url: 'https://parfaitamour.fr/',                  img: true },

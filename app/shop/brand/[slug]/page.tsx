@@ -18,7 +18,7 @@ async function load(slug: string) {
   const { data: products } = await db.from('products').select(PRODUCT_COLS)
     .eq('brand_id', brand.id).eq('active', true)
     .order('featured', { ascending: false }).order('sort').order('created_at', { ascending: false })
-    .limit(24)
+    .limit(60)
   return { brand: brand as Brand, products: products || [] }
 }
 

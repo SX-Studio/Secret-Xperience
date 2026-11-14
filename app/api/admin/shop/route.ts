@@ -60,6 +60,9 @@ function brandFields(d: any, creating: boolean) {
   const site = linkUrl(d.website_url, 'Website'); if (site !== undefined) out.website_url = site
   const aff = linkUrl(d.affiliate_url, 'Affiliate link'); if (aff !== undefined) out.affiliate_url = aff
   for (const k of ['featured', 'active'] as const) if (typeof d[k] === 'boolean') out[k] = d[k]
+  if (d.kind !== undefined) {
+    if (d.kind !== 'lingerie' && d.kind !== 'toys') throw new Error('Kind must be lingerie or toys'); out.kind = d.kind
+  }
   if (d.sort !== undefined) out.sort = Number.isFinite(+d.sort) ? Math.trunc(+d.sort) : 0
   out.updated_at = new Date().toISOString()
   return out

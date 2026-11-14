@@ -5,11 +5,14 @@ import type { Brand } from './brands'
  * Partner brands on the storefront home. Each card opens the brand's page on
  * our domain (its featured items + a counted link out), not the brand's site
  * directly — the brand page is what a brand is shown when we pitch placement.
+ * The store shows one row per brand kind (sex toys / lingerie), each with its own title.
  */
-export default function BrandRow({ brands, basePath }: { brands: Brand[]; basePath: string }) {
+export default function BrandRow({ brands, basePath, eyebrow, title, accent, label }: {
+  brands: Brand[]; basePath: string; eyebrow: string; title: string; accent: string; label: string
+}) {
   if (brands.length === 0) return null
   return (
-    <section aria-label="Partner brands" style={{ margin: '3rem 0 0' }}>
+    <section aria-label={`${title} ${accent}`} style={{ margin: '3rem 0 0' }}>
       <style>{`
         .brw-row { display:flex; flex-wrap:wrap; gap:14px; }
         .brw-card { display:block; width:200px; height:260px; flex-shrink:0; border-radius:14px; overflow:hidden; position:relative; border:0.5px solid rgba(197,160,90,0.28); box-shadow:0 8px 28px rgba(0,0,0,0.45); text-decoration:none; transition:transform .15s, border-color .2s; background:linear-gradient(150deg,#2a0d18,#0d0a14); }
@@ -18,12 +21,12 @@ export default function BrandRow({ brands, basePath }: { brands: Brand[]; basePa
       `}</style>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
         <div>
-          <p style={{ fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.6)', marginBottom: 8 }}>✦ Partner brands</p>
+          <p style={{ fontSize: 10, letterSpacing: '.18em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.6)', marginBottom: 8 }}>✦ {eyebrow}</p>
           <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(22px,3vw,30px)', fontWeight: 400, margin: 0 }}>
-            Shop the <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>Brands</em>
+            {title} <em style={{ color: 'var(--gold)', fontStyle: 'italic' }}>{accent}</em>
           </h2>
         </div>
-        <span style={{ fontSize: 12, color: 'var(--t3)' }}>{brands.length} boutiques</span>
+        <span style={{ fontSize: 12, color: 'var(--t3)' }}>{brands.length} {label}</span>
       </div>
       <div className="brw-row">
         {brands.map(b => (

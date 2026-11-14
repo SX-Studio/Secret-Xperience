@@ -71,7 +71,7 @@ export default async function BrandPage({ params }: { params: { slug: string } }
           </div>
           <div style={{ minWidth: 0 }}>
             <div style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '0.75rem', fontWeight: 600, opacity: 0.85 }}>
-              {brand.is_house ? 'SecretXperience · House collection' : 'Partner brand'}
+              {brand.is_house ? 'SecretXperience · House collection' : brand.kind === 'toys' ? 'Sex toys · Erotic shop' : 'Lingerie brand'}
             </div>
             {brand.logo_url && <img src={brand.logo_url} alt={brand.name} style={{ height: 36, maxWidth: 220, objectFit: 'contain', display: 'block', marginBottom: 12 }} />}
             <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 400, lineHeight: 1.1, margin: '0 0 0.75rem' }}>{brand.name}</h1>

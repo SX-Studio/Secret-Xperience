@@ -171,7 +171,8 @@ export default async function ShopPage() {
             </>
           )}
 
-          <BrandRow brands={brands} basePath={brandBase} />
+          <BrandRow brands={brands.filter(b => b.kind === 'toys')} basePath={brandBase} eyebrow="Sex toys & erotic shops" title="Sex Toys &" accent="Erotic Shops" label="shops" />
+          <BrandRow brands={brands.filter(b => b.kind !== 'toys')} basePath={brandBase} eyebrow="Lingerie & fashion" title="Lingerie" accent="Brands" label="lingerie brands" />
 
           <p style={{ fontSize: 11, color: 'var(--t3)', marginTop: '2rem', textAlign: 'center' }}>
             Partner brands sell and ship their own products. We may earn a commission when you buy through links on this page.

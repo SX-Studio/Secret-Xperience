@@ -9,6 +9,7 @@ import DealsSlider from './DealsSlider'
 import { BRAND_COLS, PRODUCT_COLS, type Brand } from './brands'
 import { ShopHeader, ShopFooter } from './ShopChrome'
 import { SHOP_ORIGIN, isShopHost } from '../lib/domains'
+import { detectMarket, leadFirst, shopRank } from '../lib/storeMarkets'
 
 export async function generateMetadata() {
   return {
@@ -30,6 +31,8 @@ function dealPct(p: { price_cents?: number | null; compare_at_cents?: number | n
 
 export default async function ShopPage() {
   const standalone = isShopHost(headers().get('host'))
+  // Willie leads for Belgium/Luxembourg, EasyToys for the Netherlands.
+  const market = detectMarket(headers())
   const cookieStore = cookies()
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -61,11 +64,11 @@ export default async function ShopPage() {
   // Best deals first: the biggest discount leads the slider.
   const deals = allProducts
     .filter(p => p.deal && (!p.deal_ends_at || Date.parse(p.deal_ends_at) > nowMs))
-    .sort((a, b) => dealPct(b) - dealPct(a))
+    .sort((a, b) => shopRank(market, a.brands?.slug) - shopRank(market, b.brands?.slug) || dealPct(b) - dealPct(a))
   // The house label's own products get their own section above the partners'.
   const houseProducts = allProducts.filter(p => p.brands?.is_house)
-  const partnerProducts = allProducts.filter(p => !p.brands?.is_house)
-  const brands = (brandRows || []) as Brand[]
+  const partnerProducts = leadFirst(market, allProducts.filter(p => !p.brands?.is_house), p => p.brands?.slug)
+  const brands = leadFirst(market, (brandRows || []) as Brand[], b => b.slug)
   const brandBase = standalone ? '/b' : '/shop/brand'
 
   return (

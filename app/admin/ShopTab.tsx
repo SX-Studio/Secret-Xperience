@@ -9,7 +9,7 @@ type Brand = {
   id: string; slug: string; name: string; tagline: string | null; description: string | null
   logo_url: string | null; cover_url: string | null; website_url: string | null; affiliate_url: string | null
   affiliate_network: string | null; commission_note: string | null
-  is_house: boolean; featured: boolean; sort: number; active: boolean
+  is_house: boolean; featured: boolean; sort: number; active: boolean; kind: 'lingerie' | 'toys'
 }
 type Product = {
   id: string; name: string; description: string | null; price_cents: number | null; images: string[] | null
@@ -48,6 +48,14 @@ function BrandForm({ initial, onSave, onCancel, busy }: { initial: Partial<Brand
       <Field l="Slug (store address /b/…) — blank = from name"><input style={input} value={f.slug || ''} onChange={set('slug')} disabled={!!initial.is_house} /></Field>
       <Field l="Tagline"><input style={input} value={f.tagline || ''} onChange={set('tagline')} /></Field>
       <Field l="Sort (lower = first)"><input style={input} type="number" value={f.sort ?? 0} onChange={set('sort')} /></Field>
+      {!initial.is_house && (
+        <Field l="Row on the store">
+          <select style={input} value={f.kind || 'lingerie'} onChange={set('kind')}>
+            <option value="toys">Sex toys & erotic shops</option>
+            <option value="lingerie">Lingerie & fashion</option>
+          </select>
+        </Field>
+      )}
       {!initial.is_house && <>
         <Field l="Affiliate link (where clicks go — tracking URL from the programme)" wide><input style={input} value={f.affiliate_url || ''} onChange={set('affiliate_url')} placeholder="https://…" /></Field>
         <Field l="Website (fallback when there is no affiliate link)"><input style={input} value={f.website_url || ''} onChange={set('website_url')} placeholder="https://…" /></Field>

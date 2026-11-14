@@ -41,7 +41,7 @@ export default function BrandRow({ brands, basePath, eyebrow, title, accent, lab
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(0deg, rgba(8,6,18,0.92) 0%, rgba(8,6,18,0.2) 45%, transparent 70%)' }} />
             <div style={{ position: 'absolute', left: 14, right: 14, bottom: 14 }}>
               {b.logo_url && <img src={b.logo_url} alt="" style={{ height: 22, maxWidth: '70%', objectFit: 'contain', display: 'block', marginBottom: 8 }} />}
-              <div style={{ fontFamily: 'var(--serif)', fontSize: 18, color: '#ece8e1', lineHeight: 1.15 }}>{b.name}</div>
+              <div style={{ fontFamily: 'var(--serif)', fontSize: 18, color: '#ece8e1', lineHeight: 1.15 }} translate="no" className="notranslate">{b.name}</div>
               {b.tagline && <div style={{ fontSize: 11, color: 'rgba(236,232,225,0.55)', marginTop: 4, lineHeight: 1.35 }}>{b.tagline}</div>}
             </div>
             {b.featured && (

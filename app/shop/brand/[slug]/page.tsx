@@ -74,7 +74,7 @@ export default async function BrandPage({ params }: { params: { slug: string } }
               {brand.is_house ? 'SecretXperience · House collection' : brand.kind === 'toys' ? 'Sex toys · Erotic shop' : 'Lingerie brand'}
             </div>
             {brand.logo_url && <img src={brand.logo_url} alt={brand.name} style={{ height: 36, maxWidth: 220, objectFit: 'contain', display: 'block', marginBottom: 12 }} />}
-            <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 400, lineHeight: 1.1, margin: '0 0 0.75rem' }}>{brand.name}</h1>
+            <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(2rem,5vw,3.2rem)', fontWeight: 400, lineHeight: 1.1, margin: '0 0 0.75rem' }} translate="no" className="notranslate">{brand.name}</h1>
             {brand.tagline && <p style={{ fontSize: 16, color: 'var(--t2)', marginBottom: '0.75rem' }}>{brand.tagline}</p>}
             {brand.description && <p style={{ fontSize: 14, color: 'var(--t2)', lineHeight: 1.75, maxWidth: 620, marginBottom: '1.5rem', whiteSpace: 'pre-line' }}>{brand.description}</p>}
             {outbound && (

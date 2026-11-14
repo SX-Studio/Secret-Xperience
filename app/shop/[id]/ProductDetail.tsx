@@ -72,8 +72,8 @@ export default function ProductDetail({ params, standalone }: { params: { id: st
           {/* Info */}
           <div>
             {brandName && (brandHref
-              ? <Link href={brandHref} style={{ display: 'inline-block', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '10px', textDecoration: 'none' }}>{brandName} →</Link>
-              : <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '10px' }}>{brandName}</div>)}
+              ? <Link href={brandHref} style={{ display: 'inline-block', fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '10px', textDecoration: 'none' }}><span translate="no" className="notranslate">{brandName}</span> →</Link>
+              : <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '10px' }} translate="no" className="notranslate">{brandName}</div>)}
             <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(26px,4vw,36px)', fontWeight: 400, lineHeight: 1.15, margin: '0 0 1rem' }}>{product.name}</h1>
             {priceStr && (
               <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px', flexWrap: 'wrap', marginBottom: '1.25rem' }}>

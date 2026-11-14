@@ -157,7 +157,7 @@ export default function DealsSlider({ deals, basePath }: { deals: Deal[]; basePa
                   {ends && <span className="dls-ends">⏱ Ends in {ends}</span>}
                 </div>
                 <div className="dls-body">
-                  {brand && <span className="dls-brand">{brand}</span>}
+                  {brand && <span className="dls-brand notranslate" translate="no">{brand}</span>}
                   <span className="dls-name">{d.name}</span>
                   {d.price_cents != null && (
                     <span className="dls-price">

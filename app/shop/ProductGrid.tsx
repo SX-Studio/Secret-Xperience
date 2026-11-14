@@ -80,7 +80,7 @@ function ProductCard({ p, idx, basePath, source }: { p: Product; idx: number; ba
           )}
         </div>
         <div style={{ padding: '0.9rem 1rem 1rem' }}>
-          {(p.brands?.name || p.brand) && <div style={{ fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '4px', opacity: 0.85 }}>{p.brands?.name || p.brand}</div>}
+          {(p.brands?.name || p.brand) && <div style={{ fontSize: '10px', letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '4px', opacity: 0.85 }} translate="no" className="notranslate">{p.brands?.name || p.brand}</div>}
           <div style={{ fontFamily: 'var(--serif)', fontSize: '15px', color: 'var(--t)', marginBottom: '6px', lineHeight: 1.3 }}>{p.name}</div>
           <div style={{ fontFamily: 'var(--serif)', fontSize: '15px', color: 'var(--gold)', fontWeight: 500 }}>
             {price(p) || (isAffiliate ? `View at ${p.brands?.name || p.brand || 'partner'}` : 'POA')}

@@ -161,7 +161,6 @@ export const PARTNER_SECTIONS: PartnerSection[] = [
     description: 'Premium and luxury lingerie brands with strong EU presence and active affiliate programmes.',
     items: [
       { name: 'Honey Birdette', emoji: '🖤', tagline: 'High-fashion luxury lingerie, PVC and fantasy pieces. Premium brand, high AOV. Affiliate via Commission Factory.', url: 'https://www.honeybirdette.com', network: 'Rakuten', badge: 'Premium' },
-      { name: 'Agent Provocateur', emoji: '🌙', tagline: 'The world\'s most iconic luxury lingerie. Hand-crafted. Very high AOV commissions. Affiliate via Rakuten.', url: 'https://www.agentprovocateur.com', network: 'Rakuten', badge: 'Luxury' },
       { name: 'Ann Summers', emoji: '💋', tagline: 'UK\'s favourite adult fashion brand. Wide range, constant promotions, huge EU affiliate audience.', url: 'https://www.annsummers.com', network: 'Awin', badge: 'EU Favourite' },
       { name: 'Bluebella', emoji: '🌿', tagline: 'Modern sensual lingerie. Contemporary, inclusive, affordable-luxury. Strong EU shipping and affiliate.', url: 'https://www.bluebella.com', network: 'Awin' },
       { name: 'La Perla', emoji: '🤍', tagline: 'Ultra-premium Italian couture lingerie. Low volume, very high commission per sale.', url: 'https://www.laperla.com', network: 'Rakuten', badge: 'Luxury' },

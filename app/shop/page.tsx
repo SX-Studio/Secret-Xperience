@@ -171,7 +171,7 @@ export default async function ShopPage() {
             </>
           )}
 
-          <BrandRow brands={brands.filter(b => b.kind === 'toys')} basePath={brandBase} eyebrow="Sex toys & erotic shops" title="Sex Toys &" accent="Erotic Shops" label="shops" />
+          <BrandRow brands={brands.filter(b => b.kind === 'toys')} basePath={brandBase} eyebrow="Sex toys & erotic shops" title="Sex Toys &" accent="Erotic Shops" label="shops" wide />
           <BrandRow brands={brands.filter(b => b.kind !== 'toys')} basePath={brandBase} eyebrow="Lingerie & fashion" title="Lingerie" accent="Brands" label="lingerie brands" />
 
           <p style={{ fontSize: 11, color: 'var(--t3)', marginTop: '2rem', textAlign: 'center' }}>

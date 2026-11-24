@@ -86,7 +86,7 @@ export default function LastminuteSearch() {
           ))}
         </div>
       </div>
-      <style>{`@media(max-width:820px){ .lm-grid{ grid-template-columns:1fr 1fr !important; } .lm-grid > button{ grid-column:1 / -1; } }`}</style>
+      <style>{`@media(max-width:820px){ .lm-grid{ grid-template-columns:repeat(2,minmax(0,1fr)) !important; } .lm-grid > button{ grid-column:1 / -1; } .lm-grid input, .lm-grid select{ min-width:0; width:100%; } } @media(max-width:400px){ .lm-grid{ grid-template-columns:minmax(0,1fr) !important; } }`}</style>
     </div>
   )
 }

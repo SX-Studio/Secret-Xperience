@@ -293,7 +293,7 @@ function Mosaic() {
   )
   return (
     <section style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(2rem,5vw,4rem) clamp(1rem,4vw,3.5rem)', background: 'radial-gradient(ellipse 50% 60% at 90% 10%,rgba(180,92,255,.2),transparent 60%),radial-gradient(ellipse 45% 50% at 5% 90%,rgba(197,160,90,.18),transparent 60%),#100a14' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 48, alignItems: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(320px,100%),1fr))', gap: 48, alignItems: 'center' }}>
         <div>
           <Headline accent="#d9a5ff" />
           <SearchBar btnBg="linear-gradient(90deg,#b45cff,#ff5c9e)" btnColor="#fff" border="rgba(217,165,255,.35)" max={460} />

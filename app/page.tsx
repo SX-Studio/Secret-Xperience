@@ -2384,7 +2384,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           </div>
           <div
             style={{
-              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem',
+              display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px,100%), 1fr))', gap: '1.25rem',
             }}
           >
         {/* SDC.com partner card */}
@@ -3089,7 +3089,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   <div style="background:var(--bg1);padding:2.5rem 1.5rem 0;">
     <div style="max-width:1200px;margin:0 auto;">
       <p style="font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin:0 0 10px;">✦ Sponsored Feature</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px;align-items:stretch;">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:18px;align-items:stretch;">
       <a href="https://mariskax.com/" target="_blank" rel="noopener noreferrer nofollow sponsored" aria-label="MariskaX.com — international porn production studio" style="display:block;position:relative;overflow:hidden;border-radius:20px;border:1px solid rgba(210,150,80,0.5);min-height:300px;box-shadow:0 14px 44px rgba(0,0,0,0.55);text-decoration:none;transition:transform .15s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(224,169,79,0.9)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(210,150,80,0.5)'">
         <img src="/promos/mariskax-bg.webp" alt="" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;" />
         <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(10,6,4,0.88) 0%, rgba(10,6,4,0.4) 42%, rgba(10,6,4,0.12) 72%, rgba(10,6,4,0.35) 100%);"></div>

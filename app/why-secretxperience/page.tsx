@@ -120,7 +120,7 @@ function Section({ id, eyebrow, heading, italic, children }: {
 
 function StatRow({ stats }: { stats: { n: string; l: string }[] }) {
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: `repeat(${stats.length}, 1fr)`, gap: '1.5rem', margin: '2.5rem 0', background: S.bg1, border: `0.5px solid ${S.b}`, borderRadius: '16px', padding: '2rem' }}>
+    <div className="sx-stat-row" style={{ display: 'grid', gridTemplateColumns: `repeat(${stats.length}, 1fr)`, gap: '1.5rem', margin: '2.5rem 0', background: S.bg1, border: `0.5px solid ${S.b}`, borderRadius: '16px', padding: '2rem' }}>
       {stats.map(s => (
         <div key={s.l} style={{ textAlign: 'center' }}>
           <div style={{ fontFamily: S.serif, fontSize: '2.6rem', fontWeight: 400, color: G, lineHeight: 1 }}>{s.n}</div>
@@ -276,7 +276,7 @@ export default function WhySecretXperience() {
           </div>
 
           <h3 style={{ fontFamily: S.serif, fontSize: '1.7rem', fontWeight: 400, color: S.t, margin: '2.5rem 0 1.5rem' }}>Eight pillars that make us complete</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(300px,100%),1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
             {[
               ['layout-list', 'Advertisements & Premium Services', 'Independent escorts, companion agencies, erotic massage, tantra, domination and experiential services — every advertiser category covered with premium placement tools.'],
               ['calendar-event', 'Events, Venues & Clubs', 'From fetish parties in Antwerp to swingers nights in Berlin and lifestyle events across France — discover and book adult events and nightlife venues across Europe.'],
@@ -316,7 +316,7 @@ export default function WhySecretXperience() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(280px,100%),1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
             {[
               ['bolt', 'Instant live advertisements', 'A new advertisement goes live in under 10 minutes after sign-up. No waiting room. No review queue for basic profiles. Verification adds the badge — your advertisement is live immediately.'],
               ['chart-bar', 'Real search volume, real cities', 'Our per-city pages — escorts Brussels, nightlife Amsterdam, rentals Berlin — are built to capture the exact long-tail searches EU clients actually type. Every page is server-rendered, crawlable, and indexed.'],
@@ -395,7 +395,7 @@ export default function WhySecretXperience() {
             </p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(280px,100%),1fr))', gap: '1.25rem', marginBottom: '2.5rem' }}>
             {[
               ['heart', 'Commitment to advertisers', 'Advertisers are not an afterthought — they are the product. We invest in tools that help them grow: analytics dashboards, verification badges, booking calendars, creator content feeds, token gifting, and featured placement. A advertiser who succeeds on SecretXperience is our best marketing.'],
               ['users', 'Commitment to clients', 'Clients deserve to know they are browsing real, identity-verified people. Every verified badge represents a completed verification. Every review is from a real client interaction. The platform exists to make finding the right experience easier, safer, and more reliable.'],

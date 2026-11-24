@@ -154,7 +154,7 @@ export default function AdvertisePage() {
           <div style={{ fontFamily: 'var(--sans)', fontSize: '11px', fontWeight: 700, letterSpacing: '0.3em', color: 'var(--gold)', textTransform: 'uppercase', marginBottom: '1rem' }}>Who it&apos;s for</div>
           <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 400, margin: 0 }}>One platform,<em style={{ fontStyle: 'italic', color: 'var(--gold)' }}> every niche</em></h2>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: '1.25rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(280px,100%),1fr))', gap: '1.25rem' }}>
           {categories.map(c => (
             <div key={c.title} style={{ background: 'var(--bg1)', border: '0.5px solid var(--b)', borderRadius: 'var(--rl)', padding: '1.75rem', transition: 'border-color .2s', cursor: 'default' }}
               onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--b3)')}
@@ -222,7 +222,7 @@ export default function AdvertisePage() {
             <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.8rem,4vw,2.8rem)', fontWeight: 400, margin: '0 0 1rem' }}>Simple,<em style={{ fontStyle: 'italic', color: 'var(--gold)' }}> transparent pricing</em></h2>
             <p style={{ fontSize: '15px', color: 'var(--t2)', margin: 0 }}>Start free. Upgrade when you&apos;re ready.</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: '1.25rem', alignItems: 'start' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(280px,100%),1fr))', gap: '1.25rem', alignItems: 'start' }}>
             {plans.map(p => (
               <div key={p.name} style={{ background: p.highlight ? 'var(--bg)' : 'var(--bg2)', border: p.highlight ? '1px solid var(--gbrd)' : '0.5px solid var(--b)', borderRadius: 'var(--rl)', padding: '2rem', position: 'relative', boxShadow: p.highlight ? '0 0 40px rgba(197,160,90,0.1)' : 'none' }}>
                 {p.highlight && <div style={{ position: 'absolute', top: '-12px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', color: '#0a0a0a', fontSize: '11px', fontWeight: 700, letterSpacing: '0.1em', padding: '4px 16px', borderRadius: '20px' }}>MOST POPULAR</div>}

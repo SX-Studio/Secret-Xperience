@@ -109,7 +109,7 @@ export default function CreatorPlatformsPage() {
         .cp-card { display:flex; align-items:center; justify-content:space-between; gap:10px; background:#0e0c12; border:0.5px solid rgba(255,255,255,0.07); border-radius:12px; padding:14px 18px; text-decoration:none; color:#ece8e1; transition:border-color .2s, transform .15s; }
         .cp-card:hover { border-color:rgba(197,160,90,0.35); transform:translateY(-2px); }
         .cp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:10px; }
-        @media(max-width:640px){ .cp-grid{grid-template-columns:repeat(2,1fr)} .cp-main{padding:2rem 1rem 5rem!important} }
+        @media(max-width:640px){ .cp-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .cp-card{min-width:0;padding:12px!important} .cp-main{padding:2rem 1rem 5rem!important} }
       `}</style>
 
       <nav style={{ position: 'sticky', top: 0, zIndex: 100, height: 54, padding: '0 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(8,6,8,0.97)', borderBottom: '0.5px solid rgba(197,160,90,0.08)', backdropFilter: 'blur(18px)' }}>

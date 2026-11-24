@@ -124,11 +124,11 @@ export default function PartnersPage() {
         .p-card { background: #0e0c12; border: 0.5px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; text-decoration: none; color: inherit; transition: border-color .2s, transform .15s; }
         .p-official { border-color: rgba(196,90,90,0.35); border-radius: 16px; box-shadow: 0 14px 40px rgba(0,0,0,0.45); }
         .p-official:hover { border-color: rgba(224,32,48,0.6); }
-        .p-off-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+        .p-off-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px,100%), 1fr)); gap: 16px; }
         .p-card:hover { border-color: rgba(197,160,90,0.18); transform: translateY(-2px); }
         .p-visit { display: inline-flex; align-items: center; gap: 4px; padding: 6px 13px; background: rgba(197,160,90,0.07); border: 0.5px solid rgba(197,160,90,0.25); border-radius: 7px; color: #c5a05a; font: 600 11px 'Poppins', sans-serif; text-decoration: none; transition: background .15s; white-space: nowrap; }
         .p-card:hover .p-visit, .p-visit:hover { background: rgba(197,160,90,0.14); border-color: rgba(197,160,90,0.45); }
-        .p-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+        .p-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px,100%), 1fr)); gap: 12px; }
         .sec-label { font: 700 9px 'Poppins',sans-serif; letter-spacing: .16em; text-transform: uppercase; color: rgba(197,160,90,0.55); margin: 2.5rem 0 0.75rem; display: flex; align-items: center; gap: 8px; }
         .sec-label::after { content:''; flex:1; height:.5px; background:rgba(255,255,255,0.05); }
         .group-head { padding: 2rem 0 1.5rem; border-top: 0.5px solid rgba(255,255,255,0.05); margin-top: 2rem; }
@@ -136,13 +136,13 @@ export default function PartnersPage() {
       `}</style>
 
       {/* Nav */}
-      <nav className="p-nav" style={{ position:'sticky', top:0, zIndex:100, height:54, padding:'0 1.5rem', display:'flex', alignItems:'center', justifyContent:'space-between', background:'rgba(8,6,8,0.97)', borderBottom:'0.5px solid rgba(197,160,90,0.08)', backdropFilter:'blur(18px)' }}>
+      <nav className="p-nav sx-subnav" style={{ position:'sticky', top:0, zIndex:100, height:54, padding:'0 1.5rem', display:'flex', alignItems:'center', justifyContent:'space-between', background:'rgba(8,6,8,0.97)', borderBottom:'0.5px solid rgba(197,160,90,0.08)', backdropFilter:'blur(18px)' }}>
         <Link href="/" style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:20, color:'#c5a05a', textDecoration:'none', fontStyle:'italic' }}>
           Secret<em style={{ fontStyle:'normal' }}>Xperience</em>
         </Link>
         <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-          <Link href="/regulations" style={{ fontSize:12, color:'rgba(255,255,255,0.3)', textDecoration:'none' }}>Regulations</Link>
-          <Link href="/medical" style={{ fontSize:12, color:'rgba(255,255,255,0.3)', textDecoration:'none' }}>Medical</Link>
+          <Link href="/regulations" className="sx-hide-sm" style={{ fontSize:12, color:'rgba(255,255,255,0.3)', textDecoration:'none' }}>Regulations</Link>
+          <Link href="/medical" className="sx-hide-sm" style={{ fontSize:12, color:'rgba(255,255,255,0.3)', textDecoration:'none' }}>Medical</Link>
           <Link href="/advertise" style={{ fontSize:12, color:'rgba(255,255,255,0.3)', textDecoration:'none' }}>Advertise</Link>
           <Link href="/" style={{ fontSize:12, color:'rgba(255,255,255,0.3)', textDecoration:'none' }}>← Home</Link>
         </div>

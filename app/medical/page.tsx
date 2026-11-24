@@ -457,7 +457,7 @@ export default function MedicalPage() {
     <div style={{ background: 'var(--bg)', minHeight: '100vh', color: 'var(--t)', fontFamily: 'var(--sans)' }}>
 
       {/* NAV */}
-      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', height: '64px', position: 'sticky', top: 0, zIndex: 200, background: 'rgba(8,6,18,0.92)', backdropFilter: 'blur(18px)', borderBottom: '0.5px solid var(--b)' }}>
+      <nav className="sx-subnav" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', height: '64px', position: 'sticky', top: 0, zIndex: 200, background: 'rgba(8,6,18,0.92)', backdropFilter: 'blur(18px)', borderBottom: '0.5px solid var(--b)' }}>
         <Link href="/" style={{ fontFamily: 'var(--serif)', fontSize: '28px', color: 'var(--gold)', letterSpacing: '.02em', textDecoration: 'none', filter: 'drop-shadow(0 0 14px rgba(197,160,90,0.35))' }}>
           Secret<em style={{ fontStyle: 'italic', fontWeight: 300 }}>Xperience</em>
         </Link>
@@ -557,7 +557,7 @@ export default function MedicalPage() {
                     <h2 style={{ fontFamily: 'var(--serif)', fontSize: '22px', fontWeight: 500, margin: 0 }}>{country}</h2>
                     <span style={{ fontSize: '12px', color: 'var(--t3)', background: 'var(--bg2)', border: '0.5px solid var(--b)', borderRadius: '10px', padding: '2px 10px' }}>{grouped[country].length} org{grouped[country].length !== 1 ? 's' : ''}</span>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '12px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(320px,100%), 1fr))', gap: '12px' }}>
                     {grouped[country].map((org, i) => {
                       const catColor = CAT_COLORS[org.category] || 'var(--gold)'
                       return (

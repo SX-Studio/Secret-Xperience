@@ -309,18 +309,44 @@ const langPickerScript = `
       dropdown.appendChild(item);
     });
 
+    // In the header, position the menu against the viewport (portalled to <body>)
+    // so the sticky nav can't clip it and it never runs off the screen on phones.
+    function placeDropdown() {
+      if (!inNav) return;
+      var r = btn.getBoundingClientRect();
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var w = Math.min(220, vw - 16);
+      var left = Math.max(8, Math.min(r.right - w, vw - w - 8));
+      var top = r.bottom + 8;
+      var bottomNav = vw <= 768 ? 76 : 16;
+      dropdown.style.position = 'fixed';
+      dropdown.style.top = top + 'px';
+      dropdown.style.left = left + 'px';
+      dropdown.style.right = 'auto';
+      dropdown.style.width = w + 'px';
+      dropdown.style.minWidth = '0';
+      dropdown.style.maxHeight = Math.max(200, vh - top - bottomNav) + 'px';
+      dropdown.style.overflowY = 'auto';
+      dropdown.style.webkitOverflowScrolling = 'touch';
+      dropdown.style.overscrollBehavior = 'contain';
+      dropdown.style.zIndex = '2147483000';
+    }
+
     btn.addEventListener('click', function(e) {
       e.stopPropagation();
       var open = dropdown.style.display !== 'none';
+      if (!open) placeDropdown();
       dropdown.style.display = open ? 'none' : 'block';
     });
+    dropdown.addEventListener('click', function(e) { e.stopPropagation(); });
     document.addEventListener('click', function() { dropdown.style.display = 'none'; });
+    window.addEventListener('resize', function() { if (dropdown.style.display !== 'none') placeDropdown(); });
 
     if (!inNav) {
       wrap.style.cssText = 'position:fixed;bottom:100px;right:24px;z-index:9997;';
     }
     wrap.appendChild(btn);
-    wrap.appendChild(dropdown);
+    (inNav ? document.body : wrap).appendChild(dropdown);
 
     // Restore saved language after GT loads
     if (currentLang !== 'en') {

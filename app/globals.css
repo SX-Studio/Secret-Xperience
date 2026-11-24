@@ -1202,6 +1202,13 @@ footer{background:var(--bg1);border-top:0.5px solid var(--b);padding:2.5rem 1.5r
   .nav-logo{font-size:17px}
   /* !important overrides inline style="display:flex" on the Events link */
   .nav-right .nb:not(.nav-menu-btn){display:none!important}
+  /* Header must fit the screen so the language + look pickers stay reachable:
+     the look button becomes icon-only (🎨) and the logo may shrink. */
+  .sx-look-label{display:none}
+  .sx-look-btn{padding:0!important;width:34px;height:34px;justify-content:center;border-radius:10px!important;font-size:16px!important}
+  #heroThemesNavMount{margin-left:8px!important;flex-shrink:0}
+  .nav-logo{flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  .nav-right{gap:6px}
   .nav-menu-btn{display:flex}
   /* Mobile auth button visible only when logged out (JS adds .show) */
   .mobile-auth-btn.show{display:inline-flex!important;order:-1}
@@ -1756,3 +1763,15 @@ html.pride-mode .t-eyebrow-gold {
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 html.pride-mode ::selection { background: rgba(185,107,216,0.45); }
+
+/* ── Header fit on narrow phones (language + look pickers) ── */
+@media(max-width:430px){
+  nav{padding:0 .6rem!important;gap:4px!important}
+  .nav-logo{font-size:15px;letter-spacing:0;text-overflow:clip}
+  #heroThemesNavMount{margin-left:4px!important}
+  .nav-right{gap:4px}
+  /* Language button: flag + chevron only, the menu shows the full names */
+  #langPickerBtn{padding:0 7px!important;gap:3px!important}
+  #langPickerBtn > span{display:none}
+  .mobile-auth-btn.show{padding:7px 11px!important;font-size:12px!important}
+}

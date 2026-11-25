@@ -51,7 +51,18 @@ const TYPE_FROM_CATEGORY: Record<string, BeType | undefined> = {
 }
 
 // Lap/strip clubs filed under "Gentlemen's Clubs" in venues.ts.
-const STRIP_OVERRIDE = new Set(['Amnesia Night Club', 'Myoo'])
+const STRIP_OVERRIDE = new Set(['Amnesia Night Club', 'Myoo', 'Club Riviera'])
+
+// Directory photos whose subject is a model rather than the venue (owner,
+// 2026-11-25: show interiors only). These cards fall back to the placeholder
+// until an interior photo from the venue's own site is added below.
+const MODEL_PHOTOS = new Set([
+  'Dorsia Club', 'New Club Cocoon', 'Amnesia Night Club', 'Bodytalk', 'Dox', 'Clara Moore', 'Le VIP',
+  'Love Bar Room', 'Mademoiselle X', 'Mary Hash', 'Club Privé 337', 'Club Riviera', 'De Massagerie',
+  'Massage Wereld', 'Janphen Thai Massage', 'Alizée Détente', 'Aphrodite', 'Aqua Massage Sauna', 'Bo Karma',
+  'Jardins Secret', 'Le Hammam', 'Sweetness', 'Vertigo', 'Anna Berry Louise', 'Anna Berry Schuman',
+  'Victoria Secret Garden', 'Abilux Stripclub', "Men's World", "Charlie's Angels Bar", 'Funny Horse Club',
+])
 const CITY_OVERRIDE: Record<string, string> = { 'Pin (Habay)': 'Chiny' }
 
 const FROM_DIRECTORY: BeVenue[] = venues
@@ -63,22 +74,22 @@ const FROM_DIRECTORY: BeVenue[] = venues
     city: CITY_OVERRIDE[v.city] || v.city,
     label: v.category === 'Erotic Massage & Sauna' && !/sauna|hammam/i.test(v.name) ? 'Massage' : undefined,
     website: v.website,
-    image: v.image,
+    image: MODEL_PHOTOS.has(v.name) ? undefined : v.image,
   }))
 
 const EXTRA: BeVenue[] = [
   // ── Swingers clubs ──
   {
     name: 'Acanthus', type: 'Swingers clubs', city: 'Harelbeke', address: 'Brugsesteenweg 24b, 8531 Harelbeke',
-    hours: 'Mon 19:00–02:00 · Fri 18:00–01:00 · Sat 20:00–05:00',
+    hours: 'Mon 19:00–01:00 · Fri 20:00–03:00 · Sat 20:00–05:00 · couple from €80',
     note: 'Calls itself the largest swingers club in Flanders: two dance floors, an erotic cinema, garden, saunas and jacuzzis, and a buffet.',
     website: 'https://www.parenclubacanthus.be/',
     nights: [
-      { day: 1, title: 'Monday night', from: '19:00', to: '02:00' },
-      { day: 5, title: 'Friday night', from: '18:00', to: '01:00' },
+      { day: 1, title: 'Monday night', from: '19:00', to: '01:00' },
+      { day: 5, title: 'Friday night', from: '20:00', to: '03:00' },
       { day: 6, title: 'Saturday night', from: '20:00', to: '05:00' },
     ],
-    source: 'parenclubacanthus.be; vice.com',
+    source: 'parenclubacanthus.be; acanthus.be/nl/events; vice.com',
   },
   { name: 'Eroxx', type: 'Swingers clubs', city: 'Balen', note: 'Swingers club with a disco and a restaurant.', source: 'vrt.be (2025)' },
   { name: 'Cap Hot', type: 'Swingers clubs', city: 'Menen', address: 'Rue de Bousbecque 20, 8930 Menen', note: 'Swingers club, recently extended on the ground floor.', source: 'petitfute.com' },
@@ -117,7 +128,17 @@ const EXTRA: BeVenue[] = [
 
 // Directory entries that EXTRA describes in more detail.
 const FROM_DIRECTORY_ENRICH: Record<string, Partial<BeVenue>> = {
-  'le-frisson': { note: 'Libertine club in the Belgian Ardennes, known for large themed evenings.' },
+  'le-frisson': {
+    address: 'Rue Albert 1er 134, 6810 Pin (Chiny)',
+    note: 'Libertine club in the Belgian Ardennes with a sauna, jacuzzi, mezzanine and themed alcoves; known for large themed evenings.',
+    image: 'https://lefrisson.be/storage/gallery/wp-1278.jpg',
+    website: 'https://lefrisson.be/agenda',
+  },
+  'club-riviera': {
+    address: 'Kortrijksesteenweg 227, 8530 Harelbeke',
+    hours: 'Sun–Thu 17:00–03:00 · Fri–Sat 18:00–05:00',
+    note: "Gentlemen's club near Kortrijk with striptease shows, lap dances and private rooms with jacuzzi; own parking.",
+  },
 }
 
 const extraSlugs = new Set(EXTRA.map(v => v.slug))

@@ -49,6 +49,9 @@ Live at **secretxperience.eu** (and www.secretxperience.eu). Owner email: heyoka
 - Agenda = each venue's `nights` (weekly schedule) + future rows of the `events` table (`active`, `country_code='BE'`), read server-side in `app/nightlife/page.tsx`. Add one-off events via Admin → Events.
 - `NightlifeGrid` (DB listings, category nightlife) only renders when there are listings — it showed "Venues 0" before.
 - Venue websites of EXTRA entries were not fetched (needed approval); photos/hours/events from their own sites still to add.
+- **Owner 2026-11-25: interior photos only.** `MODEL_PHOTOS` in `beNightlife.ts` drops every directory photo whose subject is a model (30 venues) → animated monogram placeholder. Le Frisson uses its own gallery photo (hotlinked from lefrisson.be; card falls back to the placeholder if it fails). Add interior photos per venue in `FROM_DIRECTORY_ENRICH`.
+- **18 real events inserted live** in `events` (source `research`, `source_url` = venue agenda): Acanthus theme nights 27 Nov–31 Dec 2026 + Le Frisson 28 Nov 2026. Weekly `nights` of a venue are hidden on days it has a dated event.
+- `app/nightlife/BelgiumGuide.tsx`: law facts, city guide with fun facts (each linked to its source), first-visit tips, support links. City buttons filter the venue grid via a `bev-city` window event.
 
 ## ⚡ Model of the Month (2026-11-25)
 - `/model-of-the-month` (server page, `app/model-of-the-month/page.tsx`) reads `app/data/modelOfTheMonth.ts`; first entry = current model, older entries show as "Past spotlights". Photos in `public/creators/<slug>/`. Teasers: homepage "All My Links" section (`app/page.tsx`) and `/creators`. In sitemap.

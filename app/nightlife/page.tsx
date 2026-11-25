@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 import NightlifeGrid from './NightlifeGrid'
 import BelgiumVenues, { type AgendaEvent } from './BelgiumVenues'
+import BelgiumGuide from './BelgiumGuide'
 import PremiumBanner from '../components/PremiumBanner/PremiumBanner'
 
 /* ─── Types ─────────────────────────────────────────────── */
@@ -643,6 +644,7 @@ export default async function NightlifePage() {
         <PremiumBanner placement="section" category="nightlife" />
       </div>
       <BelgiumVenues events={events} />
+      <BelgiumGuide />
 
       {listings.length > 0 && <NightlifeGrid listings={listings} />}
 

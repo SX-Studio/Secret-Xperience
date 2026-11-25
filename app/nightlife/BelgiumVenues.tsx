@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { BE_TYPES, BE_VENUES, type BeType, type BeVenue } from '../data/beNightlife'
 
 export interface AgendaEvent {
@@ -39,7 +39,9 @@ function buildAgenda(events: AgendaEvent[], days: number) {
     for (const e of events) {
       if (e.date_start === key) items.push({ key: e.id, title: e.title, venue: e.venue_name || '', city: e.city || '', time: e.time_start || undefined, url: e.website || undefined, oneOff: true })
     }
+    const specialAt = new Set(items.map(i => i.venue))
     for (const v of BE_VENUES) {
+      if (specialAt.has(v.name)) continue
       for (const n of v.nights || []) {
         if (n.day === d.getDay()) items.push({ key: `${v.slug}-${key}-${n.title}`, title: n.title, venue: v.name, city: v.city, time: n.from ? `${n.from}${n.to ? `–${n.to}` : ''}` : undefined, type: v.type, url: v.website, oneOff: false })
       }
@@ -52,6 +54,12 @@ function buildAgenda(events: AgendaEvent[], days: number) {
 function VenueCard({ v }: { v: BeVenue }) {
   const st = TYPE_STYLE[v.type]
   const [imgOk, setImgOk] = useState(!!v.image)
+  const imgRef = useRef<HTMLImageElement>(null)
+  // A hotlinked photo can fail before hydration, when onError is not yet attached.
+  useEffect(() => {
+    const el = imgRef.current
+    if (el && el.complete && el.naturalWidth === 0) setImgOk(false)
+  }, [])
   const Tag = v.website ? 'a' : 'div'
   return (
     <Tag
@@ -62,9 +70,13 @@ function VenueCard({ v }: { v: BeVenue }) {
       <div className="bev-media">
         {imgOk ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={v.image} alt={v.name} loading="lazy" onError={() => setImgOk(false)} />
+          <img ref={imgRef} src={v.image} alt={v.name} loading="lazy" referrerPolicy="no-referrer" onError={() => setImgOk(false)} />
         ) : (
-          <div className="bev-ph"><i className={`ti ${st.icon}`} aria-hidden="true" /></div>
+          <div className="bev-ph">
+            <span className="bev-ph-glow" />
+            <span className="bev-ph-mono" translate="no">{v.name.replace(/^(club|le|la|de|the)\s+/i, '').slice(0, 1)}</span>
+            <i className={`ti ${st.icon}`} aria-hidden="true" />
+          </div>
         )}
         <span className="bev-pill"><i className={`ti ${st.icon}`} aria-hidden="true" /> {v.label || st.short}</span>
         {!!v.nights?.length && <span className="bev-live">Regular nights</span>}
@@ -85,6 +97,12 @@ export default function BelgiumVenues({ events }: { events: AgendaEvent[] }) {
   const [type, setType] = useState<BeType | 'All'>('All')
   const [city, setCity] = useState<string>('All')
   const [showAll, setShowAll] = useState(false)
+
+  useEffect(() => {
+    const onCity = (e: Event) => { setCity((e as CustomEvent<string>).detail); setType('All'); setShowAll(false) }
+    window.addEventListener('bev-city', onCity)
+    return () => window.removeEventListener('bev-city', onCity)
+  }, [])
 
   const cities = useMemo(() => {
     const count: Record<string, number> = {}
@@ -152,7 +170,7 @@ export default function BelgiumVenues({ events }: { events: AgendaEvent[] }) {
       </div>
 
       {/* ── Filters ── */}
-      <div className="bev-filters">
+      <div className="bev-filters" id="bev-venues" style={{ scrollMarginTop: 80 }}>
         <div className="bev-chips" role="tablist" aria-label="Type">
           {(['All', ...BE_TYPES] as const).map(t => (
             <button key={t} type="button" className={`bev-chip${type === t ? ' on' : ''}`} onClick={() => { setType(t); setShowAll(false) }}>
@@ -226,8 +244,12 @@ a.bev-it:hover{background:rgba(255,255,255,.06)}
 .bev-media img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
 .bev-card:hover .bev-media img{transform:scale(1.05)}
 .bev-media::after{content:'';position:absolute;inset:auto 0 0 0;height:45%;background:linear-gradient(transparent,rgba(17,13,19,.85));pointer-events:none}
-.bev-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 25%,color-mix(in srgb,var(--hue) 45%,transparent),transparent 60%),radial-gradient(circle at 80% 85%,color-mix(in srgb,var(--hue) 22%,transparent),transparent 55%),#16111a}
-.bev-ph i{font-size:54px;color:color-mix(in srgb,var(--hue) 85%,#fff);opacity:.85}
+.bev-ph{position:relative;overflow:hidden;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 30% 25%,color-mix(in srgb,var(--hue) 45%,transparent),transparent 60%),radial-gradient(circle at 80% 85%,color-mix(in srgb,var(--hue) 22%,transparent),transparent 55%),#16111a}
+.bev-ph i{position:absolute;right:14px;bottom:12px;font-size:22px;color:color-mix(in srgb,var(--hue) 85%,#fff);opacity:.9;z-index:1}
+.bev-ph-mono{position:relative;z-index:1;font-family:var(--serif,'Cormorant Garamond',serif);font-style:italic;font-size:96px;line-height:1;color:transparent;-webkit-text-stroke:1px color-mix(in srgb,var(--hue) 75%,#fff);text-shadow:0 0 28px color-mix(in srgb,var(--hue) 55%,transparent)}
+.bev-ph-glow{position:absolute;inset:-30%;background:conic-gradient(from 210deg at 50% 50%,transparent 0deg,color-mix(in srgb,var(--hue) 30%,transparent) 60deg,transparent 140deg,color-mix(in srgb,var(--hue) 18%,transparent) 250deg,transparent 330deg);filter:blur(18px);animation:bevSpin 18s linear infinite}
+@keyframes bevSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.bev-ph-glow{animation:none}}
 .bev-pill{position:absolute;top:12px;left:12px;z-index:1;display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:20px;background:rgba(10,8,12,.72);backdrop-filter:blur(8px);color:#fff;font:600 11px var(--sans,'Poppins',sans-serif);border:.5px solid color-mix(in srgb,var(--hue) 60%,transparent)}
 .bev-pill i{color:var(--hue)}
 .bev-live{position:absolute;top:12px;right:12px;z-index:1;padding:5px 10px;border-radius:20px;background:#e0577f;color:#fff;font:700 10px var(--sans,'Poppins',sans-serif);letter-spacing:.06em;text-transform:uppercase}
@@ -249,6 +271,6 @@ a.bev-it:hover{background:rgba(255,255,255,.06)}
   .bev-note{display:none}
   .bev-pill{top:8px;left:8px;padding:4px 8px;font-size:10px}
   .bev-live{display:none}
-  .bev-ph i{font-size:40px}
+  .bev-ph-mono{font-size:64px}
 }
 `

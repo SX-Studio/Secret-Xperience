@@ -10,6 +10,7 @@ import CollabsPromo from './CollabsPromo'
 import AIGirlfriendBanner from './AIGirlfriendBanner'
 import OnlyFansShowcase from '../components/OnlyFansShowcase/OnlyFansShowcase'
 import AIAngelsBanner from '../components/AIAngelsBanner'
+import { CURRENT_MODEL } from '../data/modelOfTheMonth'
 
 export async function generateMetadata() {
   return {
@@ -191,6 +192,16 @@ export default async function CreatorsPage() {
           <div style={{ marginBottom: '2rem' }}>
             <AIAngelsBanner />
           </div>
+
+          {/* Model of the Month spotlight — data in app/data/modelOfTheMonth.ts */}
+          <Link href="/model-of-the-month" style={{ display: 'flex', alignItems: 'center', gap: 18, marginBottom: '2rem', padding: '16px 20px', borderRadius: 16, border: '0.5px solid rgba(197,160,90,0.45)', background: 'linear-gradient(110deg, rgba(197,160,90,0.14), rgba(197,160,90,0.02))', textDecoration: 'none' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={CURRENT_MODEL.avatar} alt="" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '1.5px solid #c5a05a', flexShrink: 0 }} />
+            <span style={{ minWidth: 0 }}>
+              <span style={{ display: 'block', fontSize: 9.5, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.85)', marginBottom: 4 }}>✦ Belgian Model of the Month · {CURRENT_MODEL.month}</span>
+              <span style={{ display: 'block', fontFamily: "'Cormorant Garamond', serif", fontSize: 22, color: '#eef0ff', lineHeight: 1.2 }}><span translate="no" className="notranslate">{CURRENT_MODEL.name}</span> — read her story →</span>
+            </span>
+          </Link>
 
           {/* OnlyFans directory — inherits the neon palette */}
           <div style={{ margin: '0 -1.5rem 3rem' }}>

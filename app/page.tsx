@@ -3201,7 +3201,19 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           <img src="/promos/teknoshadows.jpg" alt="Teknoshadows" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" />
           <span style="position:absolute;top:10px;left:10px;padding:4px 10px;background:rgba(197,160,90,0.92);border-radius:20px;color:#0a0a0a;font:700 9.5px var(--sans);letter-spacing:0.08em;">ALL LINKS</span>
         </a>
+        <a href="https://myslink.app/kimberlyx" target="_blank" rel="noopener noreferrer nofollow" title="KimberlyX — all links" style="display:block;width:200px;height:200px;border-radius:14px;overflow:hidden;position:relative;border:0.5px solid rgba(197,160,90,0.4);box-shadow:0 8px 28px rgba(0,0,0,0.45);flex-shrink:0;transition:transform .15s,border-color .2s;" onmouseover="this.style.transform='translateY(-3px)';this.style.borderColor='rgba(197,160,90,0.8)'" onmouseout="this.style.transform='';this.style.borderColor='rgba(197,160,90,0.4)'">
+          <img src="/onlyfans/kimberlyxxxxxxxx.jpg" alt="KimberlyX" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;" />
+          <span style="position:absolute;top:10px;left:10px;padding:4px 10px;background:rgba(197,160,90,0.92);border-radius:20px;color:#0a0a0a;font:700 9.5px var(--sans);letter-spacing:0.08em;">ALL LINKS</span>
+          <span translate="no" class="notranslate" style="position:absolute;left:0;right:0;bottom:0;padding:22px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,0.85));color:#fff;font:600 13px var(--sans);">KimberlyX</span>
+        </a>
       </div>
+      <a href="/model-of-the-month" style="display:flex;align-items:center;gap:18px;margin-top:1.6rem;padding:14px 18px;max-width:640px;border-radius:14px;border:0.5px solid rgba(197,160,90,0.45);background:linear-gradient(110deg,rgba(197,160,90,0.12),rgba(197,160,90,0.02));text-decoration:none;">
+        <img src="/creators/kimberlyx/portrait.jpg" alt="" loading="lazy" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:1.5px solid #c5a05a;flex-shrink:0;" />
+        <span style="min-width:0;">
+          <span style="display:block;font:700 9.5px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:rgba(197,160,90,0.8);margin-bottom:4px;">✦ Belgian Model of the Month</span>
+          <span style="display:block;font-family:var(--serif);font-size:20px;color:var(--t);line-height:1.2;"><span translate="no" class="notranslate">KimberlyX</span> — read her story →</span>
+        </span>
+      </a>
     </div>
   </section>
 

@@ -20,6 +20,14 @@ export interface ModelPhoto {
   shape: 'portrait' | 'landscape' | 'square'
 }
 
+export interface ModelTeaser {
+  /** Short muted loop (15–20s, H.264 MP4, vertical) in /public/creators/<slug>/. */
+  src: string
+  poster: string
+  /** Where the clip sends the visitor — one of her own channels. */
+  url: string
+}
+
 export interface ModelOfTheMonth {
   slug: string
   name: string
@@ -33,6 +41,7 @@ export interface ModelOfTheMonth {
   cover: string
   photos: ModelPhoto[]
   links: ModelLink[]
+  teasers?: ModelTeaser[]
 }
 
 export const MODELS: ModelOfTheMonth[] = [
@@ -62,6 +71,7 @@ export const MODELS: ModelOfTheMonth[] = [
       { label: 'OnlyFans', url: 'https://onlyfans.com/kimberlyxxxxxxxx', kind: 'onlyfans' },
       { label: 'Instagram', url: 'https://www.instagram.com/kimberlyx.x.x/', kind: 'instagram' },
     ],
+    teasers: [],
   },
 ]
 

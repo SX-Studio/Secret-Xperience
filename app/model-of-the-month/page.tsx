@@ -37,6 +37,11 @@ const CSS = `
   .mom-g { border-radius:14px; overflow:hidden; border:0.5px solid rgba(255,255,255,0.08); }
   .mom-g-portrait { aspect-ratio:3/4; } .mom-g-landscape { aspect-ratio:4/3; } .mom-g-square { aspect-ratio:1; }
   .mom-story p { font-size:15px; line-height:1.85; color:rgba(255,255,255,0.68); margin:0 0 1.2rem; }
+  .mom-teasers { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; }
+  .mom-t { position:relative; display:block; border-radius:14px; overflow:hidden; aspect-ratio:9/16; border:0.5px solid rgba(197,160,90,0.3); background:#111; }
+  .mom-t video { width:100%; height:100%; object-fit:cover; display:block; }
+  .mom-t span { position:absolute; left:0; right:0; bottom:0; padding:28px 14px 12px; background:linear-gradient(transparent,rgba(0,0,0,0.85)); color:#fff; font:600 12.5px var(--sans,'Poppins',sans-serif); }
+  @media(max-width:640px){ .mom-teasers{ grid-auto-flow:column; grid-template-columns:none; grid-auto-columns:62%; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none } .mom-t{ scroll-snap-align:start } }
   @media(max-width:900px){ .mom-hero{grid-template-columns:1fr; gap:2rem} .mom-gallery{grid-template-columns:1fr} }
 `
 
@@ -123,6 +128,20 @@ export default function ModelOfTheMonthPage() {
             ))}
           </div>
         </section>
+
+        {!!m.teasers?.length && (
+          <section style={{ marginBottom: '4rem' }}>
+            <p style={{ fontSize: 10, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(197,160,90,0.7)', margin: '0 0 14px' }}>Teasers</p>
+            <div className="mom-teasers">
+              {m.teasers.map(t => (
+                <a key={t.src} href={t.url} target="_blank" rel="noopener noreferrer nofollow" className="mom-t">
+                  <video src={t.src} poster={t.poster} autoPlay muted loop playsInline preload="metadata" />
+                  <span>See the full video →</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section style={{ textAlign: 'center', padding: '2.6rem 1.5rem', borderRadius: 18, border: '0.5px solid rgba(197,160,90,0.3)', background: 'radial-gradient(ellipse at 50% 0%, rgba(197,160,90,0.12), transparent 70%)', marginBottom: '3rem' }}>
           <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: 'clamp(24px,3vw,34px)', fontWeight: 400, margin: '0 0 .6rem' }}>

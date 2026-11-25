@@ -134,6 +134,27 @@ const FROM_DIRECTORY_ENRICH: Record<string, Partial<BeVenue>> = {
     image: 'https://lefrisson.be/storage/gallery/wp-1278.jpg',
     website: 'https://lefrisson.be/agenda',
   },
+  'club-prive-337': {
+    address: 'Boulevard des Alliés 337, 7700 Mouscron',
+    hours: 'Every day 14:00–05:00 · with or without appointment',
+    note: 'Private champagne bar where hostesses welcome guests in an intimate setting, with a jacuzzi.',
+    image: 'https://leclub337.com/wp-content/uploads/2022/04/600x700_club-337-jacuzzi-copie-1.jpg',
+  },
+  'de-massagerie': {
+    address: 'Ijzerlaan 39-41, 2060 Antwerp',
+    hours: 'Mon–Fri 10:30–22:00 · Sat, Sun & holidays 12:00–22:00',
+    note: 'Massage studio offering erotic and tantra massage in a discreet setting.',
+    image: 'https://static.wixstatic.com/media/c67807_c656edfbd6f84f608a8b376359bdfe38~mv2.jpg/v1/fill/w_640,h_760,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/High-End%20Interior%20Photo%20Edit_edited.jpg',
+  },
+  'bo-karma': {
+    address: 'Rue de Livourne 88, 1050 Brussels',
+    hours: 'Mon–Fri 10:30–20:00 · Sat–Sun 12:00–18:00',
+    note: "Tantric massage salon in Brussels' Louise district, with massages, rituals and workshops.",
+  },
+  'clara-moore': {
+    hours: 'Mon–Fri 11:00–22:00 · Sat–Sun 13:00–19:00',
+    note: 'Wellness centre of about 230 m² near central Brussels with tantric massage, aquamassage, jacuzzi and sauna.',
+  },
   'club-riviera': {
     address: 'Kortrijksesteenweg 227, 8530 Harelbeke',
     hours: 'Sun–Thu 17:00–03:00 · Fri–Sat 18:00–05:00',

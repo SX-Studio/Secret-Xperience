@@ -44,6 +44,12 @@ Live at **secretxperience.eu** (and www.secretxperience.eu). Owner email: heyoka
 - Static HTML in `dangerouslySetInnerHTML` is built at compile time — any `${var}` reference inside it must use variables that exist at JSX render scope, NOT inside useEffect-only scope. Heart buttons (`data-fav-lid`) go in the dynamic `renderCards` useEffect, NOT in the static template.
 - Provider/listing card category routes: `escorts → /escorts`, `companions → /companionship`, `nightlife → /nightlife`, `creators → /creators`, `rentals → /rentals`, `hotels → /hotels`, `events → /events`, `shop → /shop`.
 
+## ⚡ Belgian nightlife directory on /nightlife (2026-11-25)
+- `app/nightlife/BelgiumVenues.tsx` (client) renders right under the hero: agenda of the next 14 days, type chips (Private bars & clubs / Swingers / Saunas & massage / Strip / Fetish), city chips, photo cards. Data: `app/data/beNightlife.ts` = Belgian entries of `app/data/venues.ts` (photos in `/public/ads/venues`) + `EXTRA` venues researched 2026-11-25 from public sources (`source` field per venue; no photos yet → gradient placeholder).
+- Agenda = each venue's `nights` (weekly schedule) + future rows of the `events` table (`active`, `country_code='BE'`), read server-side in `app/nightlife/page.tsx`. Add one-off events via Admin → Events.
+- `NightlifeGrid` (DB listings, category nightlife) only renders when there are listings — it showed "Venues 0" before.
+- Venue websites of EXTRA entries were not fetched (needed approval); photos/hours/events from their own sites still to add.
+
 ## ⚡ Model of the Month (2026-11-25)
 - `/model-of-the-month` (server page, `app/model-of-the-month/page.tsx`) reads `app/data/modelOfTheMonth.ts`; first entry = current model, older entries show as "Past spotlights". Photos in `public/creators/<slug>/`. Teasers: homepage "All My Links" section (`app/page.tsx`) and `/creators`. In sitemap.
 - First model: **KimberlyX** (December 2026), also added as an "ALL LINKS" card → `myslink.app/kimberlyx`. Photos cropped from screenshots of her public Instagram posts supplied by the owner.

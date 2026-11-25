@@ -44,6 +44,13 @@ Live at **secretxperience.eu** (and www.secretxperience.eu). Owner email: heyoka
 - Static HTML in `dangerouslySetInnerHTML` is built at compile time — any `${var}` reference inside it must use variables that exist at JSX render scope, NOT inside useEffect-only scope. Heart buttons (`data-fav-lid`) go in the dynamic `renderCards` useEffect, NOT in the static template.
 - Provider/listing card category routes: `escorts → /escorts`, `companions → /companionship`, `nightlife → /nightlife`, `creators → /creators`, `rentals → /rentals`, `hotels → /hotels`, `events → /events`, `shop → /shop`.
 
+## ⚡ Mobile header + layout audit (2026-11-25, PR #38 → `b79b97d`, LIVE)
+- **Root cause of every clipped header menu:** `#app` (holds only nav + catbar + mobile drawer, ~128px tall) had `z-index:1` = same as the page content, so the page painted over all header dropdowns and the mobile nav drawer. Now `#app{z-index:900}` in `globals.css` (below auth modal 1100 / age gate 2000). ⚠️ Never lower it; a new header dropdown needs no z-index hacks.
+- Language + "Kies jouw look" pickers are portalled to `<body>` and `position:fixed`, clamped to the viewport. On ≤768px the look button is 🎨 only (`.sx-look-label`), language button flag only ≤430px; notif/profile menus become a fixed sheet (`top:72px`, `min(380px,100vw-16px)`), logged-in header shows the avatar only.
+- Subpage headers use `.sx-subnav` (+ `.sx-hide-sm` for secondary links); two-column content+sidebar grids use `.sx-two-col` (stacks ≤900px). Grid `minmax(≥260px,1fr)` → `minmax(min(Npx,100%),1fr)` so 360px phones don't overflow. Reuse these classes on new pages.
+- Audit method: `next build` + `next start` with dummy Supabase env, Playwright at 360/390px over all 73 routes, `sx_age_ok` + `sx_cookie_consent` + `sx_role=visitor` in localStorage to skip overlays. Result: 0 overflow except internal `/bg-preview`. Not covered: pages with real DB content, `.store` (shop/tokens).
+- Open nit: the floating "Pride mode" pill sits above the open mobile drawer.
+
 ## ⚡ Next Session — Resume Here (2026-11-12) — "Best deals" slider on secretxperience.store
 Branch `claude/beautiful-dirac-izob2r` (restarted from `main` after PR #28 merged). Owner asked (Dutch, with a marked screenshot) for a full-width "BEST DEAL / % promo / hot sell" slider of discounted products from several shops/brands, placed **between the store header and the hero**.
 - **DB (migration `20261112_product_deals.sql`, APPLIED live):** `products.deal`, `compare_at_cents` (old price; CHECK > `price_cents`), `deal_label`, `promo_code`, `deal_ends_at`. Additive only.

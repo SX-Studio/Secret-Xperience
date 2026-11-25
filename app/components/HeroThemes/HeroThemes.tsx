@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, CSSProperties, ReactNode } from 'react'
+import { useEffect, useRef, useState, CSSProperties, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 // Visitor-selectable hero styles. A floating 🎨 button lets the visitor pick
@@ -293,7 +293,7 @@ function Mosaic() {
   )
   return (
     <section style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(2rem,5vw,4rem) clamp(1rem,4vw,3.5rem)', background: 'radial-gradient(ellipse 50% 60% at 90% 10%,rgba(180,92,255,.2),transparent 60%),radial-gradient(ellipse 45% 50% at 5% 90%,rgba(197,160,90,.18),transparent 60%),#100a14' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(320px,1fr))', gap: 48, alignItems: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(min(320px,100%),1fr))', gap: 48, alignItems: 'center' }}>
         <div>
           <Headline accent="#d9a5ff" />
           <SearchBar btnBg="linear-gradient(90deg,#b45cff,#ff5c9e)" btnColor="#fff" border="rgba(217,165,255,.35)" max={460} />
@@ -382,6 +382,41 @@ export default function HeroThemes() {
   const [pickerMountEl, setPickerMountEl] = useState<HTMLElement | null>(null)
   const [theme, setTheme] = useState<string>('')
   const [open, setOpen] = useState(false)
+  const btnRef = useRef<HTMLButtonElement | null>(null)
+  const panelRef = useRef<HTMLDivElement | null>(null)
+  const [panelPos, setPanelPos] = useState<{ top: number; left: number; width: number; maxHeight: number } | null>(null)
+
+  // Position the nav dropdown against the viewport so it can never be clipped
+  // by the header or pushed off-screen on narrow phones.
+  useEffect(() => {
+    if (!open) return
+    const place = () => {
+      const b = btnRef.current
+      if (!b) return
+      const r = b.getBoundingClientRect()
+      const vw = window.innerWidth
+      const vh = window.innerHeight
+      const width = Math.min(260, vw - 16)
+      const left = Math.max(8, Math.min(r.left, vw - width - 8))
+      const top = r.bottom + 8
+      const bottomNav = vw <= 768 ? 76 : 16
+      setPanelPos({ top, left, width, maxHeight: Math.max(200, vh - top - bottomNav) })
+    }
+    place()
+    const close = (e: Event) => {
+      const t = e.target as Node
+      if (panelRef.current?.contains(t) || btnRef.current?.contains(t)) return
+      setOpen(false)
+    }
+    window.addEventListener('resize', place)
+    document.addEventListener('click', close)
+    document.addEventListener('touchstart', close, { passive: true })
+    return () => {
+      window.removeEventListener('resize', place)
+      document.removeEventListener('click', close)
+      document.removeEventListener('touchstart', close)
+    }
+  }, [open])
 
   useEffect(() => {
     setMountEl(document.getElementById('heroThemesMount'))
@@ -407,13 +442,15 @@ export default function HeroThemes() {
   const active = THEMES.find(t => t.id === theme)
 
   const inNav = !!pickerMountEl
+  // In the header the panel is portalled to <body> so the sticky nav can't clip it.
+  const renderPanel = (p: ReactNode) => (inNav ? createPortal(p, document.body) : p)
   const picker = (
       <div style={inNav
         ? { position: 'relative', display: 'inline-flex', zIndex: 99999 }
         : { position: 'fixed', left: 18, bottom: 84, zIndex: 99999 }}>
-        {open && (
-          <div style={inNav
-            ? { position: 'absolute', top: 'calc(100% + 8px)', left: 0, background: 'rgba(14,10,16,0.97)', border: '0.5px solid rgba(197,160,90,0.35)', borderRadius: 16, padding: 10, width: 228, boxShadow: '0 20px 60px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', maxHeight: '60vh', overflowY: 'auto' }
+        {open && renderPanel(
+          <div ref={panelRef} style={inNav
+            ? { position: 'fixed', top: panelPos?.top ?? 70, left: panelPos?.left ?? 8, width: panelPos?.width ?? 228, maxHeight: panelPos?.maxHeight ?? '70vh', zIndex: 2147483000, background: 'rgba(14,10,16,0.98)', border: '0.5px solid rgba(197,160,90,0.35)', borderRadius: 16, padding: 10, boxShadow: '0 20px 60px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', overflowY: 'auto', WebkitOverflowScrolling: 'touch', overscrollBehavior: 'contain' }
             : { marginBottom: 10, background: 'rgba(14,10,16,0.97)', border: '0.5px solid rgba(197,160,90,0.35)', borderRadius: 16, padding: 10, width: 228, boxShadow: '0 20px 60px rgba(0,0,0,0.6)', backdropFilter: 'blur(12px)', maxHeight: '60vh', overflowY: 'auto' }
           }>
             <div style={{ fontSize: 10, letterSpacing: '.14em', color: 'rgba(197,160,90,0.7)', textTransform: 'uppercase', padding: '4px 8px 8px' }}>✨ Kies jouw look</div>
@@ -432,10 +469,10 @@ export default function HeroThemes() {
             ))}
           </div>
         )}
-        <button onClick={(e) => { e.stopPropagation(); setOpen(o => !o) }} aria-label="Kies jouw look" style={inNav
+        <button ref={btnRef} className={inNav ? 'sx-look-btn' : undefined} aria-expanded={open} onClick={(e) => { e.stopPropagation(); setOpen(o => !o) }} aria-label="Kies jouw look" style={inNav
           ? { display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(14,10,16,0.85)', border: '0.5px solid rgba(197,160,90,0.4)', borderRadius: 999, padding: '6px 12px', color: '#e8c97e', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', whiteSpace: 'nowrap' }
           : { display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(14,10,16,0.95)', border: '0.5px solid rgba(197,160,90,0.5)', borderRadius: 999, padding: '10px 16px', color: '#e8c97e', fontSize: 13, fontWeight: 600, cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', fontFamily: 'inherit' }}>
-          🎨 {active ? active.name : 'Kies jouw look'}
+          🎨 <span className="sx-look-label">{active ? active.name : 'Kies jouw look'}</span>
         </button>
       </div>
   )

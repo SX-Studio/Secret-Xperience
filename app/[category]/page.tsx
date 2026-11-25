@@ -146,7 +146,7 @@ export default async function CategoryPage({ params }: { params: { category: str
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); }
         .c-nav { display:flex; align-items:center; justify-content:space-between; padding:0 1.5rem; height:64px; position:sticky; top:0; z-index:200; background:rgba(8,6,18,0.92); backdrop-filter:blur(18px); border-bottom:0.5px solid var(--b); }
-        .c-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+        .c-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr)); gap:16px; }
         .c-card { display:block; background:var(--bg1); border:0.5px solid var(--b); border-radius:var(--rl); overflow:hidden; text-decoration:none; transition:border-color .2s,transform .2s; }
         .c-card:hover { border-color:var(--b3); transform:translateY(-2px); }
         .c-card-hero { height:180px; position:relative; display:flex; align-items:flex-end; padding:1rem; }
@@ -165,7 +165,7 @@ export default async function CategoryPage({ params }: { params: { category: str
       <div style={{ background: 'var(--bg)', minHeight: '100vh', color: 'var(--t)' }}>
 
         {/* NAV */}
-        <nav className="c-nav">
+        <nav className="c-nav sx-subnav">
           <Link href="/" style={{ fontFamily: 'var(--serif)', fontSize: '24px', color: 'var(--gold)', letterSpacing: '.02em', textDecoration: 'none', filter: 'drop-shadow(0 0 12px rgba(197,160,90,0.25))' }}>
             Secret<em style={{ fontStyle: 'italic', fontWeight: 300 }}>Xperience</em>
           </Link>
@@ -173,7 +173,7 @@ export default async function CategoryPage({ params }: { params: { category: str
             <Link href="/search" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
               <i className="ti ti-search" style={{ fontSize: '14px' }} /> Browse all
             </Link>
-            <Link href="/events" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Events</Link>
+            <Link href="/events" className="sx-hide-sm" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Events</Link>
             <Link href="/advertise" style={{ height: '34px', padding: '0 14px', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', borderRadius: 'var(--r)', color: '#0a0a0a', fontSize: '13px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
               List service
             </Link>

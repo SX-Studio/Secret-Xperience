@@ -117,7 +117,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: var(--bg); }
         .s-nav { display:flex; align-items:center; justify-content:space-between; padding:0 1.5rem; height:64px; position:sticky; top:0; z-index:200; background:rgba(8,6,18,0.92); backdrop-filter:blur(18px); border-bottom:0.5px solid var(--b); }
-        .s-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; }
+        .s-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr)); gap:16px; }
         .s-card { display:block; background:var(--bg1); border:0.5px solid var(--b); border-radius:var(--rl); overflow:hidden; text-decoration:none; transition:border-color .2s,transform .2s; }
         .s-card:hover { border-color:var(--b3); transform:translateY(-2px); }
         .s-card-hero { height:180px; position:relative; display:flex; align-items:flex-end; padding:1rem; }
@@ -139,7 +139,7 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
       <div style={{ background: 'var(--bg)', minHeight: '100vh', color: 'var(--t)' }}>
 
         {/* NAV */}
-        <nav className="s-nav">
+        <nav className="s-nav sx-subnav">
           <Link href="/" style={{ fontFamily: 'var(--serif)', fontSize: '24px', color: 'var(--gold)', letterSpacing: '.02em', textDecoration: 'none', filter: 'drop-shadow(0 0 12px rgba(197,160,90,0.30))' }}>
             Secret<em style={{ fontStyle: 'italic', fontWeight: 300 }}>Xperience</em>
           </Link>
@@ -147,9 +147,9 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
             <Link href="/discover" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 4 }}>
               <span>✦</span> Discover
             </Link>
-            <Link href="/events" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Events</Link>
-            <Link href="/regulations" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Regulations</Link>
-            <Link href="/medical" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Medical</Link>
+            <Link href="/events" className="sx-hide-sm" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Events</Link>
+            <Link href="/regulations" className="sx-hide-sm" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Regulations</Link>
+            <Link href="/medical" className="sx-hide-sm" style={{ fontSize: '13px', color: 'var(--t2)', textDecoration: 'none' }}>Medical</Link>
             <Link href="/advertise" style={{ height: '34px', padding: '0 14px', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', border: 'none', borderRadius: 'var(--r)', color: '#0a0a0a', fontSize: '13px', fontWeight: 700, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <i className="ti ti-plus" /> List service
             </Link>

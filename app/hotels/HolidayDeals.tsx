@@ -94,7 +94,7 @@ export default function HolidayDeals() {
         <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.4rem,3vw,1.9rem)', fontWeight: 400, margin: 0 }}>{title}</h2>
         <p style={{ fontSize: '13px', color: 'var(--t3)', marginTop: '2px' }}>{sub}</p>
       </div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '18px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(300px,100%),1fr))', gap: '18px' }}>
         {items.map(d => <DealCard key={d.slug} d={d} />)}
       </div>
     </div>
@@ -110,7 +110,7 @@ export default function HolidayDeals() {
           <h2 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(1.4rem,3vw,1.9rem)', fontWeight: 400, margin: 0 }}>Flight + Hotel Deals</h2>
           <p style={{ fontSize: '13px', color: 'var(--t3)', marginTop: '2px' }}>Discover our most popular destinations</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(280px,1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(280px,100%),1fr))', gap: '16px' }}>
           {DESTINATIONS.map(t => (
             <a key={t.slug} href={cityUrl(t)} target="_blank" rel="noopener noreferrer sponsored" className="hd-card" style={{
               position: 'relative', display: 'block', height: '150px', borderRadius: '14px', overflow: 'hidden',

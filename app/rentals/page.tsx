@@ -48,7 +48,7 @@ export default async function RentalsPage() {
       <style>{`
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         .rental-card:hover { transform: translateY(-3px) !important; box-shadow: 0 14px 40px rgba(0,0,0,0.5) !important; border-color: var(--b3) !important; }
-        .rental-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+        .rental-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px,100%), 1fr)); gap: 18px; }
         .loc-pill { height: 36px; padding: 0 14px; border-radius: 20px; border: 0.5px solid var(--b); background: transparent; color: var(--t2); font-size: 13px; white-space: nowrap; display: inline-flex; align-items: center; text-decoration: none; transition: all 0.15s; cursor: pointer; flex-shrink: 0; }
         .loc-pill:hover { background: var(--bg2); color: var(--t); border-color: var(--b2); }
         .loc-pill.active { background: rgba(122,170,238,0.12); color: var(--sapphire); border-color: rgba(122,170,238,0.35); font-weight: 600; }

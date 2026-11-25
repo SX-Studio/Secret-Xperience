@@ -304,6 +304,11 @@ body::before {
 }
 
 #app, main { position: relative; z-index: 1; }
+/* #app only holds the header (nav + category bar + mobile nav drawer). It must
+   sit above the page content, otherwise every header dropdown (language, look,
+   notifications, profile) and the mobile drawer get painted over by the page.
+   Kept below the sidebar overlay stack's modals (auth 1100, age gate 2000). */
+#app { z-index: 900; }
 
 /* ════════════════════════════════════════════════════════════════
    SEMANTIC TYPE ROLES
@@ -1202,6 +1207,18 @@ footer{background:var(--bg1);border-top:0.5px solid var(--b);padding:2.5rem 1.5r
   .nav-logo{font-size:17px}
   /* !important overrides inline style="display:flex" on the Events link */
   .nav-right .nb:not(.nav-menu-btn){display:none!important}
+  /* Header must fit the screen so the language + look pickers stay reachable:
+     the look button becomes icon-only (🎨) and the logo may shrink. */
+  .sx-look-label{display:none}
+  .sx-look-btn{padding:0!important;width:34px;height:34px;justify-content:center;border-radius:10px!important;font-size:16px!important}
+  #heroThemesNavMount{margin-left:8px!important;flex-shrink:0}
+  .nav-logo{flex-shrink:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+  /* Logged-in: avatar only (name + chevron live in the dropdown) */
+  #profileDisplayName,#profileChevron{display:none}
+  #profileBtn{padding:3px!important}
+  /* Notification + profile menus: full-width sheet under the header, scrollable */
+  #notifDropdown,#profileDropdown{position:fixed!important;top:72px!important;left:auto!important;right:8px!important;width:min(380px,calc(100vw - 16px))!important;min-width:0!important;max-width:none!important;max-height:calc(100vh - 160px);overflow-y:auto!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+  .nav-right{gap:6px}
   .nav-menu-btn{display:flex}
   /* Mobile auth button visible only when logged out (JS adds .show) */
   .mobile-auth-btn.show{display:inline-flex!important;order:-1}
@@ -1756,3 +1773,31 @@ html.pride-mode .t-eyebrow-gold {
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 html.pride-mode ::selection { background: rgba(185,107,216,0.45); }
+
+/* ── Header fit on narrow phones (language + look pickers) ── */
+@media(max-width:430px){
+  nav{padding:0 .6rem!important;gap:4px!important}
+  .nav-logo{font-size:15px;letter-spacing:0;text-overflow:clip}
+  #heroThemesNavMount{margin-left:4px!important}
+  .nav-right{gap:4px}
+  /* Language button: flag + chevron only, the menu shows the full names */
+  #langPickerBtn{padding:0 7px!important;gap:3px!important}
+  #langPickerBtn > span{display:none}
+  .mobile-auth-btn.show{padding:7px 11px!important;font-size:12px!important}
+}
+
+/* ── Subpage headers (events, medical, regulations, partners, search) ── */
+@media(max-width:640px){
+  .sx-subnav{padding:0 1rem!important;gap:8px}
+  .sx-subnav > a:first-child{font-size:20px!important;flex-shrink:0;white-space:nowrap}
+  .sx-subnav > div{gap:8px!important;flex-shrink:1;min-width:0}
+  .sx-subnav .sx-hide-sm{display:none!important}
+}
+/* Two-column content + sidebar layouts stack on phones/tablets */
+@media(max-width:900px){
+  .sx-two-col{grid-template-columns:1fr!important}
+}
+/* Stat rows (why-secretxperience): 2×2 on phones instead of 4 squeezed columns */
+@media(max-width:640px){
+  .sx-stat-row{grid-template-columns:repeat(2,minmax(0,1fr))!important;padding:1.25rem!important;gap:1rem!important}
+}

@@ -83,7 +83,7 @@ export default function ContactPage() {
       </div>
 
       <main style={{ maxWidth: 820, margin: '0 auto', padding: '4rem 24px 6rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 280px', gap: 48, alignItems: 'flex-start' }}>
+        <div className="sx-two-col" style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 280px', gap: 48, alignItems: 'flex-start' }}>
 
           {/* Form column */}
           <div>

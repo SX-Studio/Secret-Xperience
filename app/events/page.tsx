@@ -124,13 +124,13 @@ export default function EventsPage() {
     <div style={{ background: 'var(--bg)', minHeight: '100vh', color: 'var(--t)' }}>
 
       {/* NAV */}
-      <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', height: '64px', position: 'sticky', top: 0, zIndex: 200, background: 'rgba(8,6,18,0.92)', backdropFilter: 'blur(18px)', borderBottom: '0.5px solid var(--b)' }}>
+      <nav className="sx-subnav" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 1.5rem', height: '64px', position: 'sticky', top: 0, zIndex: 200, background: 'rgba(8,6,18,0.92)', backdropFilter: 'blur(18px)', borderBottom: '0.5px solid var(--b)' }}>
         <Link href="/" style={{ fontFamily: 'var(--serif)', fontSize: '28px', color: 'var(--gold)', letterSpacing: '.02em', textDecoration: 'none', filter: 'drop-shadow(0 0 14px rgba(197,160,90,0.35))' }}>
           Secret<em style={{ fontStyle: 'italic', fontWeight: 300 }}>Xperience</em>
         </Link>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <Link href="/" style={{ height: '36px', padding: '0 14px', background: 'transparent', border: '0.5px solid var(--b2)', borderRadius: 'var(--r)', color: 'var(--t2)', fontSize: '13px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}><i className="ti ti-arrow-left" /> Browse advertisements</Link>
-          <Link href="/advertise" style={{ height: '36px', padding: '0 16px', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', borderRadius: 'var(--r)', color: '#0a0a0a', fontSize: '13px', fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}><i className="ti ti-plus" /> List an event</Link>
+          <Link href="/" style={{ height: '36px', padding: '0 14px', background: 'transparent', border: '0.5px solid var(--b2)', borderRadius: 'var(--r)', color: 'var(--t2)', fontSize: '13px', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}><i className="ti ti-arrow-left" /> Browse<span className="sx-hide-sm"> advertisements</span></Link>
+          <Link href="/advertise" style={{ height: '36px', padding: '0 16px', background: 'linear-gradient(135deg,var(--gold),var(--goldd))', borderRadius: 'var(--r)', color: '#0a0a0a', fontSize: '13px', fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}><i className="ti ti-plus" /> List <span className="sx-hide-sm">an </span>event</Link>
         </div>
       </nav>
 
@@ -304,7 +304,7 @@ export default function EventsPage() {
                   <span style={{ fontFamily: 'var(--serif)', fontSize: '20px', fontWeight: 500 }}>Featured events</span>
                   <span style={{ fontSize: '12px', color: 'var(--t3)', marginLeft: '4px' }}>{featured.length} events</span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(320px,1fr))', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(320px,100%),1fr))', gap: '1rem' }}>
                   {featured.map(e => <EventCard key={e.id} event={e} />)}
                 </div>
               </div>
@@ -318,7 +318,7 @@ export default function EventsPage() {
                   <span style={{ fontFamily: 'var(--serif)', fontSize: '20px', fontWeight: 500 }}>All events</span>
                   <span style={{ fontSize: '12px', color: 'var(--t3)', marginLeft: '4px' }}>{rest.length} events</span>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(320px,1fr))', gap: '1rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(320px,100%),1fr))', gap: '1rem' }}>
                   {rest.map(e => <EventCard key={e.id} event={e} />)}
                 </div>
               </div>

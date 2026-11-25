@@ -643,7 +643,7 @@ export default async function NightlifePage() {
         <p style={{ fontSize: 13, color: 'var(--t2, rgba(255,255,255,0.45))', maxWidth: 560, lineHeight: 1.7, marginBottom: '1.75rem' }}>
           Gentlemen&apos;s clubs, private bars and erotic massage salons in and around Brussels &amp; Antwerp — each linking to their own site.
         </p>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(260px,1fr))', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(min(260px,100%),1fr))', gap: 12 }}>
           {[
             { emoji: '🥃', name: 'Club Amnesia', desc: 'Gentlemen’s club & bar.', url: 'http://www.clubamnesia.be' },
             { emoji: '🌺', name: 'Anna Berry — Salon Louise', desc: 'Tantric massage centre — Louise district, Brussels.', url: 'http://annaberry.be/en/salon-louise/' },

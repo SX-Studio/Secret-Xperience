@@ -88,7 +88,7 @@ export default function EventDetailPage({ params }: { params: { slug: string } }
       </div>
 
       {/* BODY */}
-      <div style={{ maxWidth: '860px', margin: '0 auto', padding: '3rem 1.5rem 6rem', display: 'grid', gridTemplateColumns: '1fr 280px', gap: '2.5rem', alignItems: 'start' }}>
+      <div className="sx-two-col" style={{ maxWidth: '860px', margin: '0 auto', padding: '3rem 1.5rem 6rem', display: 'grid', gridTemplateColumns: '1fr 280px', gap: '2.5rem', alignItems: 'start' }}>
 
         {/* LEFT */}
         <div>

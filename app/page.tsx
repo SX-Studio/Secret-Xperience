@@ -2289,6 +2289,25 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
       <CategoryAnimations />
 
       <div dangerouslySetInnerHTML={{ __html: `
+  <!-- ══ MODEL OF THE MONTH (data: app/data/modelOfTheMonth.ts — update photo/name here too) ══ -->
+  <style>
+    @media(max-width:640px){
+      .mom-home{background:linear-gradient(90deg,#0c070e 0%,#0c070e 30%,rgba(12,7,14,0.75) 55%,rgba(12,7,14,0.1) 100%),url('/creators/kimberlyx/pink.jpg') right 16%/auto 150% no-repeat #0c070e!important;padding:20px 18px!important;}
+      .mom-home .mom-home-av{display:none!important}
+      .mom-home .mom-home-tx{max-width:56%}
+    }
+  </style>
+  <div style="padding:1.25rem 1.5rem 0.5rem;">
+    <a href="/model-of-the-month" class="mom-home" style="display:flex;align-items:center;gap:18px;max-width:1200px;min-height:170px;margin:0 auto;padding:22px 24px;border-radius:18px;border:0.5px solid rgba(197,160,90,0.55);background:linear-gradient(270deg,rgba(12,7,14,0) 0,rgba(12,7,14,0.35) 190px,#0c070e 410px),url('/creators/kimberlyx/pink.jpg') right 18%/auto 230% no-repeat #0c070e;box-shadow:0 12px 36px rgba(0,0,0,0.5);text-decoration:none;overflow:hidden;transition:border-color .2s,transform .15s;" onmouseover="this.style.borderColor='rgba(197,160,90,0.95)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='rgba(197,160,90,0.55)';this.style.transform=''">
+      <img class="mom-home-av" src="/creators/kimberlyx/portrait.jpg" alt="" loading="lazy" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1.5px solid #c5a05a;flex-shrink:0;" />
+      <span class="mom-home-tx" style="min-width:0;">
+        <span style="display:block;font:700 9.5px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#d8b46a;margin-bottom:6px;">✦ Belgian Model of the Month</span>
+        <span style="display:block;font-family:var(--serif);font-size:clamp(22px,3vw,30px);color:#fff;line-height:1.15;text-shadow:0 2px 12px rgba(0,0,0,0.6);"><span translate="no" class="notranslate">KimberlyX</span></span>
+        <span style="display:inline-block;margin-top:10px;padding:7px 14px;border-radius:8px;background:#c5a05a;color:#0a0a0a;font:600 12px var(--sans);letter-spacing:.03em;">Read her story →</span>
+      </span>
+    </a>
+  </div>
+
   <!-- ══ EDITORIAL HERO ══ -->
   <!-- Visitor-selectable hero styles render here (HeroThemes) -->
   <div id="heroThemesMount"></div>
@@ -3207,13 +3226,6 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
           <span translate="no" class="notranslate" style="position:absolute;left:0;right:0;bottom:0;padding:22px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,0.85));color:#fff;font:600 13px var(--sans);">KimberlyX</span>
         </a>
       </div>
-      <a href="/model-of-the-month" style="display:flex;align-items:center;gap:18px;margin-top:1.6rem;padding:14px 18px;max-width:640px;border-radius:14px;border:0.5px solid rgba(197,160,90,0.45);background:linear-gradient(110deg,rgba(197,160,90,0.12),rgba(197,160,90,0.02));text-decoration:none;">
-        <img src="/creators/kimberlyx/portrait.jpg" alt="" loading="lazy" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:1.5px solid #c5a05a;flex-shrink:0;" />
-        <span style="min-width:0;">
-          <span style="display:block;font:700 9.5px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:rgba(197,160,90,0.8);margin-bottom:4px;">✦ Belgian Model of the Month</span>
-          <span style="display:block;font-family:var(--serif);font-size:20px;color:var(--t);line-height:1.2;"><span translate="no" class="notranslate">KimberlyX</span> — read her story →</span>
-        </span>
-      </a>
     </div>
   </section>
 

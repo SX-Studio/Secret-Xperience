@@ -1,0 +1,109 @@
+/* Twelve worlds — compact rail (layout "H" on the SX – Twelve Worlds canvas)
+   with the site's own category photos. Phone: two rows that swipe sideways.
+   ≥900px: all twelve in a 6×2 grid. */
+
+.wr-section {
+  --wr-accent: #ff1f2e;
+  position: relative;
+  z-index: 1;
+  padding: 2.5rem 1rem 2rem;
+  background: #080404;
+  border-top: 0.5px solid var(--b, rgba(255,255,255,0.08));
+}
+.wr-inner { max-width: 1200px; margin: 0 auto; }
+
+.wr-head {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 12px;
+  padding: 0 4px; margin-bottom: 18px;
+}
+.wr-eyebrow {
+  display: block; margin-bottom: 8px;
+  font-family: var(--sans, system-ui, sans-serif); font-size: 10px; letter-spacing: 0.18em;
+  color: var(--wr-accent);
+}
+.wr-title {
+  margin: 0; font-family: var(--serif, Georgia, serif); font-weight: 600;
+  font-size: clamp(26px, 4vw, 40px); line-height: 1.1; color: #fff;
+}
+.wr-title em {
+  font-style: italic; color: var(--wr-accent);
+  text-shadow: 0 0 14px var(--wr-accent);
+}
+.wr-hint {
+  padding-bottom: 4px; font-family: var(--sans, system-ui, sans-serif);
+  font-size: 10px; letter-spacing: 0.12em; color: #b9aaaa;
+}
+
+.wr-rail {
+  display: grid;
+  grid-template-rows: repeat(2, auto);
+  grid-auto-flow: column;
+  grid-auto-columns: 118px;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -1rem;
+  padding: 0 1rem 4px;
+  scroll-padding: 0 1rem;
+  scrollbar-width: none;
+}
+.wr-rail::-webkit-scrollbar { display: none; }
+
+.wr-card {
+  scroll-snap-align: start;
+  display: block;
+  position: relative;
+  aspect-ratio: 300 / 486;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0b0710;
+  border: 0.5px solid rgba(255,255,255,0.08);
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform .4s cubic-bezier(.2,.8,.4,1), box-shadow .4s, border-color .3s;
+}
+.wr-card:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(0,0,0,0.6); border-color: rgba(197,160,90,0.5); }
+.wr-card:focus-visible { outline: 2px solid #e0c082; outline-offset: 2px; }
+
+.wr-photo {
+  width: 100%; height: 100%; display: block; object-fit: cover;
+  transition: transform .8s cubic-bezier(.2,.8,.4,1);
+}
+.wr-card:hover .wr-photo { transform: scale(1.05); }
+
+.wr-headline {
+  position: absolute;
+  top: 8px; left: 9px; right: 9px;
+  z-index: 2;
+  pointer-events: none;
+  font-family: var(--serif, Georgia, serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.12;
+  opacity: 0.85;
+  text-shadow: 0 2px 10px rgba(0,0,0,.75), 0 0 2px rgba(0,0,0,.5);
+  text-wrap: balance;
+}
+
+@media (min-width: 900px) {
+  .wr-section { padding: 4rem 1.5rem 3.5rem; }
+  .wr-hint { display: none; }
+  .wr-rail {
+    grid-template-rows: none;
+    grid-auto-flow: row;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    overflow: visible;
+    margin: 0; padding: 0;
+  }
+  .wr-card { border-radius: 14px; }
+  .wr-headline { top: 12px; left: 13px; right: 13px; font-size: clamp(15px, 1.4vw, 20px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wr-card, .wr-photo { transition: none; }
+  .wr-card:hover, .wr-card:hover .wr-photo { transform: none; }
+}

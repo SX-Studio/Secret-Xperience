@@ -5,7 +5,7 @@ import SliderAds from './components/SliderAds/SliderAds'
 import PremiumBanner from './components/PremiumBanner/PremiumBanner'
 import JoyBanner from './components/JoyBanner/JoyBanner'
 import LiveBanner from './components/LiveBanner/LiveBanner'
-import CategoryAnimations from './components/CategoryAnimations/CategoryAnimations'
+import WorldsRail from './components/WorldsRail/WorldsRail'
 import UpcomingEventBanner from './components/UpcomingEventBanner'
 import PartnersShowcase from './components/PartnersShowcase/PartnersShowcase'
 import VenuesShowcase from './components/VenuesShowcase'
@@ -2286,7 +2286,7 @@ document.getElementById('msgModal').addEventListener('transitionend',function(){
   </div>
 
 ` }} />
-      <CategoryAnimations />
+      <WorldsRail />
 
       <div dangerouslySetInnerHTML={{ __html: `
   <!-- ══ MODEL OF THE MONTH (data: app/data/modelOfTheMonth.ts — update photo/name here too) ══ -->

@@ -1,5 +1,6 @@
-/* Twelve worlds — neon rail (design "H" on the SX – Twelve Worlds canvas).
-   Phone: two rows that swipe sideways. ≥900px: all twelve in a 6×2 grid. */
+/* Twelve worlds — compact rail (layout "H" on the SX – Twelve Worlds canvas)
+   with the site's own category photos. Phone: two rows that swipe sideways.
+   ≥900px: all twelve in a 6×2 grid. */
 
 .wr-section {
   --wr-accent: #ff1f2e;
@@ -35,9 +36,9 @@
 
 .wr-rail {
   display: grid;
-  grid-template-rows: repeat(2, 118px);
+  grid-template-rows: repeat(2, auto);
   grid-auto-flow: column;
-  grid-auto-columns: 124px;
+  grid-auto-columns: 118px;
   gap: 8px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
@@ -52,27 +53,39 @@
 
 .wr-card {
   scroll-snap-align: start;
-  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-  padding: 10px 8px;
-  border-radius: 14px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: radial-gradient(circle at 50% 38%, rgba(255,31,46,0.3), rgba(255,31,46,0) 62%), #0c0505;
-  text-align: center; text-decoration: none;
-  transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+  display: block;
+  position: relative;
+  aspect-ratio: 300 / 486;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0b0710;
+  border: 0.5px solid rgba(255,255,255,0.08);
+  text-decoration: none;
+  isolation: isolate;
+  transition: transform .4s cubic-bezier(.2,.8,.4,1), box-shadow .4s, border-color .3s;
 }
-.wr-card:hover { border-color: var(--wr-accent); box-shadow: 0 0 0 1px var(--wr-accent), 0 0 28px -8px var(--wr-accent); transform: translateY(-2px); }
-.wr-card:focus-visible { outline: 2px solid var(--wr-accent); outline-offset: 2px; }
+.wr-card:hover { transform: translateY(-3px); box-shadow: 0 18px 40px rgba(0,0,0,0.6); border-color: rgba(197,160,90,0.5); }
+.wr-card:focus-visible { outline: 2px solid #e0c082; outline-offset: 2px; }
 
-.wr-art { width: 96px; height: 62px; overflow: visible; }
-.wr-neon {
-  color: #ffe1e3;
-  filter: drop-shadow(0 0 2px var(--wr-accent)) drop-shadow(0 0 6px var(--wr-accent)) drop-shadow(0 0 12px var(--wr-accent));
+.wr-photo {
+  width: 100%; height: 100%; display: block; object-fit: cover;
+  transition: transform .8s cubic-bezier(.2,.8,.4,1);
 }
-.wr-nt { font-family: var(--sans, system-ui, sans-serif); font-weight: 600; letter-spacing: 1px; }
+.wr-card:hover .wr-photo { transform: scale(1.05); }
 
-.wr-label {
-  font-family: var(--sans, system-ui, sans-serif); font-weight: 600;
-  font-size: 12px; line-height: 1.2; color: #fff;
+.wr-headline {
+  position: absolute;
+  top: 8px; left: 9px; right: 9px;
+  z-index: 2;
+  pointer-events: none;
+  font-family: var(--serif, Georgia, serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 1.12;
+  opacity: 0.85;
+  text-shadow: 0 2px 10px rgba(0,0,0,.75), 0 0 2px rgba(0,0,0,.5);
+  text-wrap: balance;
 }
 
 @media (min-width: 900px) {
@@ -82,16 +95,15 @@
     grid-template-rows: none;
     grid-auto-flow: row;
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    grid-auto-rows: 150px;
     gap: 12px;
     overflow: visible;
     margin: 0; padding: 0;
   }
-  .wr-art { width: 120px; height: 78px; }
-  .wr-label { font-size: 13px; }
+  .wr-card { border-radius: 14px; }
+  .wr-headline { top: 12px; left: 13px; right: 13px; font-size: clamp(15px, 1.4vw, 20px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .wr-card { transition: none; }
-  .wr-card:hover { transform: none; }
+  .wr-card, .wr-photo { transition: none; }
+  .wr-card:hover, .wr-card:hover .wr-photo { transform: none; }
 }

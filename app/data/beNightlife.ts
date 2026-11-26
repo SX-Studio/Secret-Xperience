@@ -155,6 +155,45 @@ const FROM_DIRECTORY_ENRICH: Record<string, Partial<BeVenue>> = {
     hours: 'Mon–Fri 11:00–22:00 · Sat–Sun 13:00–19:00',
     note: 'Wellness centre of about 230 m² near central Brussels with tantric massage, aquamassage, jacuzzi and sauna.',
   },
+  'alizee-detente': {
+    address: 'Avenue de la Floride 152, 1180 Uccle (Brussels)',
+    hours: 'Mon–Fri 10:30–22:00 · Sat 12:00–18:30 · Sun closed',
+    note: 'Massage salon in Uccle offering Nuru, tantric and erotic massage, plus a VIP service.',
+  },
+  vertigo: {
+    hours: 'Mon–Fri 10:00–19:00 · weekends & holidays 13:00–18:00 · by appointment',
+    note: 'Massage studio in Brussels for erotic and tantric sessions with warm oil; exact address shared on booking.',
+    image: 'https://vertigomassage.be/wp-content/uploads/2023/10/salon-massage-vertigo-a-bruxelles.jpg.webp',
+    website: 'https://vertigomassage.be/',
+  },
+  'victoria-secret-garden': {
+    address: 'Nieuwelaan 81, 1860 Meise',
+    hours: 'Mon–Fri 10:00–20:00 · Sat 12:00–20:00 · with or without appointment',
+    note: 'Massage salon offering tantric and erotic massage.',
+  },
+  'aqua-massage-sauna': {
+    address: 'Sint-Bernardusstraat 19, 1060 Sint-Gillis (Brussels)',
+    hours: 'Mon–Fri 11:00–22:00 · Sat–Sun 12:00–22:00',
+    note: 'Massage venue with female and male staff, private rooms and private parking.',
+  },
+  'mary-hash': {
+    city: 'Namur',
+    address: 'Boulevard de la Meuse 68, 5100 Namur',
+    hours: 'Mon–Fri 09:00–18:00 · weekends closed',
+    note: 'Tantric massage centre that calls itself the first of its kind in Belgium.',
+  },
+  bodytalk: { website: undefined, note: 'Website currently offline.' },
+  'janphen-thai-massage': {
+    address: 'Zandpoortvest 29, 2800 Mechelen',
+    hours: 'Mon–Fri 10:00–21:00 · Sat 10:00–18:00',
+    note: 'Salon in central Mechelen offering Thai, body and erotic massage.',
+    website: 'https://www.janphenthaimassage.com/',
+  },
+  'funny-horse-club': {
+    address: 'Rue de Livourne 37, 1050 Brussels',
+    hours: 'Open from 22:00',
+    note: 'Social bar promising a relaxed atmosphere, security and discretion.',
+  },
   'club-riviera': {
     address: 'Kortrijksesteenweg 227, 8530 Harelbeke',
     hours: 'Sun–Thu 17:00–03:00 · Fri–Sat 18:00–05:00',
